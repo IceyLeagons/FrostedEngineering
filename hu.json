@@ -1,6 +1,10 @@
 {
- "country-name": "Hungary",
- "language-name": "Hungarian",
- "translator": "TOTHTOMI",
- "messages": []
+  "country-name": "Hungary",
+  "language-name-en": "Hungarian",
+  "language-name": "Magyar",
+  "translators":
+    [
+      "TOTHTOMI", "G4be_"
+    ],
+  "messages": []
 }
