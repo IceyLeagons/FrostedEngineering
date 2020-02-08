@@ -1,4 +1,6 @@
-[
-"hu.json",
-"en.json"
-]
+{
+  [
+    "hu.json",
+    "en.json"
+  ]
+}
