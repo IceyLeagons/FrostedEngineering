@@ -1,4 +1,4 @@
-# ![Logo](https://pasteboard.co/IVhxHfc.png)
+# ![Logo](//i.imgur.com/qRUtFId.png)
 
 Frosted Engineering is a Minecraft plugin framework desinged to create Minecraft mod like experience in Spigot/Bukkit/Paper.
 However the plugin isn't ready yet.
