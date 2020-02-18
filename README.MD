@@ -19,7 +19,7 @@ worlds:
 
 
 ## Contributing
-If you want to contribute you're at the right plugin, because we have a powerful API to do so. Check our WIKI on that.
+If you want to contribute you're at the right plugin, because we have a powerful API to do so. Check our [wiki](https://github.com/IceyLeagons/FrostedEngineering/wiki) on that.
 
 ## License
 [GNU GPLv3](https://choosealicense.com/licenses/gpl-3.0/)
