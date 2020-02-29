@@ -1,0 +1,12 @@
+eclipse.preferences.version=1
+encoding//src/main/java/net/iceyleagons/frostedengineering/Listeners.java=UTF-8
+encoding//src/main/java/net/iceyleagons/frostedengineering/Main.java=UTF-8
+encoding//src/main/java/net/iceyleagons/frostedengineering/energy/network/components/Storage.java=UTF-8
+encoding//src/main/java/net/iceyleagons/frostedengineering/gui/InventoryFactory.java=UTF-8
+encoding//src/main/java/net/iceyleagons/frostedengineering/items/FrostedItems.java=UTF-8
+encoding//src/main/java/net/iceyleagons/frostedengineering/storage/yaml/Config.java=UTF-8
+encoding//src/main/java/net/iceyleagons/frostedengineering/storage/yaml/DefaultConfig.java=UTF-8
+encoding//src/main/java/net/iceyleagons/frostedengineering/vegetation/genes/types/interfaces/ILeafGene.java=UTF-8
+encoding//src/main/java/net/iceyleagons/frostedengineering/vegetation/genes/types/interfaces/ISplitGene.java=UTF-8
+encoding//src/main/java/net/iceyleagons/frostedengineering/vegetation/genes/types/interfaces/ITrunkGene.java=UTF-8
+encoding//src/main/java/net/iceyleagons/frostedengineering/vegetation/parts/Branch.java=UTF-8

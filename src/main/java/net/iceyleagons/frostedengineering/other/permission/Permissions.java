@@ -1,0 +1,37 @@
+package net.iceyleagons.frostedengineering.other.permission;
+
+public enum Permissions {
+	
+	COMMAND_DEBUG("frostedengineering.command.debug", ParentPermissionType.REGULAR);
+	
+	String perm;
+	ParentPermissionType ppt;
+	
+	Permissions(String perm, ParentPermissionType ppt) {
+		this.perm = perm;
+		this.ppt = ppt;
+	}
+	
+	public String getPermission() {
+		return this.perm;
+	}
+	
+	public ParentPermissionType getParentPermissionType() {
+		return this.ppt;
+	}
+	
+}
+
+enum ParentPermissionType {
+	REGULAR("frostedengineering.user.regular"), MODERATOR("frostedengineering.user.moderator"), ADMIN("frostedengineering.user.admin");
+	
+	String perm;
+	
+	ParentPermissionType(String perm) {
+		this.perm = perm;
+	}
+	
+	public String getPermission() {
+		return this.perm;
+	}
+}
