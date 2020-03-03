@@ -24,18 +24,23 @@ public class MySQL extends Database {
 		this.password = password;
 	}
 
+	static {
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public Connection open() {
 		Main.debug("Opening MySQL connection...");
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
+			
 			this.c = DriverManager.getConnection("jdbc:mysql://" + this.hostname + ":" + this.port + "/" + this.database, this.user, this.password);
 			return c;
 		} catch (SQLException e) {
 			Main.debug("Could not connect to MySQL server!");
 			Main.debug(e);
-		} catch (ClassNotFoundException e) {
-			Main.debug("JDBC drive not found!");
-			Main.debug(e.getMessage());
 		}
 		return this.c;
 	}

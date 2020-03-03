@@ -60,13 +60,12 @@ public class FrostedDimension extends ChunkGenerator {
 						if (chunk.getType(x, y + 1, z) != Material.WATER)
 							chunk.setBlock(x, y, z, noiseData.pointType.blocks.surfaceBlock);
 
-						if (noiseData.pointType.doWater
-								&& chunk.getType(x, noiseData.pointType.offset + chunkBase.waterHeight,
-										z) == Material.AIR
-								|| chunk.getType(x, noiseData.pointType.offset + chunkBase.waterHeight,
-										z) == Material.SNOW) {
+						if ((noiseData.pointType.doWater && chunk.getType(x,
+								noiseData.pointType.offset + chunkBase.waterHeight, z) == Material.AIR)
+								|| (noiseData.pointType.doWater && chunk.getType(x,
+										noiseData.pointType.offset + chunkBase.waterHeight, z) == Material.SNOW)) {
 							for (int i2 = noiseData.pointType.offset
-									+ chunkBase.waterHeight; i >= noiseData.pointType.offset; i--) {
+									+ chunkBase.waterHeight; i2 >= noiseData.pointType.offset; i2--) {
 								Material mat = chunk.getType(x, i2, z);
 								if (mat == Material.AIR || mat == Material.SNOW || mat == Material.SNOW_BLOCK) {
 									if (i2 == noiseData.pointType.offset + chunkBase.waterHeight)

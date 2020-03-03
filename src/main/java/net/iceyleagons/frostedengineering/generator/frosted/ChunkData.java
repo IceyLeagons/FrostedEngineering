@@ -52,6 +52,9 @@ public class ChunkData {
 		ChunkData.erosion = utils.getErosion() != null ? utils.getErosion()
 				: utils.getErosion(mapSize, 1f, 1f, 128, 10f, .01f, .8f, .8f, 01f, 4f, .3f, 4, erosionIterations);
 
+		if (ChunkData.noiser.getSeed() != seed)
+			ChunkData.noiser.setSeed(seed);
+
 		ChunkData.noiser.setNoiseType(NoiseType.PERLIN);
 		ChunkData.noiser.setInterp(Interp.QUINTIC);
 	}

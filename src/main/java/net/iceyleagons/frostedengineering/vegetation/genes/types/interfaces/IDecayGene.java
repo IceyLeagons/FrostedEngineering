@@ -1,6 +1,6 @@
 package net.iceyleagons.frostedengineering.vegetation.genes.types.interfaces;
 
-import net.iceyleagons.frostedengineering.vegetation.Bounds;
+import net.iceyleagons.frostedengineering.utils.math.Bounds;
 
 public interface IDecayGene {
 

@@ -1,5 +1,6 @@
 package net.iceyleagons.frostedengineering.storage.sql.types;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -18,18 +19,24 @@ public class SQLite extends Database {
 		this.user = username;
 		this.password = password;
 	}
+	
+	static {
+		try {
+			Class.forName("org.sqlite.JDBC");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public Connection open() {
 		try {
-			Class.forName("org.sqlite.JDBC");
-			this.c = DriverManager.getConnection("jdbc:sqlite:main.db");
+			new File("plugins/FrostedDatabases").mkdir();
+		
+			this.c = DriverManager.getConnection("jdbc:sqlite:plugins/FrostedDatabases/"+database+".db");
 			return c;
 		} catch (SQLException e) {
 			Main.debug("Could not connect to SQLite database!");
 			Main.debug(e);
-		} catch (ClassNotFoundException e) {
-			Main.debug("JDBC drive not found!");
-			Main.debug(e.getMessage());
 		}
 		return this.c;
 	}

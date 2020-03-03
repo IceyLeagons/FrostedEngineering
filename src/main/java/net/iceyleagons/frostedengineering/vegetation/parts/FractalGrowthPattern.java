@@ -7,10 +7,10 @@ import java.util.List;
 import org.bukkit.util.Vector;
 
 import fastnoise.MathUtils;
+import net.iceyleagons.frostedengineering.vegetation.genes.types.IGenome;
 import net.iceyleagons.frostedengineering.vegetation.genes.types.interfaces.IAngleGene;
 import net.iceyleagons.frostedengineering.vegetation.genes.types.interfaces.IClumpGene;
 import net.iceyleagons.frostedengineering.vegetation.genes.types.interfaces.IDecayGene;
-import net.iceyleagons.frostedengineering.vegetation.genes.types.interfaces.IGenome;
 import net.iceyleagons.frostedengineering.vegetation.genes.types.interfaces.ILeafGene;
 import net.iceyleagons.frostedengineering.vegetation.genes.types.interfaces.IRootGene;
 import net.iceyleagons.frostedengineering.vegetation.genes.types.interfaces.ISplitGene;

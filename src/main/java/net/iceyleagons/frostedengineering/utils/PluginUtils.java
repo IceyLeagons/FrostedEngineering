@@ -19,7 +19,11 @@ package net.iceyleagons.frostedengineering.utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 
 public class PluginUtils {
@@ -41,5 +45,18 @@ public class PluginUtils {
 	public static EntityType randomEntity() {
 		return PluginUtils.spawnerEntityTypes
 				.get(PluginUtils.reusableRandom.nextInt(PluginUtils.spawnerEntityTypes.size()));
+	}
+	
+	public static String serializeLocation(Location loc) {
+		return loc.getX() + ";" + loc.getY() + ";" + loc.getZ() + ";" + loc.getWorld().getUID();
+	}
+	
+	public static Location deserializeLocation(String str) {
+		String[] data = str.split(";");
+		double x = Double.parseDouble(data[0]);
+		double y = Double.parseDouble(data[1]);
+		double z = Double.parseDouble(data[2]);
+		World w = Bukkit.getServer().getWorld(UUID.fromString(data[3]));
+		return new Location(w,x,y,z);
 	}
 }

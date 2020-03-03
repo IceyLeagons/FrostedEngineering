@@ -7,24 +7,25 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import net.iceyleagons.frostedengineering.vegetation.Genes;
 import net.iceyleagons.frostedengineering.vegetation.themes.ITheme;
-import net.iceyleagons.frostedengineering.vegetation.themes.OakTheme;
 
 public abstract class Tree implements ITree {
 
 	private static Random rand = new Random();
 	protected Location seed;
 	protected Vector origin;
-	protected ITheme theme = new OakTheme();
+	protected ITheme theme;
 	protected World world;
 	protected Random random = Tree.rand;
 	protected Player planter;
 
-	public Tree(Player planter, Location seed) {
+	public Tree(Genes gene, Player planter, Location seed) {
 		this.planter = planter;
 		this.origin = seed.toVector();
 		this.seed = seed;
 		this.world = seed.getWorld();
+		this.theme = gene.theme;
 	}
 
 	public boolean hasPlanter() {

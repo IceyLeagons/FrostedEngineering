@@ -1,7 +1,7 @@
 package net.iceyleagons.frostedengineering.vegetation.genes.types.genome;
 
 import fastnoise.MathUtils;
-import net.iceyleagons.frostedengineering.vegetation.Bounds;
+import net.iceyleagons.frostedengineering.utils.math.Bounds;
 import net.iceyleagons.frostedengineering.vegetation.genes.types.interfaces.IDecayGene;
 
 public class DecayGene implements IDecayGene {

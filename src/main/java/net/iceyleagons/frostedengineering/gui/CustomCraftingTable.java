@@ -6,9 +6,7 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import net.iceyleagons.frostedengineering.Main;
@@ -22,8 +20,13 @@ public class CustomCraftingTable {
 	private InventoryFactory fac;
 
 	public CustomCraftingTable(Location loc) {
+		new CustomCraftingTable(loc,false);
+	}
+	
+	public CustomCraftingTable(Location loc, boolean init) {
 		this.loc = loc;
 		list.add(this);
+		if (init == false) Main.STORAGE_MANAGER.CRAFTING_TABLE.addCraftingTable(loc);
 		this.fac = new InventoryFactory("Crafting Table", 54, FrostedItems.INVENTORY_FILLER, false);
 		for (int i = 0; i <= 4; i++) {
 			for (int j = 2; j <= 6; j++) {
@@ -47,7 +50,7 @@ public class CustomCraftingTable {
 					cc.check(fac);
 				});
 			}
-		}, 0L, 10L);
+		}, 0L, 2L);
 		// for (int i = 2; i <= 5; i++) {
 		//
 		// }
@@ -78,6 +81,12 @@ public class CustomCraftingTable {
 			}
 		}
 		return null;
+	}
+	
+	public static void loadFromDatabase() {
+		Main.STORAGE_MANAGER.CRAFTING_TABLE.getCraftingTables().forEach(l -> {
+			new CustomCraftingTable(l, true);
+		});
 	}
 
 }

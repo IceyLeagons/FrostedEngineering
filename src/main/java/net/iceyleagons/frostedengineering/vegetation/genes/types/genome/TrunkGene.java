@@ -3,7 +3,7 @@ package net.iceyleagons.frostedengineering.vegetation.genes.types.genome;
 import org.bukkit.util.Vector;
 
 import fastnoise.MathUtils;
-import net.iceyleagons.frostedengineering.vegetation.Bounds;
+import net.iceyleagons.frostedengineering.utils.math.Bounds;
 import net.iceyleagons.frostedengineering.vegetation.genes.types.interfaces.ITrunkGene;
 import net.iceyleagons.frostedengineering.vegetation.parts.Branch;
 

@@ -10,5 +10,6 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target({ METHOD, TYPE_USE })
 public @interface Achievement {
+	
 
 }

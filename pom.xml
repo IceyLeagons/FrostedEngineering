@@ -52,14 +52,22 @@
 			<artifactId>json</artifactId>
 			<version>20180813</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongo-java-driver</artifactId>
+			<version>2.12.3</version>
+		</dependency>
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot</artifactId>
 			<version>1.14.2</version>
 		</dependency>
 
-
+		<dependency>
+			<groupId>org.reflections</groupId>
+			<artifactId>reflections</artifactId>
+			<version>0.9.12</version>
+		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/javassist/javassist -->
 		<dependency>

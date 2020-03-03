@@ -29,9 +29,11 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import net.iceyleagons.frostedengineering.commands.cmds.SaplingCommand;
 import net.iceyleagons.frostedengineering.energy.helpers.BreakHandler;
 import net.iceyleagons.frostedengineering.energy.helpers.PlacementHandler;
 import net.iceyleagons.frostedengineering.energy.network.EnergyNetwork;
@@ -43,6 +45,8 @@ import net.iceyleagons.frostedengineering.gui.CustomCraftingTable;
 import net.iceyleagons.frostedengineering.items.FrostedItems;
 import net.iceyleagons.frostedengineering.other.Changelog;
 import net.iceyleagons.frostedengineering.other.WebAPI;
+import net.iceyleagons.frostedengineering.Main;
+import net.md_5.bungee.api.ChatColor;
 
 public class Listeners implements Listener {
 
@@ -75,20 +79,24 @@ public class Listeners implements Listener {
 	}
 
 	@EventHandler
+	public void onChat(AsyncPlayerChatEvent e) {
+		e.setMessage(ChatColor.translateAlternateColorCodes('&', e.getMessage()));
+	}
+
+	@EventHandler
 	public void onClick(InventoryClickEvent e) {
 		// if (e.getCursor().hasItemMeta() && e.getCurrentItem().hasItemMeta()) {
 		// if (e.getCursor().getType().equals(e.getCurrentItem().getType())
 		// && e.getCursor().getItemMeta().equals(e.getCurrentItem().getItemMeta())) {
-		if (e.getCursor() == null)
-			return;
-		if (e.getCurrentItem().getType().equals(Material.DIAMOND_HOE)
-				&& e.getCursor().getType().equals(Material.DIAMOND_HOE)) {
-			// if (e.getCurrentItem().getItemMeta().hasCustomModelData() &&
-			// e.getCursor().getItemMeta().hasCustomModelData()) {
-			e.getCurrentItem().setAmount(e.getCursor().getAmount() + e.getCurrentItem().getAmount());
-			e.getCursor().setAmount(0);
-			// }
-		}
+		if (e.getCursor() != null)
+			if (e.getCurrentItem().getType().equals(Material.DIAMOND_HOE)
+					&& e.getCursor().getType().equals(Material.DIAMOND_HOE)) {
+				// if (e.getCurrentItem().getItemMeta().hasCustomModelData() &&
+				// e.getCursor().getItemMeta().hasCustomModelData()) {
+				e.getCurrentItem().setAmount(e.getCursor().getAmount() + e.getCurrentItem().getAmount());
+				e.getCursor().setAmount(0);
+				// }
+			}
 		// }
 		// }
 	}
@@ -107,7 +115,7 @@ public class Listeners implements Listener {
 
 		PlacementHandler.place(e);
 
-		if (e.getItemInHand().equals(FrostedItems.CRAFTING_TABLE)) {
+		if (e.getItemInHand().getItemMeta().equals(FrostedItems.CRAFTING_TABLE.getItemMeta())) {
 			e.getBlockPlaced().setType(Material.BEDROCK);
 			new CustomCraftingTable(e.getBlock().getLocation());
 		}
@@ -115,6 +123,8 @@ public class Listeners implements Listener {
 		if (e.getBlock().getType() == Material.BONE_BLOCK) {
 			// CreativeMode.open(e.getPlayer());// new Install(e.getPlayer()).start();
 		}
+
+		SaplingCommand.rightClick(e);
 	}
 
 	@EventHandler
@@ -152,6 +162,8 @@ public class Listeners implements Listener {
 			e.getBlock().getLocation().getWorld().dropItemNaturally(e.getBlock().getLocation(),
 					FrostedItems.CRAFTING_TABLE.clone());
 			CustomCraftingTable.list.remove(c);
+			Main.STORAGE_MANAGER.CRAFTING_TABLE.removeCraftingTable(e.getBlock().getLocation());
+			
 		}
 	}
 
@@ -166,6 +178,7 @@ public class Listeners implements Listener {
 			CustomCraftingTable c = CustomCraftingTable.getCustomCraftingTable(b.getLocation());
 			if (c != null) {
 				CustomCraftingTable.list.remove(c);
+				Main.STORAGE_MANAGER.CRAFTING_TABLE.removeCraftingTable(c.getLocation());
 			}
 		});
 
@@ -182,6 +195,7 @@ public class Listeners implements Listener {
 			CustomCraftingTable c = CustomCraftingTable.getCustomCraftingTable(b.getLocation());
 			if (c != null) {
 				CustomCraftingTable.list.remove(c);
+				Main.STORAGE_MANAGER.CRAFTING_TABLE.removeCraftingTable(c.getLocation());
 			}
 		});
 	}

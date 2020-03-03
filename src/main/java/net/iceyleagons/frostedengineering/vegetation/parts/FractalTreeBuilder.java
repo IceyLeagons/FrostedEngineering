@@ -12,7 +12,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import net.iceyleagons.frostedengineering.Main;
-import net.iceyleagons.frostedengineering.vegetation.FunctionIterator;
+import net.iceyleagons.frostedengineering.utils.math.FunctionIterator;
+import net.iceyleagons.frostedengineering.vegetation.Genes;
 import net.iceyleagons.frostedengineering.vegetation.Passthrublocks;
 import net.iceyleagons.frostedengineering.vegetation.SegmentIterator;
 
@@ -31,8 +32,8 @@ public class FractalTreeBuilder extends Tree {
 	private Material rootMaterial;
 	private Material leafMaterial;
 
-	public FractalTreeBuilder(Player planter, Location seed, FractalBlueprint blueprint) {
-		super(planter, seed);
+	public FractalTreeBuilder(Genes gene, Player planter, Location seed, FractalBlueprint blueprint) {
+		super(gene, planter, seed);
 
 		this.selfMaterial = theme.getSelfMaterials();
 		this.rootMaterial = theme.getRoot();
@@ -45,8 +46,9 @@ public class FractalTreeBuilder extends Tree {
 	}
 
 	@Override
-	public void growPhased(int phaseTicks) {
-		// Nothing lmao
+	public void growPhased(long delay) {
+		this.delay2 = delay;
+		grow();
 	}
 
 	private List<Branch> getBranches(int n) {
@@ -57,8 +59,7 @@ public class FractalTreeBuilder extends Tree {
 		return this.leafClusters.get(n);
 	}
 
-	@Override
-	public void growInstant() {
+	private void grow() {
 		int phase = 0;
 		boolean finished = false;
 		while (!finished) {
@@ -97,7 +98,12 @@ public class FractalTreeBuilder extends Tree {
 
 			phase++;
 		}
+	}
 
+	@Override
+	public void growInstant() {
+		this.delay2 = 0L;
+		grow();
 	}
 
 	private Set<Location> buildTrunk(Branch branch) {

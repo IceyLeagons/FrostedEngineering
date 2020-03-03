@@ -9,22 +9,24 @@ import java.util.HashMap;
  */
 public enum Biome {
 
-	TAIGA("Taiga", org.bukkit.block.Biome.SNOWY_TAIGA, .45f, VegetationType.TREES),
-	HILLS("Hills", org.bukkit.block.Biome.WOODED_HILLS, .6f, VegetationType.TREES),
-	MOUNTAINS("Mountains", org.bukkit.block.Biome.SNOWY_MOUNTAINS, .8f, VegetationType.BUSHES),
-	TUNDRA("Tundra", org.bukkit.block.Biome.SNOWY_TUNDRA, .275f, VegetationType.BUSHES),
-	WATER("Water", org.bukkit.block.Biome.FROZEN_OCEAN, .15f, VegetationType.NONE);
+	TAIGA("Taiga", org.bukkit.block.Biome.SNOWY_TAIGA, .45f, VegetationType.TREES, .4D),
+	HILLS("Hills", org.bukkit.block.Biome.ICE_SPIKES, .6f, VegetationType.TREES, .3D),
+	MOUNTAINS("Mountains", org.bukkit.block.Biome.SNOWY_MOUNTAINS, .8f, VegetationType.BUSHES, .2D),
+	TUNDRA("Tundra", org.bukkit.block.Biome.SNOWY_TUNDRA, .275f, VegetationType.BUSHES, .2D),
+	WATER("Water", org.bukkit.block.Biome.FROZEN_OCEAN, .155f, VegetationType.TREES, 0.4D);
 
 	public final org.bukkit.block.Biome biome;
 	public final float heightFactor;
 	public final String displayName;
 	public final VegetationType vegetationType;
+	public final double vegetationChance;
 
-	private Biome(String displayName, org.bukkit.block.Biome biome, float value, VegetationType vType) {
+	private Biome(String displayName, org.bukkit.block.Biome biome, float value, VegetationType vType, double vChance) {
 		this.biome = biome;
 		this.heightFactor = value;
 		this.displayName = displayName;
 		this.vegetationType = vType;
+		this.vegetationChance = vChance;
 	}
 
 	public static Biome fromBiome(org.bukkit.block.Biome biome) {

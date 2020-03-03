@@ -16,13 +16,18 @@ public class FrostedItems {
 	
 	
 	public static void init() {
+		/*
+		 * Storage item
+		 */
 		STORAGE = new ItemFactory(Material.COBBLESTONE).setDisplayName("§b§lStorage - §r§b0 FP")
 		.addLoreLine("§fStores: §b0 §fFP")
 		.addLoreLine("§fCapacity: §b500 §fFP")
 		.addLoreLine(" ")
 		.addLoreLine("§7Storage ID §b#0000").build();
 		
-		CRAFTING_TABLE = new ItemFactory(Material.CRAFTING_TABLE).setDisplayName("§b§lFrosted CraftingTable").build();
+		/*
+		 * Inventory filler  item
+		 */
 		
 		ItemStack invf = new ItemStack(Material.DIAMOND_HOE);
 		ItemMeta invfm = invf.getItemMeta();
@@ -31,12 +36,19 @@ public class FrostedItems {
 		INVENTORY_FILLER = invf;
 		
 		
-		
+		/*
+		 * Test crafting for Storage
+		 */
 		
 		RecipeBuilder.createRecipe().name("test").addIngredient('a', new ItemStack(Material.COBBLESTONE))
 		.shape("aaa", "a a", "aaa").type(RecipeType.SHAPED).output(STORAGE.clone())
 		.build();
 		
+		/*
+		 * Crafting Table item,crafting
+		 */
+		
+		CRAFTING_TABLE = new ItemFactory(Material.CRAFTING_TABLE).setDisplayName("§b§lFrosted Crafting Table").build();
 		RecipeBuilder.createRecipe().name("frostedcraftingtable")
 		.addIngredient('l', new ItemStack(Material.LADDER))
 		.addIngredient('c', new ItemStack(Material.CHEST))

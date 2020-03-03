@@ -10,7 +10,6 @@ import javax.annotation.Nullable;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.gui.InventoryFactory;
 
 public class CustomCrafting {
@@ -33,6 +32,7 @@ public class CustomCrafting {
 		return this;
 	}
 
+	private boolean crafted = false;
 	public void check(InventoryFactory fac) {
 		List<ItemStack> inInventory = new ArrayList<ItemStack>(); // recipe
 		ItemStack inputItem = null;
@@ -61,7 +61,20 @@ public class CustomCrafting {
 		if (powerItem == null && this.powerItem == null) {
 			if (inputItem == null && this.inputItem == null) {
 				if (isRecipeSame(inInventory.toArray(new ItemStack[] {}))) {
-					Main.debug("SAME HURRAY!!!!");
+					if (crafted == false) {
+						crafted = true;	
+						fac.setItem(outputItem, 26);
+					} else {
+						if (fac.getSourceInventory().getItem(26) == null) {
+							crafted = false;
+							clear(fac);
+						}
+					}
+				} else {
+					if (crafted==true) {
+						fac.removeItem(26);
+						crafted = false;
+					}
 				}
 			}
 			return;
@@ -70,8 +83,39 @@ public class CustomCrafting {
 		if (powerItem.equals(this.powerItem)) {
 			if (inputItem.equals(this.inputItem)) {
 				if (isRecipeSame(inInventory.toArray(new ItemStack[] {}))) {
-					Main.debug("SAME HURRAY!!!!");
+					if (crafted == false) {
+						crafted = true;	
+						fac.setItem(outputItem, 26);
+					} else {
+						if (fac.getSourceInventory().getItem(26) == null) {
+							crafted = false;
+							clear(fac);
+						}
+					}
+				} else {
+					if (crafted==true) {
+						fac.removeItem(26);
+						crafted = false;
+					}
 				}
+			}
+		}
+	}
+	
+	private void clear(InventoryFactory fac) {
+		for (int i = 0; i <= 4; i++) {
+			for (int j = 2; j <= 6; j++) {
+				if (i > 0) {
+					fac.removeItem(i*9+j);
+				} else {
+					fac.removeItem(j);
+				}
+			}
+			if (i == 2) {
+				fac.removeItem(i*9);
+			}
+			if (i == 4) {
+				fac.removeItem((i+1)*9);
 			}
 		}
 	}

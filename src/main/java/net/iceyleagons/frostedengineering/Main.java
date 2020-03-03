@@ -17,8 +17,10 @@
 package net.iceyleagons.frostedengineering;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
@@ -35,50 +37,118 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.reflections.Reflections;
+import org.reflections.scanners.ResourcesScanner;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 
 import dev.arantes.inventorymenulib.listeners.InventoryListener;
 import net.iceyleagons.frostedengineering.api.APIHandler;
 import net.iceyleagons.frostedengineering.api.EngineersAPI;
 import net.iceyleagons.frostedengineering.commands.CommandManager;
-import net.iceyleagons.frostedengineering.commands.Commands;
 import net.iceyleagons.frostedengineering.energy.network.Unit;
+import net.iceyleagons.frostedengineering.entity.Registry;
+import net.iceyleagons.frostedengineering.generator.frosted.ChunkData;
 import net.iceyleagons.frostedengineering.generator.frosted.FrostedDimension;
 import net.iceyleagons.frostedengineering.generator.nether.NetherGenerator;
+import net.iceyleagons.frostedengineering.gui.CustomCraftingTable;
 import net.iceyleagons.frostedengineering.items.FrostedItems;
 import net.iceyleagons.frostedengineering.modules.ModuleManager;
 import net.iceyleagons.frostedengineering.modules.builtin.ExampleModule;
 import net.iceyleagons.frostedengineering.other.Changelog;
+import net.iceyleagons.frostedengineering.storage.StorageManager;
+import net.iceyleagons.frostedengineering.storage.StorageType;
+import net.iceyleagons.frostedengineering.storage.sql.SQL;
+import net.iceyleagons.frostedengineering.storage.sql.types.altypes.craftingtables.CraftingTablesSQLite;
 import net.iceyleagons.frostedengineering.storage.yaml.CheatConfig;
 import net.iceyleagons.frostedengineering.storage.yaml.Config;
 import net.iceyleagons.frostedengineering.storage.yaml.DefaultConfig;
 import net.iceyleagons.frostedengineering.utils.CustomCrafting;
 import net.iceyleagons.frostedengineering.utils.Metrics;
 import net.iceyleagons.frostedengineering.utils.RecipeBuilder;
-import net.minecraft.server.v1_14_R1.EntityTypes;
 
 public class Main extends JavaPlugin implements CommandExecutor {
 
 	public static Main MAIN;
 	public static ModuleManager MODULE_MANAGER;
+	public static Logger LOGGER;
+	public static CommandManager COMMAND_MANAGER;
+	public static StorageManager STORAGE_MANAGER;
 
 	private static List<Config> configs = new ArrayList<>();
 
 	public static int PLUGIN_ID = 6426; //Used for BStats
-
 	public static boolean DEBUG = true;
+	
 
-	public static Logger LOGGER;
+	/*
+	 * Spigot methods
+	 */
 
 	@Override
 	public void onLoad() {
 		//Registry.registerEntities();
+		Registry.load();
 	}
 
-	public static Config getConfig(String name) {
-		for (Config c : configs)
-			if (c.getName().equalsIgnoreCase(name))
-				return c;
-		return null;
+	@Override
+	public void onEnable() {
+		MAIN = this;
+		LOGGER = this.getLogger();
+		printLogo();
+
+		//=-=-=Init stuff=-=-=//
+		initConfigs();
+		SQL s = new SQL(this, StorageType.SQLITE);
+		s.sqlite.open();
+		
+		STORAGE_MANAGER = new StorageManager("FrostedEngineering", "Asdf1234", "craftingtables", null, null, StorageType.SQLITE);
+		
+		setupCommands();
+		initModules();
+		startSchedulers();
+		new Listeners(MAIN);
+		new InventoryListener(MAIN);
+		setupCustomItemsAndCrafting();
+		startDimensionGeneration();
+
+		CustomCraftingTable.loadFromDatabase();
+		
+		
+		//=-=-=Web stuff=-=-=//
+		//WebAPI.getAvailableLanguages();
+		new Metrics(this, PLUGIN_ID);
+
+		//=-=-=API stuff=-=-=//
+		Bukkit.getServicesManager().register(EngineersAPI.class, new APIHandler(), MAIN, ServicePriority.High);
+
+		Changelog.populateBook();
+	}
+
+	@Override
+	public void onDisable() {
+
+	}
+
+	/*
+	 * Initializing
+	 */
+
+	private void setupCustomItemsAndCrafting() {
+		FrostedItems.init();
+		new CustomCrafting(null, new ItemStack(Material.DIRT), null,
+				new String[] { "lllll", "aaaaa", "aaaaa", "aaaaa", "aaaaa" })
+						.addIngredient('l', new ItemStack(Material.LADDER))
+						.addIngredient('a', new ItemStack(Material.AIR));
+	}
+
+	private void initModules() {
+		MODULE_MANAGER = new ModuleManager();
+		MODULE_MANAGER.registerModule(new ExampleModule());
+		MODULE_MANAGER.enableModules();
+
 	}
 
 	private void initConfigs() {
@@ -88,39 +158,7 @@ public class Main extends JavaPlugin implements CommandExecutor {
 		configs.forEach(c -> c.init());
 	}
 
-	public static EntityTypes<?> CUSTOM;
-	
-	@Override
-	public void onEnable() {
-		MAIN = this;
-
-		printLogo();
-		LOGGER = this.getLogger();
-
-		initConfigs();
-
-		MODULE_MANAGER = new ModuleManager();
-		MODULE_MANAGER.registerModule(new ExampleModule());
-		MODULE_MANAGER.enableModules();
-
-		CommandManager c = new CommandManager(MAIN, "[FrostedEngineering - Help]", "frostedengineering", "frostedengineering", "fe");
-		c.loadCommandClass(Commands.class);
-		
-		
-		new CustomCrafting(null, null, null, new String[] {"lllll","aaaaa","aaaaa","aaaaa","aaaaa"})
-		.addIngredient('l', new ItemStack(Material.LADDER))
-		.addIngredient('a', new ItemStack(Material.AIR));
-		
-		//WebAPI.getAvailableLanguages();
-		new Metrics(this, PLUGIN_ID);
-		new InventoryListener(MAIN);
-		FrostedItems.init();
-		Bukkit.getServicesManager().register(EngineersAPI.class, new APIHandler(), MAIN, ServicePriority.High);
-		//PaginatedGUI.prepare(this);
-
-		getCommand("tpxd").setExecutor(this);
-
-		new Listeners(MAIN);
+	private void startSchedulers() {
 		Bukkit.getScheduler().runTaskTimer(this, () -> {
 			Unit.tickListeners.forEach(l -> {
 				l.onTick();
@@ -141,6 +179,16 @@ public class Main extends JavaPlugin implements CommandExecutor {
 			}
 
 		});
+	}
+
+	private void startDimensionGeneration() {
+		Bukkit.getConsoleSender().sendMessage("§e§lWarming up generator for usage.");
+
+		for (int i = 0; i < 100; i++) {
+			@SuppressWarnings("unused")
+			ChunkData tempChunkData = new ChunkData(10, 10, 0L);
+			tempChunkData = null;
+		}
 
 		Bukkit.getConsoleSender().sendMessage("§e§lGenerating Frosted Dimension, this may take a while");
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
@@ -161,9 +209,44 @@ public class Main extends JavaPlugin implements CommandExecutor {
 			}
 
 		});
-
-		Changelog.populateBook();
 	}
+
+	private void setupCommands() {
+		COMMAND_MANAGER = new CommandManager(MAIN, "[FrostedEngineering - Help]", "frostedengineering",
+				"frostedengineering", "fe");
+
+		List<ClassLoader> cll = new LinkedList<ClassLoader>();
+		cll.add(ClasspathHelper.contextClassLoader());
+		cll.add(ClasspathHelper.staticClassLoader());
+
+		Reflections r = new Reflections(
+				new ConfigurationBuilder().setScanners(new SubTypesScanner(false), new ResourcesScanner())
+						.setUrls(ClasspathHelper.forClassLoader(cll.toArray(new ClassLoader[0])))
+						.filterInputsBy(new FilterBuilder()
+								.include(FilterBuilder.prefix("net.iceyleagons.frostedengineering.commands.cmds"))));
+		Set<Class<?>> classes = r.getSubTypesOf(Object.class);
+		classes.forEach(clazz -> {
+			COMMAND_MANAGER.loadCommandClass(clazz);
+		});
+
+		getCommand("tpxd").setExecutor(this);
+
+	}
+
+	/*
+	 * Getters
+	 */
+
+	public static Config getConfig(String name) {
+		for (Config c : configs)
+			if (c.getName().equalsIgnoreCase(name))
+				return c;
+		return null;
+	}
+
+	/*
+	 * Logo printing
+	 */
 
 	private void printLogo() {
 		Bukkit.getConsoleSender().sendMessage(
@@ -178,6 +261,10 @@ public class Main extends JavaPlugin implements CommandExecutor {
 		Bukkit.getConsoleSender().sendMessage(" ");
 	}
 
+	/*
+	 * Debugging
+	 */
+
 	public static void debug(String s) {
 		if (!DEBUG)
 			return;
@@ -191,11 +278,6 @@ public class Main extends JavaPlugin implements CommandExecutor {
 		Bukkit.broadcastMessage("§b[FrostedEngineering - DEBUG](Exception) §c" + e.getMessage());
 		System.out.println("[FrostedEngineering - DEBUG](Exception) ");
 		e.printStackTrace();
-	}
-
-	@Override
-	public void onDisable() {
-
 	}
 
 	@Override

@@ -283,11 +283,13 @@ public class CommandManager implements TabCompleter, CommandExecutor {
 						return CommandFinished.NOCONSOLE;
 
 					// Check for the "op" argument and permission argument
+					if (!PermissionManager.hasPermission(sender, bestFit.permission())) return CommandFinished.PERMISSION;
+					
+					/*
 					if((bestFit.only() == CommandOnly.OP ? !sender.isOp() : false) ||
 							(bestFit.permission() != null ? !sender.hasPermission(permissionScheme + "." + bestFit.permission()) : false))
 						return CommandFinished.PERMISSION;
-					
-					if (!PermissionManager.hasPermission(sender, bestFit.permission())) return CommandFinished.PERMISSION;
+					*/
 
 					// Split up the args; arguments in quotes count as a single argument.
 					List<Object> cmdArgList = new ArrayList<Object>();

@@ -9,8 +9,8 @@ public class SQL {
 	
 	Main main = null;
 	private StorageType type;
-	MySQL mySQL;
-	SQLite sqlite;
+	public MySQL mySQL;
+	public SQLite sqlite;
 	
 	public SQL(Main main, StorageType type) {
 		this.main = main;
@@ -25,7 +25,7 @@ public class SQL {
 			mySQL = new MySQL("","","","","");
 			break;
 		case SQLITE:
-			sqlite = new SQLite("", "", "");
+			sqlite = new SQLite("main", "FrostedEngineering", "test1234"); //Main is used for 
 			break;
 		default:
 			break;

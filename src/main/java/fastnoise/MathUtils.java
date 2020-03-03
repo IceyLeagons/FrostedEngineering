@@ -4,7 +4,7 @@ import java.util.Random;
 
 import org.bukkit.util.Vector;
 
-import net.iceyleagons.frostedengineering.vegetation.Range;
+import net.iceyleagons.frostedengineering.utils.math.Range;
 
 // 2/26/2020 In the progress of making this a central utility
 // 2/26/2020 Implemented Erosion inside here
