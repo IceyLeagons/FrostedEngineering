@@ -1,12 +1,235 @@
-
 <!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <title>Frosted Engineering</title>
 
-<html>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<body>
+  <link rel="stylesheet" href="style.css" type="text/css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="parallax.min.js"></script>
 
-<p>Documentation</p>
+  <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
 
-</body>
 
-</html>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
+</head>
+
+<body style="overflow-x: hidden;">
+  <script>AOS.init();</script>
+  <script>
+  window.setTimeout(function(){
+    $(window).resize();
+  },500);
+  </script>
+  <section class="hero-image" data-parallax="scroll" data-image-src="images/header.png">
+    <div class="hero-text" data-aos="fade-up" data-aos-anchor-placement="top-bottom" data-aos-duration="2000">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-4 col-md-2">
+          </div>
+          <div class="col-14 col-md10">
+            <h1 class="display-2">Frosted Engineering</h1>
+            <h2 class="display-6">Simple modding in Vanilla</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!--About-->
+  <img src="images/whitewave.png" style="position: relative; top: -40px; height: 80px; width: 120%;"></img>
+  <section class="page-element white" style="min-height: 30%; height: auto; width: 100%;">
+    <div class="container-fluid text-center">
+      <div class="row text-center">
+        <div class="col-12 space" data-aos="fade-right" data-aos-anchor-placement="top-bottom" data-aos-duration="2000">
+          <b><h1 class="display-5"><b>About FrostedEngineering</b></h1></b>
+          <br>
+        </div>
+        <div class="col-12 space" data-aos="fade-left" data-aos-anchor-placement="top-bottom" data-aos-duration="2000">
+          <h5 class="resp-text">FrostedEngineering is a Minecraft plugin framework designed to create Minecraft mod like experience in Spigot/Bukkit/Paper.</h5>
+          <h5 class="resp-text">The plugin offeres a modular API system, which allows you to create/install new "mods".</h5>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!--Features-->
+  <section class="page-element white" style="min-height: 70%; height: auto; width: 100%;">
+    <div class="container-fluid text-center">
+      <div class="row text-center">
+        <div class="col-12 space">
+          <b><h1 class="display-5" data-aos="fade-right" data-aos-anchor-placement="top-bottom" data-aos-duration="2000"><b>What does FrostedEngineering offer?</b></h1></b>
+          <br>
+        </div>
+        <div class="col-12 space">
+        </div>
+        <!-- Offer row one -->
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+          <div class="card-transparent" style="border: none;" data-aos="zoom-in" data-aos-anchor-placement="top-bottom" data-aos-duration="2500">
+            <img class="card-img-top rounded mx-auto d-block" src="images/modular.png" style="width: 100px; height: 100px;"></img>
+            <h3>Modularity</h3>
+            <p>Want to disable or just enable more features?<br>You can simply install modules to add even more features.</p>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+          <div class="card-transparent" style="border: none;" data-aos="zoom-in" data-aos-anchor-placement="top-bottom" data-aos-duration="2500">
+            <img class="card-img-top rounded mx-auto d-block" src="images/checkmark.png" style="width: 100px; height: 100px;"></img>
+            <h3>Easy-to-use</h3>
+            <p>Both the installing and setting up the plugin is very easy.<br>We kept things user-friendly and understandable.</p>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+          <div class="card-transparent" style="border: none;" data-aos="zoom-in" data-aos-anchor-placement="top-bottom" data-aos-duration="2500">
+            <img class="card-img-top rounded mx-auto d-block" src="images/update.png" style="width: 100px; height: 100px;"></img>
+            <h3>Frequent Updates</h3>
+            <p>The plugin receives updates about every single week.<br>These could be minor or even major fixes/updates.</p>
+          </div>
+          <br>
+        </div>
+        <br>
+        <!-- Offer row two -->
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 space">
+          <div class="card-transparent" style="border: none;" data-aos="zoom-in" data-aos-anchor-placement="top-bottom" data-aos-duration="2500">
+            <img class="card-img-top rounded mx-auto d-block" src="images/api.png" style="width: 100px; height: 100px;"></img>
+            <h3>Powerful API</h3>
+            <p>Are you a developer and you want to access our features?<br>You're in the right place, we have an API built in for you.</p>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 space">
+          <div class="card-transparent" style="border: none;" data-aos="zoom-in" data-aos-anchor-placement="top-bottom" data-aos-duration="2500">
+            <img class="card-img-top rounded mx-auto d-block" src="images/joystick.png" style="width: 100px; height: 100px;"></img>
+            <h3>Unique Experience</h3>
+            <p>This plugin offeres a very advanced mod experience but in Vanilla!<br>Try it out today!.</p>
+          </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 space">
+          <div class="card-transparent" style="border: none;" data-aos="zoom-in" data-aos-anchor-placement="top-bottom" data-aos-duration="2500">
+            <img class="card-img-top rounded mx-auto d-block" src="images/open-source.png" style="width: 100px; height: 100px;"></img>
+            <h3>Open Source</h3>
+            <p>Yes you heard it right, this plugin is open source and<br>distributed under the GNU GPv3 License.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <img src="images/whitewave2.png" style="width: 100%; height: 50px; position: relative; top: 30px; left: -2px;"></img>
+  <!--asd-->
+
+
+  <script type="text/javascript" src="responsiveslides.min.js"></script>
+  <section class="page-element" data-parallax="scroll" data-image-src="images/nether.png" style="min-height: 30%; height: 90%; width: 100%; color: white; border-top: 1px solid black;">
+    <div class="container-fluid text-center">
+      <div class="row text-center" data-aos="fade-left" data-aos-anchor-placement="top-bottom" data-aos-duration="2000">
+        <div class="col-12 space">
+          <b><h1 class="display-5"><b>Features of FrostedEngineering</b></h1></b>
+          <br>
+        </div>
+        <div class="col-12 space text-center align-middle">
+          <h5 class="resp-text">Altough we can show you, it is best to experience it in-game!</h5>
+          <hr style="width: 25%;">
+          <center>
+            <div class="slide" style="width: 50%;">
+              <div>
+                <p>We've made our own Dimension! In it you'll find stuff that are required to craft&achieve something.</p>
+                <iframe width="600" height="400" allowfullscreen style="border-radius: 10px; overflow: hidden;" src="https://cdn.pannellum.org/2.5/pannellum.htm#panorama=https%3A//i.imgur.com/aA7nd8N.jpg&title=Frosted%20Dimension&author=G4be_&autoLoad=true"></iframe>
+              </div>
+              <div><p>asd2</p></div>
+            </div>
+          </center>
+          <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick.css">
+          <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.9.0/slick-theme.css">
+          <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js"></script>
+          <script>
+          $('.slide').slick();
+          </script>
+          <!--https://pannellum.org/documentation/overview/tutorial/-->
+
+        </div>
+      </div>
+    </div>
+  </section>
+  <img src="images/whitewave.png" style="width: 100%; height: 50px; position: relative; top: -30px;"></img>
+  <!--Download-->
+  <section class="page-element white" style="min-height: 30%; height: auto; width: 100%;">
+    <div class="container-fluid text-center">
+      <div class="row text-center">
+        <div class="col-12 space" data-aos="fade-down" data-aos-anchor-placement="top-bottom" data-aos-duration="2000">
+          <b><h1 class="display-5"><b>Try it out! It's completely free!</b></h1></b>
+          <br>
+          <p>Start exploring or creating something new!</p>
+        </div>
+        <div class="col-12 space">
+        </div>
+      </div>
+      <div class="row text-center">
+        <div class="col-4"></div>
+        <div class="col-2" data-aos="fade-right" data-aos-anchor-placement="top-bottom" data-aos-duration="2000">
+          <a href="#" class="btn btn-dark">I'm a server owner</a>
+        </div>
+        <div class="col-2 " data-aos="fade-left" data-aos-anchor-placement="top-bottom" data-aos-duration="2000">
+          <a href="#" class="btn btn-dark">I'm  a  developer</a>
+        </div>
+        <div class="col-4"></div>
+      </div>
+    </div>
+  </section>
+  <hr style="width: 40%;">
+  <!-- Our Team -->
+  <section class="page-element white" style="min-height: 30%; height: 50%; width: 100%;">
+    <div class="container-fluid text-center">
+      <div class="row text-center">
+        <div class="col-12 space" data-aos="fade-right" data-aos-anchor-placement="top-bottom" data-aos-duration="2000">
+          <b><h1 class="display-5"><b>Frosted Engineering team</b></h1></b>
+          <br>
+        </div>
+        <div class="col-12 space">
+          <h5 class="resp-text" data-aos="fade-down" data-aos-anchor-placement="top-bottom" data-aos-duration="2000">We always wanted to create something useful and fun.</h5>
+          <div class="row text-center" style=" color: white;">
+            <div class="col-6 " data-aos="fade-right" data-aos-anchor-placement="top-bottom" data-aos-duration="2000">
+              <div class="card bg-dark">
+                <div class="card-body">
+                  <h5 class="card-title">G4be_</h5>
+                  <div class="card-text">
+                    <p>Java Developer, Quality Assurance, Lead tester</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-6" data-aos="fade-left" data-aos-anchor-placement="top-bottom" data-aos-duration="2000">
+              <div class="card bg-dark">
+                <div class="card-body">
+                  <h5 class="card-title">TOTHTOMI</h5>
+                  <div class="card-text">
+                    <p>Java Developer, Web Developer, Community Manager</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <img src="images/whitewave2.png" style="width: 100%; height: 50px; position: relative; top: 30px; left: -2px;"></img>
+  <section class="page-element" data-parallax="scroll" data-image-src="images/footer.png" style="min-height: 15%; height: 15%; width: 100%; color: white; border-top: 1px solid black;">
+    <div class="container-fluid text-center">
+      <div class="row text-center" data-aos="fade-up" data-aos-anchor-placement="top-bottom" data-aos-duration="2000">
+        <div class="col-12 space">
+          <b><h6 class="display-5"><b>Copyright © IceyLeagons 2020 - All Rights Reserved.</b></h1></b>
+            <br>
+            <a href="#" class="btn btn-info">Back to Main Page</a>
+            <br>
+          </div>
+          <div class="col-12 space">
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+  </html>

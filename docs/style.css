@@ -1,0 +1,114 @@
+body, html {
+  height: 100%;
+}
+
+.page-element {
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+/* If the screen size is 601px wide or more, set the font-size of <div> to 80px */
+@media screen and (min-width: 601px) {
+  .resp-text {
+    font-size: 15pt;
+  }
+}
+
+/* If the screen size is 600px wide or less, set the font-size of <div> to 30px */
+@media screen and (max-width: 600px) {
+  .resp-text {
+    font-size: 8pt;
+  }
+}
+.row {
+  position: relative;
+  top: 50px;
+}
+
+.white {
+  background-color: #fff;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+@media only screen and (max-device-width: 1366px) {
+  .hero-image {
+    background-attachment: scroll;
+  }
+}
+
+/* The hero image */
+.hero-image {
+  /* Use "linear-gradient" to add a darken background effect to the image (photographer.jpg). This will make the text easier to read */
+  /*background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("header.png");
+
+  /* Set a specific height */
+  height: 100%;
+
+  /* Position and center the image to scale nicely on all screens */
+  /*  background-attachment: fixed;*/
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;*/
+  position: relative;
+}
+
+.image {
+    /* Use "linear-gradient" to add a darken background effect to the image (photographer.jpg). This will make the text easier to read */
+    /*background-image: linear-gradient
+    (rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("header.png");
+    /* Set a specific height */
+    background-image: url("whitewave3.png");
+    height: 50px;
+
+    /* Position and center the image to scale nicely on all screens */
+    /*  background-attachment: fixed;*/
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;*/
+    position: relative;
+    top: -30px;
+
+}
+
+/* Place text in the middle of the image */
+.hero-text {
+  text-align: left;
+  position: relative;
+  top: 30%;
+  color: white;
+}
+
+.rslides {
+  position: relative;
+  list-style: none;
+  overflow: hidden;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.rslides li {
+  -webkit-backface-visibility: hidden;
+  position: absolute;
+  display: none;
+  width: 100%;
+  left: 0;
+  top: 0;
+}
+
+.rslides li:first-child {
+  position: relative;
+  display: block;
+  float: left;
+}
+
+.rslides img {
+  display: block;
+  height: auto;
+  float: left;
+  width: 100%;
+  border: 0;
+}
