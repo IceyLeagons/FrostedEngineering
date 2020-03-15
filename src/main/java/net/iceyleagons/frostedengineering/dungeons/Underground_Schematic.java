@@ -34,8 +34,7 @@ public class Underground_Schematic {
 				for (int z = 1; z <= 13; z++) {
 					world.setBlock(offset, Material.ANDESITE);
 					switch (y) {
-					case 1:
-
+					case 1: {
 						switch (x) {
 						case 1: {
 							switch (z) {
@@ -161,7 +160,360 @@ public class Underground_Schematic {
 								break;
 							}
 						}
+						case 4: {
+							switch (z) {
+							case 1:
+							case 2: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 3: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 4: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 5: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 6: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 7: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 8: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 9: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 10: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 11: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 12: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 13: {
+								offset.add(new Vector(0, 0, -14));
+							}
+							default:
+								break;
+							}
 						}
+						case 5: {
+							switch (z) {
+							case 1:
+							case 2: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 3: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 4: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 5: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 6: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 7: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 8: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 9: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 10: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 11: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 12: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 13: {
+								offset.add(new Vector(0, 0, -14));
+							}
+							default:
+								break;
+							}
+						}
+						case 6: {
+							world.setBlock(offset, Material.POLISHED_GRANITE);
+						}
+						case 7: {
+							world.setBlock(offset, Material.POLISHED_GRANITE);
+						}
+						case 8: {
+							world.setBlock(offset, Material.POLISHED_GRANITE);
+						}
+						case 9: {
+							switch (z) {
+							case 1:
+							case 2: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 3: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 4: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 5: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 6: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 7: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 8: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 9: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 10: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 11: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 12: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 13: {
+								offset.add(new Vector(0, 0, -14));
+							}
+							default:
+								break;
+							}
+						}
+						case 10: {
+							switch (z) {
+							case 1:
+							case 2: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 3: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 4: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 5: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 6: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 7: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 8: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 9: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 10: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 11: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 12: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 13: {
+								offset.add(new Vector(0, 0, -14));
+							}
+							default:
+								break;
+							}
+						}
+						case 11: {
+							switch (z) {
+							case 1:
+							case 2:
+							case 3: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 4: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 5: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 6: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 7: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 8: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 9: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 10: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 11: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 12:
+								break;
+							case 13: {
+								offset.add(new Vector(0, 0, -14));
+							}
+							default:
+								break;
+							}
+						}
+						case 12: {
+							switch (z) {
+							case 1:
+							case 2:
+							case 3:
+							case 4: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 5: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 6: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 7: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 8: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 9: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 10: {
+								world.setBlock(offset, Material.ANDESITE);
+								break;
+							}
+							case 11:
+							case 12:
+								break;
+							case 13: {
+								offset.add(new Vector(0, 0, -14));
+							}
+							default:
+								break;
+							}
+						}
+						case 13: {
+							switch (z) {
+							case 1:
+							case 2:
+							case 3:
+							case 4:
+							case 5:
+								break;
+							case 6: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 7: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 8: {
+								world.setBlock(offset, Material.POLISHED_GRANITE);
+								break;
+							}
+							case 9:
+							case 10:
+							case 11:
+							case 12:
+								break;
+							case 13: {
+								offset.add(new Vector(0, 0, -14));
+							}
+							default:
+								break;
+							}
+						}
+						}
+					}
+					case 2: {
+						
+					}
 					}
 
 					offset.add(new Vector(1, 0, 0));

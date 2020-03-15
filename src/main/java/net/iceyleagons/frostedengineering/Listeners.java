@@ -29,6 +29,7 @@ import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -45,13 +46,17 @@ import net.iceyleagons.frostedengineering.gui.CustomCraftingTable;
 import net.iceyleagons.frostedengineering.items.FrostedItems;
 import net.iceyleagons.frostedengineering.other.Changelog;
 import net.iceyleagons.frostedengineering.other.WebAPI;
-import net.iceyleagons.frostedengineering.Main;
 import net.md_5.bungee.api.ChatColor;
 
 public class Listeners implements Listener {
 
 	public Listeners(Main main) {
 		Bukkit.getPluginManager().registerEvents(this, main);
+	}
+
+	@EventHandler
+	public void inventoryClose(InventoryCloseEvent e) {
+		SaplingCommand.inventoryCloseEvent(e);
 	}
 
 	@EventHandler
@@ -69,6 +74,11 @@ public class Listeners implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
+	public void onInteractSapling(PlayerInteractEvent e) {
+		SaplingCommand.rightClick(e);
+	}
+
+	@EventHandler(priority = EventPriority.HIGH)
 	public void onInteract(PlayerInteractEvent e) {
 		if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
 			Unit u = Unit.getUnitAtLocation(e.getClickedBlock().getLocation());
@@ -124,7 +134,7 @@ public class Listeners implements Listener {
 			// CreativeMode.open(e.getPlayer());// new Install(e.getPlayer()).start();
 		}
 
-		SaplingCommand.rightClick(e);
+		SaplingCommand.blockPlace(e);
 	}
 
 	@EventHandler
@@ -162,8 +172,8 @@ public class Listeners implements Listener {
 			e.getBlock().getLocation().getWorld().dropItemNaturally(e.getBlock().getLocation(),
 					FrostedItems.CRAFTING_TABLE.clone());
 			CustomCraftingTable.list.remove(c);
-			Main.STORAGE_MANAGER.CRAFTING_TABLE.removeCraftingTable(e.getBlock().getLocation());
-			
+			//Main.CTD.removeCraftingTable(e.getBlock().getLocation());
+
 		}
 	}
 
@@ -178,7 +188,7 @@ public class Listeners implements Listener {
 			CustomCraftingTable c = CustomCraftingTable.getCustomCraftingTable(b.getLocation());
 			if (c != null) {
 				CustomCraftingTable.list.remove(c);
-				Main.STORAGE_MANAGER.CRAFTING_TABLE.removeCraftingTable(c.getLocation());
+				//Main.CTD.removeCraftingTable(c.getLocation());
 			}
 		});
 
@@ -195,7 +205,7 @@ public class Listeners implements Listener {
 			CustomCraftingTable c = CustomCraftingTable.getCustomCraftingTable(b.getLocation());
 			if (c != null) {
 				CustomCraftingTable.list.remove(c);
-				Main.STORAGE_MANAGER.CRAFTING_TABLE.removeCraftingTable(c.getLocation());
+				//Main.CTD.removeCraftingTable(c.getLocation());
 			}
 		});
 	}

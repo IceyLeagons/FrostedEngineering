@@ -3,7 +3,8 @@ package net.iceyleagons.frostedengineering.other.permission;
 public enum Permissions {
 	
 	COMMAND_DEBUG("frostedengineering.command.debug", ParentPermissionType.REGULAR),
-	NO_PERM("",ParentPermissionType.REGULAR);
+	NO_PERM("",ParentPermissionType.REGULAR),
+	COMMAND_SAVESTRUCT("frostedengineering.command.savestruct", ParentPermissionType.ADMIN);
 	
 	String perm;
 	ParentPermissionType ppt;

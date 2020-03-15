@@ -13,7 +13,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.IceyLeagons</groupId>
 	<artifactId>FrostedEngineering</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.5.0-SNAPSHOT</version>
 	<name>FrostedEngineering</name>
 	<description>FrostedEngineering</description>
 
@@ -36,17 +36,44 @@
 			<id>arantes-repo</id>
 			<url>https://mvn.arantes.dev/repository/maven-releases/</url>
 		</repository>
+		<repository>
+			<id>enginehub-maven</id>
+			<url>http://maven.enginehub.org/repo/</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
-
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-api</artifactId>
+			<version>3.141.59</version>
+		</dependency>
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>htmlunit-driver</artifactId>
+			<version>2.38.0</version>
+		</dependency>
+		<dependency>
+			<groupId>net.lingala.zip4j</groupId>
+			<artifactId>zip4j</artifactId>
+			<version>2.5.0</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.6</version>
+		</dependency>
 		<dependency>
 			<groupId>com.destroystokyo.paper</groupId>
 			<artifactId>paper-api</artifactId>
 			<version>1.14.1-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>com.sk89q.worldedit</groupId>
+			<artifactId>worldedit-bukkit</artifactId>
+			<version>7.0.0-SNAPSHOT</version>
+		</dependency>
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
@@ -56,6 +83,11 @@
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongo-java-driver</artifactId>
 			<version>2.12.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mongodb</groupId>
+			<artifactId>mongodb-driver</artifactId>
+			<version>3.0.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.spigotmc</groupId>
@@ -119,13 +151,33 @@
 				<filtering>true</filtering>
 				<directory>${basedir}/src/main/resources</directory>
 				<includes>
-					<include>plugin.yml</include>
-					<include>LICENSE</include>
-					<include>assets.zip</include>
+					<include>**/*</include>
 				</includes>
 			</resource>
 		</resources>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>create-archive</id>
+						<phase>generate-resources</phase> <!-- We use this to make sure we have the zip in the jar, so we've ignored 
+							the problem -->
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<finalName>assets</finalName>
+							<appendAssemblyId>false</appendAssemblyId>
+							<outputDirectory>${basedir}/output</outputDirectory>
+							<descriptors>
+								<descriptor>assembly-zip.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
@@ -147,6 +199,9 @@
 						<configuration>
 							<artifactSet>
 								<excludes>
+									<exclude>com.sk89q.worldedit:worldedit-bukkit:jar:</exclude>
+									<exclude>com.sk89q.worldedit:worldedit-core:jar:</exclude>
+									<exclude>com.sk89q.worldedit.worldedit-libs:core:jar:</exclude>
 									<exclude>classworlds:classworlds</exclude>
 									<exclude>junit:junit</exclude>
 									<exclude>jmock:*</exclude>
@@ -163,5 +218,41 @@
 				</executions>
 			</plugin>
 		</plugins>
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-assembly-plugin
+										</artifactId>
+										<versionRange>
+											[2.2-beta-5,)
+										</versionRange>
+										<goals>
+											<goal>single</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 </project>

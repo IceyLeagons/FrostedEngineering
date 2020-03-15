@@ -26,7 +26,6 @@ public class CustomCraftingTable {
 	public CustomCraftingTable(Location loc, boolean init) {
 		this.loc = loc;
 		list.add(this);
-		if (init == false) Main.STORAGE_MANAGER.CRAFTING_TABLE.addCraftingTable(loc);
 		this.fac = new InventoryFactory("Crafting Table", 54, FrostedItems.INVENTORY_FILLER, false);
 		for (int i = 0; i <= 4; i++) {
 			for (int j = 2; j <= 6; j++) {
@@ -84,9 +83,9 @@ public class CustomCraftingTable {
 	}
 	
 	public static void loadFromDatabase() {
-		Main.STORAGE_MANAGER.CRAFTING_TABLE.getCraftingTables().forEach(l -> {
-			new CustomCraftingTable(l, true);
-		});
+		//Main.CTD.getCraftingTables().forEach(l -> {
+		//	new CustomCraftingTable(l, true);
+		//});
 	}
 
 }

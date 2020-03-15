@@ -7,10 +7,15 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Particle;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.Vector;
 
 import net.iceyleagons.frostedengineering.Main;
@@ -18,6 +23,7 @@ import net.iceyleagons.frostedengineering.commands.CommandManager.Arg.ArgString;
 import net.iceyleagons.frostedengineering.commands.CommandManager.Cmd;
 import net.iceyleagons.frostedengineering.commands.CommandManager.CommandFinished;
 import net.iceyleagons.frostedengineering.vegetation.Genes;
+import net.iceyleagons.frostedengineering.vegetation.Genes.GeneType;
 
 public class SaplingCommand {
 	@Cmd(cmd = "sapling", args = "[sapling_type]", argTypes = {
@@ -32,41 +38,82 @@ public class SaplingCommand {
 		return CommandFinished.NOCONSOLE;
 	}
 
-	public static void rightClick(BlockPlaceEvent e) {
+	public static void blockPlace(BlockPlaceEvent e) {
 		Location loc = e.getBlock().getLocation();
 		Genes gene = Genes.isSaplingItem(e.getPlayer().getInventory().getItemInMainHand());
 		if (gene != null) {
-			Random random = new Random(1234567L);
+			if (gene.geneType == GeneType.BUSH || gene.geneType == GeneType.TREE) {
+				Random random = new Random(1234567L);
 
-			@SuppressWarnings("deprecation")
-			int taskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(Main.MAIN, new BukkitRunnable() {
+				BukkitTask task = new BukkitRunnable() {
 
-				@Override
-				public void run() {
-					if (loc.getBlock().getType() != Material.OAK_SAPLING)
-						this.cancel();
-					else {
+					@Override
+					public void run() {
+						if (loc.getBlock().getType() != Material.OAK_SAPLING)
+							this.cancel();
+						else {
+							loc.getWorld().spawnParticle(Particle.BLOCK_CRACK, loc.getX() + .5D, loc.getY() + .5D,
+									loc.getZ() + .5D, 20, 0.5D, 0.5D, 0.5D, 0, Material.OAK_SAPLING.createBlockData());
 
-						loc.getWorld().spawnParticle(Particle.BLOCK_CRACK, loc.getX() + .5D, loc.getY() + .5D,
-								loc.getZ() + .5D, 20, 0.5D, 0.5D, 0.5D, 0, Material.OAK_SAPLING.createBlockData());
+							loc.getWorld().playSound(loc, Sound.BLOCK_GRASS_BREAK, 1.f, random.nextFloat() * .5f);
+						}
 
-						loc.getWorld().playSound(loc, Sound.BLOCK_GRASS_BREAK, 1.f,
-								random.nextFloat() * (.5f - 0.f) + 0.f);
 					}
-				}
+				}.runTaskTimer(Main.MAIN, gene.growTime - 200L, 20L);
 
-			}, 0L, 20L);
-			Bukkit.getScheduler().scheduleSyncDelayedTask(Main.MAIN, new Runnable() {
+				Bukkit.getScheduler().scheduleSyncDelayedTask(Main.MAIN, new Runnable() {
 
-				@Override
-				public void run() {
-					Bukkit.getScheduler().cancelTask(taskId);
-					if (loc.getBlock().getType() == Material.OAK_SAPLING)
-						gene.growPlantPhased(loc.add(new Vector(0, -1, 0)), 1L);
-				}
+					@Override
+					public void run() {
+						task.cancel();
+						if (loc.getBlock().getType() == Material.OAK_SAPLING)
+							gene.growPlantPhased(loc.add(new Vector(0, -1, 0)), 2L, true);
+					}
 
-			}, 200L);
+				}, gene.growTime);
+			} else {
+				Main.debug("Plant#grow().");
+				gene.growPlantPhased(loc, 0L, true);
+			}
 		}
+	}
+
+	public static void rightClick(PlayerInteractEvent e) {
+		Block block = e.getClickedBlock();
+
+		if (block != null) {
+			Main.debug("NOT NULL!");
+			if (block.getType() == Material.OAK_SAPLING) {
+				Main.debug("SAPLING!");
+				if (Genes.saplings.containsKey(block.getLocation())) {
+					Main.debug("ADDED");
+					Genes.saplings.get(block.getLocation()).openInventory(e.getPlayer());
+				}
+			}
+
+			if (block.getType() == Material.WHEAT) {
+				Main.debug("WHEAT!");
+				if (Genes.plants.containsKey(block.getLocation())) {
+					Main.debug("ADDED");
+					Genes.plants.get(block.getLocation()).openInventory(e.getPlayer());
+				}
+			}
+		}
+	}
+
+	public static void inventoryCloseEvent(InventoryCloseEvent e) {
+		Inventory inv = e.getInventory();
+		Genes.saplings.forEach((location, treeBuilder) -> {
+			if (treeBuilder.inventory == inv) {
+				treeBuilder.openedFor.remove(e.getPlayer());
+			}
+		});
+
+		Genes.plants.forEach((location, plant) -> {
+			if (plant.inventory == inv) {
+				plant.openedFor.remove(e.getPlayer());
+			}
+		});
 	}
 
 }

@@ -12,7 +12,7 @@ import net.iceyleagons.frostedengineering.generator.frosted.ChunkData.PointData.
 // 2/26/2020 General optimizations
 // 2/26/2020 Replaced reflections with direct calling (ModificationType)
 public class ChunkData {
-	int erosionIterations = 11500;
+	int erosionIterations = 2000;
 	static int mapSize = 16;
 	static int terraceNumber = 11;
 	static int vegetationNumber = 1; // add + 1 for max possible trees.
@@ -51,9 +51,6 @@ public class ChunkData {
 		ChunkData.noiser = utils.getNoiser();
 		ChunkData.erosion = utils.getErosion() != null ? utils.getErosion()
 				: utils.getErosion(mapSize, 1f, 1f, 128, 10f, .01f, .8f, .8f, 01f, 4f, .3f, 4, erosionIterations);
-
-		if (ChunkData.noiser.getSeed() != seed)
-			ChunkData.noiser.setSeed(seed);
 
 		ChunkData.noiser.setNoiseType(NoiseType.PERLIN);
 		ChunkData.noiser.setInterp(Interp.QUINTIC);

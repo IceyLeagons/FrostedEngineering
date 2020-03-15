@@ -35,6 +35,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.reflections.Reflections;
@@ -44,13 +45,14 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 
+import com.sk89q.worldedit.bukkit.WorldEditPlugin;
+
 import dev.arantes.inventorymenulib.listeners.InventoryListener;
 import net.iceyleagons.frostedengineering.api.APIHandler;
 import net.iceyleagons.frostedengineering.api.EngineersAPI;
 import net.iceyleagons.frostedengineering.commands.CommandManager;
 import net.iceyleagons.frostedengineering.energy.network.Unit;
 import net.iceyleagons.frostedengineering.entity.Registry;
-import net.iceyleagons.frostedengineering.generator.frosted.ChunkData;
 import net.iceyleagons.frostedengineering.generator.frosted.FrostedDimension;
 import net.iceyleagons.frostedengineering.generator.nether.NetherGenerator;
 import net.iceyleagons.frostedengineering.gui.CustomCraftingTable;
@@ -58,13 +60,12 @@ import net.iceyleagons.frostedengineering.items.FrostedItems;
 import net.iceyleagons.frostedengineering.modules.ModuleManager;
 import net.iceyleagons.frostedengineering.modules.builtin.ExampleModule;
 import net.iceyleagons.frostedengineering.other.Changelog;
-import net.iceyleagons.frostedengineering.storage.StorageManager;
 import net.iceyleagons.frostedengineering.storage.StorageType;
-import net.iceyleagons.frostedengineering.storage.sql.SQL;
-import net.iceyleagons.frostedengineering.storage.sql.types.altypes.craftingtables.CraftingTablesSQLite;
 import net.iceyleagons.frostedengineering.storage.yaml.CheatConfig;
 import net.iceyleagons.frostedengineering.storage.yaml.Config;
 import net.iceyleagons.frostedengineering.storage.yaml.DefaultConfig;
+import net.iceyleagons.frostedengineering.textures.Textures;
+import net.iceyleagons.frostedengineering.textures.base.TexturedBase;
 import net.iceyleagons.frostedengineering.utils.CustomCrafting;
 import net.iceyleagons.frostedengineering.utils.Metrics;
 import net.iceyleagons.frostedengineering.utils.RecipeBuilder;
@@ -75,13 +76,18 @@ public class Main extends JavaPlugin implements CommandExecutor {
 	public static ModuleManager MODULE_MANAGER;
 	public static Logger LOGGER;
 	public static CommandManager COMMAND_MANAGER;
-	public static StorageManager STORAGE_MANAGER;
+
+	public static StorageType CHOOSEN_STORAGE;
 
 	private static List<Config> configs = new ArrayList<>();
 
 	public static int PLUGIN_ID = 6426; //Used for BStats
-	public static boolean DEBUG = true;
-	
+	public static boolean DEBUG = false;
+
+	public static List<TexturedBase> customBases = new ArrayList<>();
+	public static Textures texturesMain;
+
+	//public static CraftingTableDatabase CTD = null;
 
 	/*
 	 * Spigot methods
@@ -93,6 +99,7 @@ public class Main extends JavaPlugin implements CommandExecutor {
 		Registry.load();
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onEnable() {
 		MAIN = this;
@@ -101,22 +108,19 @@ public class Main extends JavaPlugin implements CommandExecutor {
 
 		//=-=-=Init stuff=-=-=//
 		initConfigs();
-		SQL s = new SQL(this, StorageType.SQLITE);
-		s.sqlite.open();
-		
-		STORAGE_MANAGER = new StorageManager("FrostedEngineering", "Asdf1234", "craftingtables", null, null, StorageType.SQLITE);
-		
+		initStorage();
+
 		setupCommands();
 		initModules();
 		startSchedulers();
-		new Listeners(MAIN);
 		new InventoryListener(MAIN);
+		texturesMain = new Textures();
 		setupCustomItemsAndCrafting();
 		startDimensionGeneration();
+		setupCustomItemsAndBlocks();
 
 		CustomCraftingTable.loadFromDatabase();
-		
-		
+
 		//=-=-=Web stuff=-=-=//
 		//WebAPI.getAvailableLanguages();
 		new Metrics(this, PLUGIN_ID);
@@ -129,12 +133,17 @@ public class Main extends JavaPlugin implements CommandExecutor {
 
 	@Override
 	public void onDisable() {
-
+		texturesMain.onDisable();
 	}
 
 	/*
 	 * Initializing
 	 */
+
+	private void initStorage() {
+		CHOOSEN_STORAGE = StorageType.SQLITE;
+
+	}
 
 	private void setupCustomItemsAndCrafting() {
 		FrostedItems.init();
@@ -156,6 +165,13 @@ public class Main extends JavaPlugin implements CommandExecutor {
 		configs.add(new CheatConfig(MAIN));
 
 		configs.forEach(c -> c.init());
+	}
+
+	public WorldEditPlugin getWorldEdit() {
+		Plugin p = Bukkit.getServer().getPluginManager().getPlugin("WorldEdit");
+		if (p instanceof WorldEditPlugin)
+			return (WorldEditPlugin) p;
+		return null;
 	}
 
 	private void startSchedulers() {
@@ -181,14 +197,15 @@ public class Main extends JavaPlugin implements CommandExecutor {
 		});
 	}
 
+	private void setupCustomItemsAndBlocks() {
+		customBases.add(new BlockTest(this));
+		customBases.forEach((base) -> {
+			Textures.register(base);
+		});
+	}
+
 	private void startDimensionGeneration() {
 		Bukkit.getConsoleSender().sendMessage("§e§lWarming up generator for usage.");
-
-		for (int i = 0; i < 100; i++) {
-			@SuppressWarnings("unused")
-			ChunkData tempChunkData = new ChunkData(10, 10, 0L);
-			tempChunkData = null;
-		}
 
 		Bukkit.getConsoleSender().sendMessage("§e§lGenerating Frosted Dimension, this may take a while");
 		Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
