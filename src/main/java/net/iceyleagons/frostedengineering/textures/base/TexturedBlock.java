@@ -5,8 +5,8 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,7 +38,7 @@ public class TexturedBlock extends TexturedBase {
 		// Nothing, we let the user implement stuff like this.
 	}
 
-	public void onPlacement(BlockPlaceEvent event) {
+	public void onPlacement(Block block, Player player) {
 		// Nothing, we let the user implement stuff like this.
 	}
 
@@ -81,30 +81,32 @@ public class TexturedBlock extends TexturedBase {
 	/**
 	 * @see TexturedBlock#setBlock(Location)
 	 */
-	public void setBlock(World world, int x, int y, int z) {
-		setBlock(new Location(world, x, y, z));
+	public void setBlock(World world, int x, int y, int z, Player player) {
+		setBlock(new Location(world, x, y, z), player);
 	}
 
 	/**
 	 * @see TexturedBlock#setBlock(Location)
 	 */
-	public void setBlock(Block block) {
-		setBlock(block.getLocation());
+	public void setBlock(Block block, Player player) {
+		setBlock(block.getLocation(), player);
 	}
 
 	/**
 	 * Sets the block at specified location to this type of block.
 	 * 
 	 * @param location the location to place the block
+	 * @param player   the player who placed it
 	 */
-	public void setBlock(Location location) {
+	public void setBlock(Location location, Player player) {
 		Block block = location.getWorld().getBlockAt(location);
 		block.setType(Material.SPAWNER);
 
 		wms.execute(block,
-				"{MaxNearbyEntities:0s,RequiredPlayerRange:0s,SpawnData:{id:\"minecraft:armor_stand\",Invisible:1,Marker:1,ArmorItems:[{},{},{},{id:\"minecraft:"
-						+ getBaseMaterial().name().toLowerCase() + "\",Count:1b,Damage:"
-						+ (getBaseMaterial().getMaxDurability() - getId()) + "s,tag:{Unbreakable:1}}]}}");
+				"{MaxNearbyEntities:0s,RequiredPlayerRange:0s,SpawnData:{id:\"minecraft:armor_stand\",Invisible:1,Marker:1,ArmorItems:[{},{},{},{id:\""
+						+ getBaseMaterial().getKey() + "\",Count:1b,Damage:" + getId() + "s,tag:{Unbreakable:1,Damage:"
+						+ getId() + "s}}]}}");
+		onPlacement(block, player);
 
 		block.getWorld().playSound(location, placeSound, 1.f, 1.f);
 	}

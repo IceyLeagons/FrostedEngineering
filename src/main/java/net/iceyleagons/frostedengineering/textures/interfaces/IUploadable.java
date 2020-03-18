@@ -2,6 +2,7 @@ package net.iceyleagons.frostedengineering.textures.interfaces;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,6 +11,9 @@ import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -20,6 +24,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
+import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.textures.Textures;
 import net.iceyleagons.frostedengineering.textures.base.TexturedBase;
 import net.iceyleagons.frostedengineering.textures.initialization.McMeta;
@@ -40,9 +45,9 @@ public interface IUploadable {
 
 		List<WebElement> webElements = driver.findElements(By.className("select"));
 
-		System.out.println("[TEXTURES] - Resource pack uploaded.");
-		System.out.println("[TEXTURES] - Resource-pack link is: " + webElements.get(0).getAttribute("value"));
-		System.out.println("[TEXTURES] - Resource-pack sha1-hash is: " + webElements.get(1).getAttribute("value"));
+		Main.info(Optional.of("TEXTURES"), "Resource pack uploaded.");
+		Main.info(Optional.of("TEXTURES"), "Resource pack link is: " + webElements.get(0).getAttribute("value"));
+		Main.info(Optional.of("TEXTURES"), "Resource pack hash is: " + webElements.get(1).getAttribute("value"));
 
 		Textures.setData("resourcepack-link", webElements.get(0).getAttribute("value"));
 		Textures.setData("resourcepack-sha1", webElements.get(1).getAttribute("value"));
@@ -54,24 +59,54 @@ public interface IUploadable {
 		driver.close();
 	}
 
+	public default void unzipFile(File assets, File where) {
+		try {
+			ZipInputStream zipIn = new ZipInputStream(new FileInputStream(assets));
+			ZipEntry entry = zipIn.getNextEntry();
+			while (entry != null) {
+				Main.debug("Extracting entry " + entry.getName() + " from the zip file " + assets.getName());
+				if (!entry.isDirectory()) {
+					extractEntry(zipIn, new File(where, entry.getName()));
+				} else {
+					createFolder(new File(where, entry.getName()));
+				}
+				zipIn.closeEntry();
+				entry = zipIn.getNextEntry();
+			}
+			zipIn.close();
+		} catch (IOException exception) {
+			exception.printStackTrace();
+		}
+	}
+
+	public default void extractEntry(ZipInputStream zipIn, File file) throws IOException {
+		FileOutputStream fOS = new FileOutputStream(file);
+		byte[] bytesIn = new byte[8192];
+		int read = 0;
+		while ((read = zipIn.read(bytesIn)) != -1) {
+			fOS.write(bytesIn, 0, read);
+		}
+		fOS.close();
+	}
+
 	public default void printData() {
 		if (Textures.items.size() != 0)
-			System.out.println("[TEXTURES] - Registered " + Textures.items.size() + " textured item(s).");
+			Main.info(Optional.of("TEXTURES"), "Registered " + Textures.items.size() + " textured item(s).");
 		if (Textures.blocks.size() != 0)
-			System.out.println("[TEXTURES] - Registered " + Textures.blocks.size() + " textured block(s).");
+			Main.info(Optional.of("TEXTURES"), "Registered " + Textures.blocks.size() + " textured block(s).");
 		if (Textures.plugins.size() != 0) {
-			System.out.println("[TEXTURES] - Registered plugins include:");
+			Main.info(Optional.of("TEXTURES"), "Registered plugins include:");
 			for (Plugin plugin : Textures.plugins) {
-				System.out.println("[TEXTURES] - " + plugin.getName());
+				Main.info(Optional.of("TEXTURES"), plugin.getName());
 			}
 		}
 
-		System.out.println("[TEXTURES] - Registered " + (Textures.blocks.size() + Textures.items.size())
-				+ " textured instance(s).");
+		Main.info(Optional.of("TEXTURES"),
+				"Registered " + (Textures.blocks.size() + Textures.items.size()) + " textured instance(s).");
 	}
 
 	public default File extractFile(Plugin plugin, String name, File where) {
-		System.out.println("[TEXTURES] - Retrieving assets.zip out of the plugin \"" + plugin.getName() + "\".");
+		Main.info(Optional.of("TEXTURES"), " Retrieving assets.zip out of the plugin \"" + plugin.getName() + "\".");
 
 		try {
 			FileOutputStream fOS = new FileOutputStream(where);
@@ -112,7 +147,8 @@ public interface IUploadable {
 		texturedList.forEach((textured) -> {
 			if (textured != null) {
 				BigDecimal bD = new BigDecimal(1D / 1562D * textured.getId());
-				System.out.println("Damage: " + bD.toPlainString() + ", id: " + textured.getId());
+				Main.info(Optional.of("TEXTURES"), "Wrote custom JSON data for texturedbase #" + textured.getId() + " ("
+						+ textured.getName() + ") with damage " + bD.toPlainString());
 
 				printWriter.println(",{ \"predicate\": {\"damaged\": 0, \"damage\": " + bD.toPlainString()
 						+ "}, \"model\": \"" + textured.getModel() + "\"}");

@@ -7,8 +7,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.PrintWriter;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -27,16 +25,6 @@ import net.lingala.zip4j.model.enums.CompressionMethod;
 
 public class Minepack implements IUploadable {
 
-	private void extractEntry(ZipInputStream zipIn, File file) throws IOException {
-		FileOutputStream fOS = new FileOutputStream(file);
-		byte[] bytesIn = new byte[4096];
-		int read = 0;
-		while ((read = zipIn.read(bytesIn)) != -1) {
-			fOS.write(bytesIn, 0, read);
-		}
-		fOS.close();
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public void init() {
@@ -47,54 +35,23 @@ public class Minepack implements IUploadable {
 
 		File assetsFolder = new File(finalResourcesFolder, "assets");
 
-		Thread t = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				// We get the assets.zip files and extract them into the final_resources folder.
-				Textures.plugins.forEach((plugin) -> {
-					File pluginFolder = new File(resourcepacksFolder, plugin.getName());
-					deleteFile(pluginFolder);
-					createFolder(pluginFolder);
+		// We get the assets.zip files and extract them into the final_resources folder.
+		Textures.plugins.forEach((plugin) -> {
+			File pluginFolder = new File(resourcepacksFolder, plugin.getName());
+			deleteFile(pluginFolder);
+			createFolder(pluginFolder);
 
-					File assets = extractFile(plugin, "assets.zip", new File(pluginFolder, "assets.zip"));
+			File assets = extractFile(plugin, "assets.zip", new File(pluginFolder, "assets.zip"));
 
-					try {
-						ZipInputStream zipIn = new ZipInputStream(new FileInputStream(assets));
-						ZipEntry entry = zipIn.getNextEntry();
-						while (entry != null) {
-							System.out.println(entry.getName());
-							if (!entry.isDirectory()) {
-								extractEntry(zipIn, new File(pluginFolder, entry.getName()));
-							} else {
-								createFolder(new File(pluginFolder, entry.getName()));
-							}
-							zipIn.closeEntry();
-							entry = zipIn.getNextEntry();
-						}
-						zipIn.close();
-					} catch (IOException exception) {
-						exception.printStackTrace();
-					}
+			unzipFile(assets, pluginFolder);
+			deleteFile(assets);
 
-					/*ZipFile zipFile = new ZipFile(assets);
-					try {
-						zipFile.extractAll(pluginFolder.getAbsolutePath());
-					} catch (ZipException exception) {
-						exception.printStackTrace();
-					}*/
-
-					deleteFile(assets);
-
-					try {
-						FileUtils.copyDirectory(pluginFolder, assetsFolder);
-					} catch (IOException exception) {
-						exception.printStackTrace();
-					}
-				});
+			try {
+				FileUtils.copyDirectory(pluginFolder, assetsFolder);
+			} catch (IOException exception) {
+				exception.printStackTrace();
 			}
-
 		});
-		t.start();
 
 		// We write our custom diamond_hoe.json file.
 		File modelsFolder = createFolder(new File(finalResourcesFolder, "assets/minecraft/models/item"));
@@ -118,8 +75,8 @@ public class Minepack implements IUploadable {
 		if (Textures.USE_PACK_IMAGE)
 			deleteFile(new File(finalResourcesFolder, "pack.png"));
 
-		File blocksFolder = createFolder(new File(finalResourcesFolder, "assets/minecraft/textures/blocks"));
-		File mobSpawnerFile = new File(blocksFolder, "mob_spawner.png");
+		File blocksFolder = createFolder(new File(finalResourcesFolder, "assets/minecraft/textures/block"));
+		File mobSpawnerFile = new File(blocksFolder, "spawner.png");
 		deleteFile(mobSpawnerFile);
 
 		File oldResourcePack = new File(Textures.homeFolder, "old-resourcepack.zip");
@@ -132,6 +89,7 @@ public class Minepack implements IUploadable {
 						new File(finalResourcesFolder, "pack.png"));
 
 			FileUtils.moveFile(new File(Textures.mainFolder, "mob_spawner.png"), mobSpawnerFile);
+			FileUtils.copyFile(mobSpawnerFile, new File(blocksFolder, "mob_spawner.png"));
 
 			deleteFile(oldResourcePack);
 
@@ -145,12 +103,6 @@ public class Minepack implements IUploadable {
 			download(Textures.PACK_IMAGE_LINK, new File(finalResourcesFolder, "pack.png"));
 
 		deleteFile(finalResourcePack);
-
-		try {
-			t.join();
-		} catch (InterruptedException exception) {
-			exception.printStackTrace();
-		}
 
 		try {
 			ZipFile zip = new ZipFile(finalResourcePack);
@@ -172,13 +124,7 @@ public class Minepack implements IUploadable {
 		if (!oldResourcePack.exists())
 			upload(finalResourcePack);
 		else {
-			try {
-				if (FileUtils.contentEquals(finalResourcePack, oldResourcePack)) {
-					upload(finalResourcePack);
-				}
-			} catch (IOException exception) {
-				exception.printStackTrace();
-			}
+			upload(finalResourcePack);
 		}
 
 		Textures.plugins.forEach((pl) -> {

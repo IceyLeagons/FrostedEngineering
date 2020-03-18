@@ -99,14 +99,12 @@ public class Storage extends Unit {
 	 * @return the remaining power if the storage gets full, the main logic is handled by the energy network.
 	 */
 	public float addPower(float fp) {
-		
 		if ((stores+fp)<=maxStores) {
 			stores+=fp;
 			updateInventory();
 			return 0f;
 		} else {
 			stores=maxStores;
-			//explode();
 			updateInventory();
 			return maxStores-(stores+fp);
 		}
@@ -170,13 +168,16 @@ public class Storage extends Unit {
 	 * @return the remainig power to discharge, the main logic is handled by the energy network.
 	 */
 	public float consumePower(float fp) {
-		if ((stores-fp)>=0) {
-			stores-=fp;
-			return 0f;
-		} else {
+		if ((stores-fp)<0) {
 			stores-=maxStores;
 			return fp-maxStores;
 		}
+		
+		if ((stores-fp)>=0) {
+			stores-=fp;
+			return 0f;
+		}
+		return 0f;
 	}
 
 }

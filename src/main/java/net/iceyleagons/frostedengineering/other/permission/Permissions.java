@@ -4,7 +4,8 @@ public enum Permissions {
 	
 	COMMAND_DEBUG("frostedengineering.command.debug", ParentPermissionType.REGULAR),
 	NO_PERM("",ParentPermissionType.REGULAR),
-	COMMAND_SAVESTRUCT("frostedengineering.command.savestruct", ParentPermissionType.ADMIN);
+	COMMAND_SAVESTRUCT("frostedengineering.command.savestruct", ParentPermissionType.ADMIN),
+	COMMAND_GIVE("frostedengineering.command.give", ParentPermissionType.ADMIN);
 	
 	String perm;
 	ParentPermissionType ppt;

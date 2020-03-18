@@ -19,6 +19,7 @@ package net.iceyleagons.frostedengineering.energy.network.components;
 import java.util.Collection;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -30,22 +31,31 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import net.iceyleagons.frostedengineering.Main;
+import net.iceyleagons.frostedengineering.energy.interfaces.ExplodableComponent;
+import net.iceyleagons.frostedengineering.energy.interfaces.ISecond;
+import net.iceyleagons.frostedengineering.energy.interfaces.ITick;
 import net.iceyleagons.frostedengineering.energy.network.EnergyNetwork;
-import net.iceyleagons.frostedengineering.energy.network.ISecond;
-import net.iceyleagons.frostedengineering.energy.network.ITick;
+import net.iceyleagons.frostedengineering.energy.network.NetworkType;
 import net.iceyleagons.frostedengineering.energy.network.Unit;
 
-public class Cable extends Unit implements ITick, ISecond {
+public class Cable extends Unit implements ITick, ISecond, ExplodableComponent {
 
-	private float maxFP = 1.0f; // how many FP can it handle/tick
+	private NetworkType capable = NetworkType.LOW_VOLTAGE; // (how many FP can it handle/tick)
 	private boolean insulated = false;
 	
-	public Cable(Location loc, EnergyNetwork network, float maxFP) {
+	/**
+	 * @param loc is the {@link Location} of the Cable
+	 * @param network is the {@link EnergyNetwork} of this {@link Unit}
+	 * @param maxFP i
+	 * @param insulated
+	 */
+	public Cable(Location loc, EnergyNetwork network, NetworkType capable, boolean insulated) {
 		super(loc, network);
-		this.maxFP = maxFP;
+		this.capable = capable;
 		Unit.tickListeners.add(this);
 		Unit.secondListeners.add(this);
 		Main.debug("Creating cable unit...");
+		this.insulated = insulated;
 	}
 	
 	@Override
@@ -54,12 +64,15 @@ public class Cable extends Unit implements ITick, ISecond {
 	
 	@Override
 	public void onSecond() {
+		if (NetworkType.doExplode(getCapable(), getNetwork().getType())) this.explode();
 		if (insulated == false) {
 			electrocute();
-			//Main.debug("Electrocuting...");
 		}
 	}
 	
+	/**
+	 * Used to shock entities around the cable
+	 */
 	private void electrocute() {
 		Collection<Entity> near = getLocation().getWorld().getNearbyEntities(getLocation(),1.5,1.5,1.5);
 		
@@ -85,8 +98,18 @@ public class Cable extends Unit implements ITick, ISecond {
 		});
 	}
 
-	public float getMaxFP() {
-		return maxFP;
+	/**
+	 * @return the {@link NetworkType} it can handle
+	 */
+	public NetworkType getCapable() {
+		return capable;
+	}
+
+	@Override
+	public void explode() {
+		this.destroy();
+		this.getLocation().getWorld().playSound(this.getLocation(), Sound.BLOCK_FIRE_EXTINGUISH, 1L, 1L);
+		this.getLocation().getWorld().playEffect(this.getLocation(), Effect.SMOKE, 5L);
 	}
 
 	

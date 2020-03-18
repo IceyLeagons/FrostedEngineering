@@ -13,7 +13,7 @@ public class BlockTestCommand {
 		if (sender instanceof Player) {
 			Player player = (Player) sender;
 
-			player.getInventory().addItem(Main.customBases.get(0).getItem());
+			player.getInventory().addItem(Main.TEXTURED_GENERATOR.getItem());
 			return CommandFinished.DONE;
 		}
 		return CommandFinished.NOCONSOLE;

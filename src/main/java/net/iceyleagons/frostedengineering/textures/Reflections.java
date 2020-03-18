@@ -1,6 +1,7 @@
 package net.iceyleagons.frostedengineering.textures;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
@@ -12,7 +13,8 @@ public class Reflections {
 
 	private static HashMap<String, Class<?>> cache = new HashMap<>();
 
-	public static String version;
+	public static String versionString;
+	public static Version version;
 
 	static {
 		if (Bukkit.getServer() != null) {
@@ -21,7 +23,7 @@ public class Reflections {
 			String[] pas = bukkitServerClass.getName().split("\\.");
 			if (pas.length == 5) {
 				String verB = pas[3];
-				version = verB;
+				versionString = verB;
 				craftBukkitPrefix += "." + verB;
 			}
 			try {
@@ -36,6 +38,11 @@ public class Reflections {
 			} catch (Exception ignored) {
 			}
 		}
+		Arrays.asList(Version.values()).forEach((version2) -> {
+			if(versionString.contains(version2.name().toLowerCase())) {
+				version = version2;
+			}
+		});
 	}
 
 	private static Class<?> existsAlready(String className) {
@@ -67,6 +74,16 @@ public class Reflections {
 	public static Method setAccessible(Method f) {
 		f.setAccessible(true);
 		return f;
+	}
+
+	public enum Version {
+		V1_15(5), V1_14(4);
+
+		public int packFormat;
+
+		private Version(int packFormat) {
+			this.packFormat = packFormat;
+		}
 	}
 
 }

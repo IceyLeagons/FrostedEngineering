@@ -1,0 +1,9 @@
+{
+	"parent": "builtin/generated",
+	"display": {
+		"gui": {
+			"rotation": [ 0, 170, 0 ],
+			"scale": [ 1.125, 1.125, 1.125 ]
+		}
+	}
+}

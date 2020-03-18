@@ -19,7 +19,7 @@ public class TextureUtils {
 		itemMeta.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);
 		itemMeta.setUnbreakable(true);
 		itemMeta.setDisplayName(title);
-		((Damageable) itemMeta).setDamage(item.getType().getMaxDurability() - id);
+		((Damageable) itemMeta).setDamage(id);
 
 		return itemMeta;
 	}

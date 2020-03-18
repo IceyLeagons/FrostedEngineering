@@ -27,7 +27,7 @@ import net.iceyleagons.frostedengineering.energy.network.components.Storage;
  * The energy network and its unit all know each other(unit has a reference to the network, and vice versa)
  * The energy distribution and all the main logic is handled by this class.
  * 
- * Tracing and consuming,generating logic handled by the units themselves.
+ * Tracing and consuming,generating logic is handled by the units themselves.
  * 
  * @author TOTHT
  *
@@ -38,6 +38,7 @@ public class EnergyNetwork {
 	private List<Unit> storages;
 	private float frostedpower = 0.0f;
 	private float capacity = 5.0f;
+	private NetworkType type;
 
 	public EnergyNetwork() {
 		units = new ArrayList<Unit>();
@@ -54,6 +55,7 @@ public class EnergyNetwork {
 		units.add(u);
 		Main.debug("Adding unit " + u.toString() + " to network" + this.toString());
 		updateStorages();
+		calculateCapacity();
 	}
 
 	/**
@@ -65,6 +67,7 @@ public class EnergyNetwork {
 		units.remove(u);
 		Main.debug("Removing unit " + u.toString() + " from network" + this.toString());
 		updateStorages();
+		calculateCapacity();
 	}
 
 	/**
@@ -73,8 +76,8 @@ public class EnergyNetwork {
 	 * @param fp is the power to be added to the network
 	 */
 	public void generateFP(float fp) {
-		calculateCapacity();
 		addPowerToStorages(fp);
+		type = NetworkType.getClassification(frostedpower);
 	}
 
 	/**
@@ -88,6 +91,7 @@ public class EnergyNetwork {
 		calculateFrostedPower();
 		if (hasEnoughFP(fp)) {
 			removePowerFromStorages(fp);
+			type = NetworkType.getClassification(frostedpower);
 			return true;
 		} else {
 			return false;
@@ -95,15 +99,22 @@ public class EnergyNetwork {
 	}
 
 
+	int j = 0;
 	/**
 	 * This is used to store the power to a non filled storage.
 	 * 
 	 * @param power is the generate amount of FP
 	 */
+	
 	private void addPowerToStorages(float power) {
+		if (storages.isEmpty()) {
+			if ((frostedpower+power)<=capacity) frostedpower+=power;
+			else if ((frostedpower+power)>capacity){
+				frostedpower=capacity;
+			}
+		}
 		Storage currentlyFilling = getNextNotFullStorage();
 		if (currentlyFilling == null) {
-			return;
 		} else {
 			float remaining = currentlyFilling.addPower(power);
 			if (remaining > 0) {
@@ -120,7 +131,7 @@ public class EnergyNetwork {
 	private boolean removePowerFromStorages(float power) {
 		Storage currentlyFilling = getNextFullStorage();
 		if (currentlyFilling == null) {
-			Main.debug("EnergyNetwork line 113, it doesn't supposed to happen.");
+			Main.debug("EnergyNetwork line 113, this doesn't supposed to happen.");
 			return false;
 		} else {
 			float remaining = currentlyFilling.consumePower(power);
@@ -138,6 +149,7 @@ public class EnergyNetwork {
 	 * @return the found {@link Storage}
 	 */
 	private Storage getNextNotFullStorage() {
+		if (storages.isEmpty()) return null;
 		for (Unit u : storages) {
 			Storage s = (Storage) u;
 			if (s.getStored() != s.getMaxStorage())
@@ -166,6 +178,13 @@ public class EnergyNetwork {
 	public List<Unit> getUnits() {
 		return this.units;
 	}
+	
+	/**
+	 * @return the {@link NetworkType} of this {@link EnergyNetwork}
+	 */
+	public NetworkType getType() {
+		return this.type;
+	}
 
 	/**
 	 * This method will calculate the stored energy from the storages
@@ -173,7 +192,8 @@ public class EnergyNetwork {
 	private void calculateFrostedPower() {
 		float start = 0.0f;
 		for (Unit s : storages) {
-			start += ((Storage) s).getStored();
+			if (((Storage) s).getStored() > 0)
+				start += ((Storage) s).getStored();
 		}
 		frostedpower = start;
 	}
@@ -208,7 +228,7 @@ public class EnergyNetwork {
 	 * @return true if this amount of power can be discharged
 	 */
 	public boolean hasEnoughFP(float needed) {
-		return ((frostedpower - needed) >= 0) ? true : false;
+		return ((this.frostedpower - needed) >= 0) ? true : false;
 	}
 
 	/**
@@ -224,6 +244,21 @@ public class EnergyNetwork {
 	 */
 	public float getFP() {
 		return frostedpower;
+	}
+	
+	/**
+	 * @return the capacity of the network
+	 */
+	public float getCapacity() {
+		return this.capacity;
+	}
+	
+	public List<Storage> getStorages() {
+		List<Storage> s = new ArrayList<Storage>();
+		for (Unit u : storages) {
+			if (u instanceof Storage) s.add(((Storage)u));
+		}
+		return s;
 	}
 
 }

@@ -37,9 +37,9 @@ public class Textures {
 	public static HashMap<String, Integer> idMap;
 	public static HashMap<World, BlockStorage> storageMap = new HashMap<>();
 
-	public static boolean USE_PACK_IMAGE = true;
+	public static boolean USE_PACK_IMAGE = true; // If this is set to false, we need to set the PACK_IMAGE_LINK
 	public static String PACK_IMAGE_LINK = "";
-	public static int pack_format = 4;
+	public static int pack_format = Reflections.version.packFormat;
 	public static String pack_description = "Just your normal everyday resourcepack";
 
 	public static Gson GSON = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
@@ -53,7 +53,7 @@ public class Textures {
 	public static File homeFolder = createFolder(new File(mainFolder, "textures"));
 
 	/**
-	 * @deprecated Don't use outside of plugin!
+	 * @deprecated Don't use outside of FrostedEngineering! For internal use only!
 	 */
 	@Deprecated
 	public Textures() {
@@ -204,7 +204,7 @@ public class Textures {
 
 	public static boolean isTexturedItem(ItemStack itemStack) {
 		for (TexturedItem texturedItem : items) {
-			if (texturedItem.getItem().equals(itemStack))
+			if (texturedItem.getItem().getItemMeta().equals(itemStack.getItemMeta()))
 				return true;
 		}
 
@@ -213,7 +213,7 @@ public class Textures {
 
 	public static TexturedBlock getTexturedBlock(ItemStack itemStack) {
 		for (TexturedBlock texturedBlock : blocks) {
-			if (texturedBlock.getItem().equals(itemStack))
+			if (texturedBlock.getItem().getItemMeta().equals(itemStack.getItemMeta()))
 				return texturedBlock;
 		}
 
@@ -222,7 +222,7 @@ public class Textures {
 
 	public static TexturedItem getTexturedItem(ItemStack itemStack) {
 		for (TexturedItem texturedItem : items) {
-			if (texturedItem.getItem().equals(itemStack))
+			if (texturedItem.getItem().getItemMeta().equals(itemStack.getItemMeta()))
 				return texturedItem;
 		}
 

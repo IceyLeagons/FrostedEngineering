@@ -16,10 +16,9 @@
  ******************************************************************************/
 package net.iceyleagons.frostedengineering;
 
-import java.io.IOException;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -33,19 +32,20 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
 import net.iceyleagons.frostedengineering.commands.cmds.SaplingCommand;
+import net.iceyleagons.frostedengineering.commands.cmds.StickCommand;
 import net.iceyleagons.frostedengineering.energy.helpers.BreakHandler;
 import net.iceyleagons.frostedengineering.energy.helpers.PlacementHandler;
 import net.iceyleagons.frostedengineering.energy.network.EnergyNetwork;
+import net.iceyleagons.frostedengineering.energy.network.NetworkType;
 import net.iceyleagons.frostedengineering.energy.network.Unit;
 import net.iceyleagons.frostedengineering.energy.network.components.Cable;
 import net.iceyleagons.frostedengineering.energy.network.components.Consumer;
 import net.iceyleagons.frostedengineering.energy.network.components.Generator;
+import net.iceyleagons.frostedengineering.energy.network.components.Storage;
 import net.iceyleagons.frostedengineering.gui.CustomCraftingTable;
-import net.iceyleagons.frostedengineering.items.FrostedItems;
-import net.iceyleagons.frostedengineering.other.Changelog;
-import net.iceyleagons.frostedengineering.other.WebAPI;
 import net.md_5.bungee.api.ChatColor;
 
 public class Listeners implements Listener {
@@ -61,30 +61,19 @@ public class Listeners implements Listener {
 
 	@EventHandler
 	public void onPlayerJoin(PlayerJoinEvent e) {
-		Changelog.giveToPlayer(e.getPlayer());
-		try {
-			e.getPlayer()
-					.sendMessage(WebAPI
-							.getResponseFromWeb(
-									"https://api.iceyleagons.net/?function=update&plugin=frostedengineering&data=0.0.5")
-							.getContent().toString());
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+		/*
+		 * try { e.getPlayer() .sendMessage(WebAPI .getResponseFromWeb(
+		 * "https://api.iceyleagons.net/?function=update&plugin=frostedengineering&data=0.0.5")
+		 * .getContent().toString()); } catch (IOException e1) { e1.printStackTrace(); }
+		 */
+
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
-	public void onInteractSapling(PlayerInteractEvent e) {
-		SaplingCommand.rightClick(e);
-	}
-
-	@EventHandler(priority = EventPriority.HIGH)
-	public void onInteract(PlayerInteractEvent e) {
-		if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			Unit u = Unit.getUnitAtLocation(e.getClickedBlock().getLocation());
-			if (u != null) {
-				u.getInventoryFactory().openInventory(e.getPlayer());
-			}
+	@EventHandler
+	public void onResourcepackStatusEvent(PlayerResourcePackStatusEvent e) {
+		if (e.getStatus() == PlayerResourcePackStatusEvent.Status.DECLINED) {
+			e.getPlayer().kickPlayer(
+					"Unfortunately you can't play without our resource-pack :(. If your Minecraft can't handle the download, try downloading it here: ");
 		}
 	}
 
@@ -98,7 +87,7 @@ public class Listeners implements Listener {
 		// if (e.getCursor().hasItemMeta() && e.getCurrentItem().hasItemMeta()) {
 		// if (e.getCursor().getType().equals(e.getCurrentItem().getType())
 		// && e.getCursor().getItemMeta().equals(e.getCurrentItem().getItemMeta())) {
-		if (e.getCursor() != null)
+		if (e.getCursor() != null && e.getCurrentItem() != null) {
 			if (e.getCurrentItem().getType().equals(Material.DIAMOND_HOE)
 					&& e.getCursor().getType().equals(Material.DIAMOND_HOE)) {
 				// if (e.getCurrentItem().getItemMeta().hasCustomModelData() &&
@@ -107,28 +96,20 @@ public class Listeners implements Listener {
 				e.getCursor().setAmount(0);
 				// }
 			}
-		// }
+		}
 		// }
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlace(BlockPlaceEvent e) {
 		if (e.getBlock().getType() == Material.STONE) { //
-			new Consumer(e.getBlock().getLocation(), new EnergyNetwork(), 4f);
-		}
-		if (e.getBlock().getType() == Material.DIRT) {
-			new Generator(e.getBlock().getLocation(), new EnergyNetwork(), 2f);
+			new Consumer(e.getBlock().getLocation(), new EnergyNetwork(), 1f, NetworkType.LOW_VOLTAGE);
 		}
 		if (e.getBlock().getType() == Material.OAK_PLANKS) {
-			new Cable(e.getBlock().getLocation(), new EnergyNetwork(), 100f);
+			new Cable(e.getBlock().getLocation(), new EnergyNetwork(), NetworkType.LOW_VOLTAGE, false);
 		}
 
 		PlacementHandler.place(e);
-
-		if (e.getItemInHand().getItemMeta().equals(FrostedItems.CRAFTING_TABLE.getItemMeta())) {
-			e.getBlockPlaced().setType(Material.BEDROCK);
-			new CustomCraftingTable(e.getBlock().getLocation());
-		}
 
 		if (e.getBlock().getType() == Material.BONE_BLOCK) {
 			// CreativeMode.open(e.getPlayer());// new Install(e.getPlayer()).start();
@@ -139,10 +120,39 @@ public class Listeners implements Listener {
 
 	@EventHandler
 	public void onClick(PlayerInteractEvent e) {
+		SaplingCommand.rightClick(e);
 		if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-			CustomCraftingTable c = CustomCraftingTable.getCustomCraftingTable(e.getClickedBlock().getLocation());
-			if (c != null) {
-				c.getInventoryFactory().openInventory(e.getPlayer());
+			if (e.getItem()!=null)
+			if (e.getItem().equals(StickCommand.stick)) {
+				Unit u = Unit.getUnitAtLocation(e.getClickedBlock().getLocation());
+				Player p = e.getPlayer();
+				if (u == null) {
+					p.sendMessage("§e§l[Energy Debug] §rThere is no unit at this location!");
+					return;
+				}
+				p.sendMessage("§e§l[Energy Debug] §rUnit found!");
+				p.sendMessage("§f - Neighbours: §b" + u.getNeighbours().size());
+				if (u instanceof Storage) {
+					p.sendMessage("§f - Unit type: §bStorage");
+				} else if (u instanceof Generator) {
+					p.sendMessage("§f - Unit type: §bGenerator");
+				} else if (u instanceof Consumer) {
+					p.sendMessage("§f - Unit type: §bConsumer");
+				} else if (u instanceof Cable) {
+					p.sendMessage("§f - Unit type: §bCable");
+				} else {
+					p.sendMessage("§f - Unit type: §bNot defined?? How this even happened?");
+				}
+				
+				p.sendMessage("§f - Energy network: §b" + u.getNetwork().toString().split("@")[1]);
+				p.sendMessage("§f    - Capacity: §b"+u.getNetwork().getCapacity());
+				p.sendMessage("§f    - Stored: §b"+u.getNetwork().getFP());
+				p.sendMessage("§f    - Storages: §b"+u.getNetwork().getStorages().size());
+				p.sendMessage("§f    - Units: §b"+u.getNetwork().getUnits().size());
+				p.sendMessage("§f    - NetworkType: §b"+u.getNetwork().getType().toString());
+			}
+			if (Main.CUSTOM_CRAFTING_TABLE.compare(e.getClickedBlock())) {
+				CustomCraftingTable.openCraftingTable(e.getClickedBlock().getLocation(), e.getPlayer());
 			}
 		}
 	}
@@ -154,11 +164,6 @@ public class Listeners implements Listener {
 			if (u != null)
 				u.destroy();
 		}
-		if (e.getBlock().getType() == Material.DIRT) {
-			Unit u = Unit.getUnitAtLocation(e.getBlock().getLocation());
-			if (u != null)
-				u.destroy();
-		}
 		if (e.getBlock().getType() == Material.OAK_PLANKS) {
 			Unit u = Unit.getUnitAtLocation(e.getBlock().getLocation());
 			if (u != null)
@@ -166,15 +171,6 @@ public class Listeners implements Listener {
 		}
 
 		BreakHandler.breakk(e);
-
-		CustomCraftingTable c = CustomCraftingTable.getCustomCraftingTable(e.getBlock().getLocation());
-		if (c != null) {
-			e.getBlock().getLocation().getWorld().dropItemNaturally(e.getBlock().getLocation(),
-					FrostedItems.CRAFTING_TABLE.clone());
-			CustomCraftingTable.list.remove(c);
-			//Main.CTD.removeCraftingTable(e.getBlock().getLocation());
-
-		}
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -184,11 +180,6 @@ public class Listeners implements Listener {
 			if (u != null) {
 				Main.debug("§4§l" + u);
 				u.destroy();
-			}
-			CustomCraftingTable c = CustomCraftingTable.getCustomCraftingTable(b.getLocation());
-			if (c != null) {
-				CustomCraftingTable.list.remove(c);
-				//Main.CTD.removeCraftingTable(c.getLocation());
 			}
 		});
 
@@ -201,11 +192,6 @@ public class Listeners implements Listener {
 			if (u != null) {
 				Main.debug("§4§l" + u);
 				u.destroy();
-			}
-			CustomCraftingTable c = CustomCraftingTable.getCustomCraftingTable(b.getLocation());
-			if (c != null) {
-				CustomCraftingTable.list.remove(c);
-				//Main.CTD.removeCraftingTable(c.getLocation());
 			}
 		});
 	}

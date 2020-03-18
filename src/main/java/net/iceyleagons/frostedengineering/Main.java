@@ -19,6 +19,7 @@ package net.iceyleagons.frostedengineering;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -52,11 +53,13 @@ import net.iceyleagons.frostedengineering.api.APIHandler;
 import net.iceyleagons.frostedengineering.api.EngineersAPI;
 import net.iceyleagons.frostedengineering.commands.CommandManager;
 import net.iceyleagons.frostedengineering.energy.network.Unit;
+import net.iceyleagons.frostedengineering.energy.network.components.textured.TexturedGenerator;
 import net.iceyleagons.frostedengineering.entity.Registry;
 import net.iceyleagons.frostedengineering.generator.frosted.FrostedDimension;
 import net.iceyleagons.frostedengineering.generator.nether.NetherGenerator;
 import net.iceyleagons.frostedengineering.gui.CustomCraftingTable;
 import net.iceyleagons.frostedengineering.items.FrostedItems;
+import net.iceyleagons.frostedengineering.items.GUIItem;
 import net.iceyleagons.frostedengineering.modules.ModuleManager;
 import net.iceyleagons.frostedengineering.modules.builtin.ExampleModule;
 import net.iceyleagons.frostedengineering.other.Changelog;
@@ -71,7 +74,7 @@ import net.iceyleagons.frostedengineering.utils.Metrics;
 import net.iceyleagons.frostedengineering.utils.RecipeBuilder;
 
 public class Main extends JavaPlugin implements CommandExecutor {
-
+	//8657.866 60 -8089.848 -148.1 -6.1
 	public static Main MAIN;
 	public static ModuleManager MODULE_MANAGER;
 	public static Logger LOGGER;
@@ -82,10 +85,14 @@ public class Main extends JavaPlugin implements CommandExecutor {
 	private static List<Config> configs = new ArrayList<>();
 
 	public static int PLUGIN_ID = 6426; //Used for BStats
-	public static boolean DEBUG = false;
+	public static boolean DEBUG = true;
 
 	public static List<TexturedBase> customBases = new ArrayList<>();
 	public static Textures texturesMain;
+
+	public static TexturedGenerator TEXTURED_GENERATOR;
+	public static CustomCraftingTable CUSTOM_CRAFTING_TABLE;
+	public static GUIItem GUI_ITEM;
 
 	//public static CraftingTableDatabase CTD = null;
 
@@ -109,17 +116,16 @@ public class Main extends JavaPlugin implements CommandExecutor {
 		//=-=-=Init stuff=-=-=//
 		initConfigs();
 		initStorage();
-
 		setupCommands();
 		initModules();
 		startSchedulers();
 		new InventoryListener(MAIN);
 		texturesMain = new Textures();
-		setupCustomItemsAndCrafting();
 		startDimensionGeneration();
 		setupCustomItemsAndBlocks();
+		setupCustomItemsAndCrafting();
 
-		CustomCraftingTable.loadFromDatabase();
+		Bukkit.getServer().getPluginManager().registerEvents(new Listeners(this), MAIN);
 
 		//=-=-=Web stuff=-=-=//
 		//WebAPI.getAvailableLanguages();
@@ -198,7 +204,9 @@ public class Main extends JavaPlugin implements CommandExecutor {
 	}
 
 	private void setupCustomItemsAndBlocks() {
-		customBases.add(new BlockTest(this));
+		customBases.add(TEXTURED_GENERATOR = new TexturedGenerator());
+		customBases.add(CUSTOM_CRAFTING_TABLE = new CustomCraftingTable(this));
+		customBases.add(GUI_ITEM = new GUIItem(this));
 		customBases.forEach((base) -> {
 			Textures.register(base);
 		});
@@ -278,6 +286,15 @@ public class Main extends JavaPlugin implements CommandExecutor {
 		Bukkit.getConsoleSender().sendMessage(" ");
 	}
 
+	public static void info(Optional<String> prefix, String s) {
+		if (prefix.isPresent()) {
+			Bukkit.getConsoleSender().sendMessage("§b[FrostedEngineering - " + prefix.get() + "] §r" + s);
+			return;
+		}
+
+		Bukkit.getConsoleSender().sendMessage("§b[FrostedEngineering] §r" + s);
+	}
+
 	/*
 	 * Debugging
 	 */
@@ -286,7 +303,6 @@ public class Main extends JavaPlugin implements CommandExecutor {
 		if (!DEBUG)
 			return;
 		Bukkit.broadcastMessage("§b[FrostedEngineering - DEBUG] §r" + s);
-		System.out.println("[FrostedEngineering - DEBUG] " + s);
 	}
 
 	public static void debug(Exception e) {

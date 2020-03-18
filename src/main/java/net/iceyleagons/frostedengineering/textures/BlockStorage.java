@@ -35,7 +35,8 @@ public class BlockStorage {
 	}
 
 	public void handleEvent(BlockBreakEvent event) {
-		metadatas.remove(event.getBlock().getLocation());
+		if (metadatas.containsKey(event.getBlock().getLocation()))
+			metadatas.remove(event.getBlock().getLocation());
 	}
 
 	public Object getData(Location location, String key) {

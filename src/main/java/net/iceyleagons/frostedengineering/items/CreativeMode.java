@@ -1,11 +1,12 @@
 package net.iceyleagons.frostedengineering.items;
 
+import java.util.ArrayList;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
 
 import dev.arantes.inventorymenulib.PaginatedGUIBuilder;
 import dev.arantes.inventorymenulib.buttons.ClickAction;
@@ -16,6 +17,11 @@ import net.iceyleagons.frostedengineering.Main;
 public class CreativeMode {
 
 	public static void open(Player p) {
+		ArrayList<ItemButton> items = new ArrayList<ItemButton>();
+		Main.customBases.forEach(tb -> {
+			items.add(new ItemButton(tb.getItem()));
+		});
+		items.add(new ItemButton(FrostedItems.STORAGE));
 		PaginatedGUI gui = new PaginatedGUIBuilder("§8Menu | page: {page}",
 				"xxxxxxxxx" + "x#######x" + "<#######>" + "x#######x" + "xxxxxxxxx")
 
@@ -33,21 +39,14 @@ public class CreativeMode {
 
 						// Set the item for the previous page buttom.
 						.setPreviousPageItem(Material.ARROW, 1, "§6Previous page")
-						.setContent(new ItemButton(Material.DIAMOND, 1, "Item"),
-								new ItemButton(FrostedItems.STORAGE),
-								new ItemButton(Material.DIAMOND, 1, "Item"),
-								new ItemButton(Material.DIAMOND, 1, "Item"),new ItemButton(Material.DIAMOND, 1, "Item"),new ItemButton(Material.DIAMOND, 1, "Item"),new ItemButton(Material.DIAMOND, 1, "Item"),
-								new ItemButton(Material.DIAMOND, 1, "Item"),new ItemButton(Material.DIAMOND, 1, "Item"),new ItemButton(Material.DIAMOND, 1, "Item"),new ItemButton(Material.DIAMOND, 1, "Item"),
-								new ItemButton(Material.DIAMOND, 1, "Item"),new ItemButton(Material.DIAMOND, 1, "Item"),new ItemButton(Material.DIAMOND, 1, "Item"),new ItemButton(Material.DIAMOND, 1, "Item"),
-								new ItemButton(Material.DIAMOND, 1, "Item"),new ItemButton(Material.DIAMOND, 1, "Item"),new ItemButton(Material.DIAMOND, 1, "Item"),new ItemButton(Material.DIAMOND, 1, "Item"),
-								new ItemButton(Material.DIAMOND, 1, "Item"),new ItemButton(Material.DIAMOND, 1, "Item"),new ItemButton(Material.DIAMOND, 1, "Item"),new ItemButton(Material.DIAMOND, 1, "Item"))
+						.setContent(items)
 						.setContentDefaultAction(new ClickAction() {
 							
 							@Override
 							public void run(InventoryClickEvent ev) {
 								ev.setCancelled(false);
 								Bukkit.getScheduler().runTaskLater(Main.MAIN, () -> {
-									ev.getClickedInventory().setItem(ev.getSlot(), new ItemStack(Material.DIRT));
+									ev.getClickedInventory().setItem(ev.getSlot(), items.get(ev.getSlot()-11).getItem());
 								}, 1L); 
 							}
 						})

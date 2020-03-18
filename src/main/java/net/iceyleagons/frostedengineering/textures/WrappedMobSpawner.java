@@ -1,8 +1,6 @@
 package net.iceyleagons.frostedengineering.textures;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.CreatureSpawner;
@@ -29,14 +27,12 @@ public class WrappedMobSpawner implements IWrapped {
 
 	@Override
 	public boolean execute(Object... args) {
-		List<Object> arguments = Arrays.asList(args);
+		assert args[0] instanceof Block : "first argument not block";
 
-		assert arguments.get(0) instanceof Block : "first argument not block";
+		Block b = (Block) args[0];
 
-		Block b = (Block) arguments.get(0);
-
-		if (arguments.get(1) instanceof String) {
-			String data = (String) arguments.get(1);
+		if (args[1] instanceof String) {
+			String data = (String) args[1];
 			try {
 				if (b.getState() instanceof CreatureSpawner) {
 					CreatureSpawner cs = (CreatureSpawner) b.getState();
@@ -57,12 +53,12 @@ public class WrappedMobSpawner implements IWrapped {
 			} catch (Exception exception) {
 				exception.printStackTrace();
 			}
-		} else if (arguments.get(1) instanceof TexturedBlock) {
+		} else if (args[1] instanceof TexturedBlock) {
 			try {
 				if (b.getState() instanceof CreatureSpawner) {
 					CreatureSpawner cs = (CreatureSpawner) b.getState();
 
-					TexturedBlock data = (TexturedBlock) arguments.get(1);
+					TexturedBlock data = (TexturedBlock) args[1];
 
 					Object tileEntity = Reflections
 							.setAccessible(cCSClass.getSuperclass().getDeclaredMethod("getTileEntity")).invoke(cs);
@@ -96,7 +92,7 @@ public class WrappedMobSpawner implements IWrapped {
 			}
 		}
 
-		assert arguments.get(1) instanceof String : "second argument not supported";
+		assert args[1] instanceof String : "second argument not supported";
 
 		return false;
 	}

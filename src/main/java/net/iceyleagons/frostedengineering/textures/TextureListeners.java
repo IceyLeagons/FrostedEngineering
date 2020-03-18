@@ -11,13 +11,17 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryCreativeEvent;
 import org.bukkit.event.inventory.PrepareItemCraftEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 
+import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.textures.base.TexturedBlock;
 import net.iceyleagons.frostedengineering.textures.base.TexturedItem;
 
@@ -27,42 +31,33 @@ public class TextureListeners implements Listener {
 	public void onBreakBlock(BlockBreakEvent e) {
 		Block b = e.getBlock();
 		if (Textures.isTexturedBlock(b)) {
-
 			TexturedBlock cb = Textures.getBlock(b);
 			cb.onBroken(e);
-			for (ItemStack i : cb.getLootTable()) {
-				if (i != null && i.getType() != Material.AIR)
-					e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), i);
+			if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
+				for (ItemStack i : cb.getLootTable()) {
+					if (i != null && i.getType() != Material.AIR)
+						e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), i);
+				}
 			}
 
-			BlockStorage ws = Textures.getBlockStorage(e.getBlock().getWorld());
-			ws.handleEvent(e);
+			try {
+				BlockStorage ws = Textures.getBlockStorage(e.getBlock().getWorld());
+				ws.handleEvent(e);
+			} catch (NullPointerException ignored) {
+				// We ignore this, 'cause even if this happens, it just means that the block storage has not been initialized yet. No worries there!
+			}
 
 			e.setExpToDrop(0);
 		}
 	}
 
 	@EventHandler
-	public void onInteractEntity(PlayerInteractEvent e) {
-		if (e.getAction().equals(Action.RIGHT_CLICK_BLOCK)) {
-
-			if (Textures.isTexturedBlock(e.getClickedBlock()) && e.getHand().equals(EquipmentSlot.HAND)) {
-				e.setCancelled(true);
-				Textures.getBlock(e.getClickedBlock()).onInteract(e);
-			}
-			if (e.getHand().equals(EquipmentSlot.HAND) && e.getItem() != null && Textures.isTexturedBlock(e.getItem())
-					&& e.getAction() == Action.RIGHT_CLICK_BLOCK) {
-				e.setCancelled(true);
-				TexturedBlock cb = Textures.getTexturedBlock(e.getItem());
-				int x = e.getClickedBlock().getX() + e.getBlockFace().getModX();
-				int y = e.getClickedBlock().getY() + e.getBlockFace().getModY();
-				int z = e.getClickedBlock().getZ() + e.getBlockFace().getModZ();
-				Block b = new Location(e.getClickedBlock().getWorld(), x, y, z).getBlock();
-				if (b.isEmpty())
-					cb.setBlock(b);
-
-				e.getItem().setAmount(e.getItem().getAmount() - 1);
-			}
+	public void onMiddleClick(InventoryCreativeEvent e) {
+		if (e.getClick() == ClickType.MIDDLE) {
+			if (e.getCurrentItem() != null && e.getWhoClicked() != null)
+				if (Textures.isTexturedBlock(e.getCurrentItem())) {
+					e.getWhoClicked().getInventory().addItem(Textures.getTexturedBlock(e.getCurrentItem()).getItem());
+				}
 		}
 	}
 
@@ -115,13 +110,14 @@ public class TextureListeners implements Listener {
 			if (e.getItem() != null && Textures.isTexturedBlock(e.getItem())
 					&& (e.getAction() == Action.RIGHT_CLICK_BLOCK)) {
 				e.setCancelled(true);
+				Main.debug("" + ((Damageable) e.getItem().getItemMeta()).getDamage());
 				TexturedBlock cb = Textures.getTexturedBlock(e.getItem());
 				int x = e.getClickedBlock().getX() + e.getBlockFace().getModX();
 				int y = e.getClickedBlock().getY() + e.getBlockFace().getModY();
 				int z = e.getClickedBlock().getZ() + e.getBlockFace().getModZ();
 				Block b = new Location(e.getClickedBlock().getWorld(), x, y, z).getBlock();
 				if (b.isEmpty())
-					cb.setBlock(b);
+					cb.setBlock(b, e.getPlayer());
 
 				if (e.getPlayer().getGameMode() != GameMode.CREATIVE)
 					e.getItem().setAmount(e.getItem().getAmount() - 1);
