@@ -63,10 +63,8 @@ import net.iceyleagons.frostedengineering.items.GUIItem;
 import net.iceyleagons.frostedengineering.modules.ModuleManager;
 import net.iceyleagons.frostedengineering.modules.builtin.ExampleModule;
 import net.iceyleagons.frostedengineering.other.Changelog;
+import net.iceyleagons.frostedengineering.storage.StorageHandler;
 import net.iceyleagons.frostedengineering.storage.StorageType;
-import net.iceyleagons.frostedengineering.storage.yaml.CheatConfig;
-import net.iceyleagons.frostedengineering.storage.yaml.Config;
-import net.iceyleagons.frostedengineering.storage.yaml.DefaultConfig;
 import net.iceyleagons.frostedengineering.textures.Textures;
 import net.iceyleagons.frostedengineering.textures.base.TexturedBase;
 import net.iceyleagons.frostedengineering.utils.CustomCrafting;
@@ -81,8 +79,6 @@ public class Main extends JavaPlugin implements CommandExecutor {
 	public static CommandManager COMMAND_MANAGER;
 
 	public static StorageType CHOOSEN_STORAGE;
-
-	private static List<Config> configs = new ArrayList<>();
 
 	public static int PLUGIN_ID = 6426; //Used for BStats
 	public static boolean DEBUG = true;
@@ -114,7 +110,6 @@ public class Main extends JavaPlugin implements CommandExecutor {
 		printLogo();
 
 		//=-=-=Init stuff=-=-=//
-		initConfigs();
 		initStorage();
 		setupCommands();
 		initModules();
@@ -124,7 +119,7 @@ public class Main extends JavaPlugin implements CommandExecutor {
 		startDimensionGeneration();
 		setupCustomItemsAndBlocks();
 		setupCustomItemsAndCrafting();
-
+		StorageHandler.init(MAIN);
 		Bukkit.getServer().getPluginManager().registerEvents(new Listeners(this), MAIN);
 
 		//=-=-=Web stuff=-=-=//
@@ -164,13 +159,6 @@ public class Main extends JavaPlugin implements CommandExecutor {
 		MODULE_MANAGER.registerModule(new ExampleModule());
 		MODULE_MANAGER.enableModules();
 
-	}
-
-	private void initConfigs() {
-		configs.add(new DefaultConfig(MAIN));
-		configs.add(new CheatConfig(MAIN));
-
-		configs.forEach(c -> c.init());
 	}
 
 	public WorldEditPlugin getWorldEdit() {
@@ -256,17 +244,6 @@ public class Main extends JavaPlugin implements CommandExecutor {
 
 		getCommand("tpxd").setExecutor(this);
 
-	}
-
-	/*
-	 * Getters
-	 */
-
-	public static Config getConfig(String name) {
-		for (Config c : configs)
-			if (c.getName().equalsIgnoreCase(name))
-				return c;
-		return null;
 	}
 
 	/*

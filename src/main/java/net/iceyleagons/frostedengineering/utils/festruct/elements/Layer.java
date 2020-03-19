@@ -14,16 +14,49 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package net.iceyleagons.frostedengineering.vegetation.genes.types.interfaces;
+package net.iceyleagons.frostedengineering.utils.festruct.elements;
 
-import net.iceyleagons.frostedengineering.utils.math.Bounds;
+import java.util.ArrayList;
+import java.util.List;
 
-public interface IDecayGene {
+/**
+ * @author TOTHT
+ *
+ * This class represents a layer of a structure, containing all the needed information
+ *
+ */
+public class Layer {
 
-	double next();
+	private int id;
+	private List<String> layerrow;
+	public boolean counted = false;
 
-	double next(double angle, Bounds angleBounds);
+	public Layer() {
+		this.layerrow = new ArrayList<String>();
 
-	double next(double previous);
+	}
+
+	/**
+	 * This will set the id of this layer to the parameter
+	 * 
+	 * @param id is the id to set the id to.
+	 */
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the layer's id
+	 */
+	public int getId() {
+		return id;
+	}
+
+	/**
+	 * @return the rows of this layer.
+	 */
+	public List<String> getLayerRows() {
+		return layerrow;
+	}
 
 }

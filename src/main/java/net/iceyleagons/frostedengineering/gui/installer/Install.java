@@ -1,3 +1,19 @@
+/*******************************************************************************
+ * Copyright (C) IceyLeagons(https://iceyleagons.net/) 
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package net.iceyleagons.frostedengineering.gui.installer;
 
 import java.util.ArrayList;
@@ -8,6 +24,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import net.iceyleagons.frostedengineering.Main;
+import net.iceyleagons.frostedengineering.storage.StorageHandler;
 
 public class Install {
 	
@@ -24,28 +41,28 @@ public class Install {
 			
 			@Override
 			public void run(String text) {
-				Main.getConfig("config").getConfig().set("lang", text);
-				Main.getConfig("config").saveConfig();
+				StorageHandler.getYamlHandler().getConfig("config").getConfig().set("lang", text);
+				StorageHandler.getYamlHandler().getConfig("config").saveConfig();
 				nextStep();
 			}
 		}, p).build());
 		
 		steps.add(new Step(StepType.YES_OR_NO, "Auto update?", new String[] {"Would you like to enable auto update?"},()->{
-			Main.getConfig("config").getConfig().set("auto-update", true);
-			Main.getConfig("config").saveConfig();
+			StorageHandler.getYamlHandler().getConfig("config").getConfig().set("auto-update", true);
+			StorageHandler.getYamlHandler().getConfig("config").saveConfig();
 			nextStep();
 		},()->{
-			Main.getConfig("config").getConfig().set("auto-update", false);
-			Main.getConfig("config").saveConfig();
+			StorageHandler.getYamlHandler().getConfig("config").getConfig().set("auto-update", false);
+			StorageHandler.getYamlHandler().getConfig("config").saveConfig();
 			nextStep();
 		},p).build());
 		steps.add(new Step(StepType.YES_OR_NO, "Cheating?", new String[] {"Would you like to enable cheating?"},()->{
-			Main.getConfig("config").getConfig().set("allow-cheating", true);
-			Main.getConfig("config").saveConfig();
+			StorageHandler.getYamlHandler().getConfig("config").getConfig().set("allow-cheating", true);
+			StorageHandler.getYamlHandler().getConfig("config").saveConfig();
 			nextStep();
 		},()->{
-			Main.getConfig("config").getConfig().set("allow-cheating", false);
-			Main.getConfig("config").saveConfig();
+			StorageHandler.getYamlHandler().getConfig("config").getConfig().set("allow-cheating", false);
+			StorageHandler.getYamlHandler().getConfig("config").saveConfig();
 			nextStep();
 		},p).build());
 		

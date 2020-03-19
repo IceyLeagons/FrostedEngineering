@@ -14,16 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  ******************************************************************************/
-package net.iceyleagons.frostedengineering.vegetation.genes.types.interfaces;
+package net.iceyleagons.frostedengineering.storage;
 
-import net.iceyleagons.frostedengineering.utils.math.Bounds;
+import net.iceyleagons.frostedengineering.Main;
+import net.iceyleagons.frostedengineering.storage.handlers.YamlHandler;
 
-public interface IDecayGene {
-
-	double next();
-
-	double next(double angle, Bounds angleBounds);
-
-	double next(double previous);
+public class StorageHandler {
+	
+	private static YamlHandler yamlHandler;
+	
+	public static void init(Main main) {
+		if (yamlHandler != null) yamlHandler = new YamlHandler(main);
+	}
+	
+	public static YamlHandler getYamlHandler() {
+		return yamlHandler;
+	}
 
 }
