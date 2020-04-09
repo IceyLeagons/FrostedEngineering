@@ -19,7 +19,6 @@ package net.iceyleagons.frostedengineering.utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -48,7 +47,7 @@ public class PluginUtils {
 	}
 	
 	public static String serializeLocation(Location loc) {
-		return loc.getX() + ";" + loc.getY() + ";" + loc.getZ() + ";" + loc.getWorld().getUID();
+		return loc.getX() + ";" + loc.getY() + ";" + loc.getZ() + ";" + loc.getWorld().getName();
 	}
 	
 	public static Location deserializeLocation(String str) {
@@ -56,7 +55,7 @@ public class PluginUtils {
 		double x = Double.parseDouble(data[0]);
 		double y = Double.parseDouble(data[1]);
 		double z = Double.parseDouble(data[2]);
-		World w = Bukkit.getServer().getWorld(UUID.fromString(data[3]));
+		World w = Bukkit.getServer().getWorld((data[3]));
 		return new Location(w,x,y,z);
 	}
 }

@@ -4,7 +4,7 @@
   <groupId>net.IceyLeagons</groupId>
   <artifactId>FrostedEngineering</artifactId>
   <name>FrostedEngineering</name>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.5.0-SNAPSHOT</version>
   <description>FrostedEngineering</description>
   <build>
     <sourceDirectory>src/main/java</sourceDirectory>
@@ -15,14 +15,60 @@
         <filtering>true</filtering>
         <directory>${basedir}/src/main/resources</directory>
         <includes>
-          <include>plugin.yml</include>
-          <include>LICENSE</include>
-          <include>assets.zip</include>
+          <include>**/*</include>
         </includes>
       </resource>
     </resources>
     <finalName>FrostedEngineering</finalName>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <versionRange>[2.2-beta-5,)</versionRange>
+                    <goals>
+                      <goal>single</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
     <plugins>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>create-archive</id>
+            <phase>generate-resources</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <finalName>assets</finalName>
+              <appendAssemblyId>false</appendAssemblyId>
+              <outputDirectory>${basedir}/output</outputDirectory>
+              <descriptors>
+                <descriptor>assembly-zip.xml</descriptor>
+              </descriptors>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.3.2</version>
@@ -43,6 +89,9 @@
             <configuration>
               <artifactSet>
                 <excludes>
+                  <exclude>com.sk89q.worldedit:worldedit-bukkit:jar:</exclude>
+                  <exclude>com.sk89q.worldedit:worldedit-core:jar:</exclude>
+                  <exclude>com.sk89q.worldedit.worldedit-libs:core:jar:</exclude>
                   <exclude>classworlds:classworlds</exclude>
                   <exclude>junit:junit</exclude>
                   <exclude>jmock:*</exclude>
@@ -52,6 +101,9 @@
                   <exclude>com.google.code.findbugs:jsr305:jar:</exclude>
                   <exclude>org.spigotmc:spigot:jar:</exclude>
                   <exclude>com.comphenix.protocol:ProtocolLib:jar:</exclude>
+                  <exclude>com.sk89q.worldedit.worldedit-libs:bukkit:jar:</exclude>
+                  <exclude>org.bukkit:bukkit:jar:</exclude>
+                  <exclude>io.papermc:paperlib:jar:</exclude>
                 </excludes>
               </artifactSet>
             </configuration>
@@ -74,48 +126,20 @@
       <url>https://jitpack.io</url>
     </repository>
     <repository>
-      <id>arantes-repo</id>
-      <url>https://mvn.arantes.dev/repository/maven-releases/</url>
+      <id>enginehub-maven</id>
+      <url>http://maven.enginehub.org/repo/</url>
     </repository>
   </repositories>
   <dependencies>
     <dependency>
       <groupId>com.destroystokyo.paper</groupId>
       <artifactId>paper-api</artifactId>
-      <version>1.14.1-R0.1-SNAPSHOT</version>
+      <version>1.15.2-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
-          <artifactId>commons-lang</artifactId>
-          <groupId>commons-lang</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>jsr305</artifactId>
-          <groupId>com.google.code.findbugs</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>json-simple</artifactId>
-          <groupId>com.googlecode.json-simple</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>guava</artifactId>
-          <groupId>com.google.guava</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>gson</artifactId>
-          <groupId>com.google.code.gson</groupId>
-        </exclusion>
-        <exclusion>
           <artifactId>bungeecord-chat</artifactId>
           <groupId>net.md-5</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>snakeyaml</artifactId>
-          <groupId>org.yaml</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>slf4j-api</artifactId>
-          <groupId>org.slf4j</groupId>
         </exclusion>
         <exclusion>
           <artifactId>asm</artifactId>
@@ -128,15 +152,15 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.mongodb</groupId>
-      <artifactId>mongo-java-driver</artifactId>
-      <version>2.12.3</version>
+      <groupId>com.sk89q.worldedit</groupId>
+      <artifactId>worldedit-bukkit</artifactId>
+      <version>7.0.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.spigotmc</groupId>
-      <artifactId>spigot</artifactId>
-      <version>1.14.2</version>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongo-java-driver</artifactId>
+      <version>2.12.3</version>
       <scope>compile</scope>
     </dependency>
   </dependencies>

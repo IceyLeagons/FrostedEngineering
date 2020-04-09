@@ -16,6 +16,21 @@
  ******************************************************************************/
 package net.iceyleagons.frostedengineering.api;
 
+import net.iceyleagons.frostedengineering.Main;
+import net.iceyleagons.frostedengineering.network.energy.EnergyAPI;
+
 public interface EngineersAPI {
+	
+	/**
+	 * @return the plugin main of FrostedEngineering
+	 */
+	public Main getFrostedPlugin();
+	
+	/**
+	 * Use this to handle energy networks
+	 * 
+	 * @return the {@link EnergyAPI}
+	 */
+	public EnergyAPI getEnergyAPI();
 
 }

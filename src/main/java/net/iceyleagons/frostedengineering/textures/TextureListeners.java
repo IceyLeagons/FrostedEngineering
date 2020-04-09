@@ -17,6 +17,7 @@
 package net.iceyleagons.frostedengineering.textures;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.GameMode;
@@ -36,8 +37,11 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import net.iceyleagons.frostedengineering.Main;
+import net.iceyleagons.frostedengineering.network.energy.EnergyUnit;
+import net.iceyleagons.frostedengineering.network.energy.components.Storage;
 import net.iceyleagons.frostedengineering.textures.base.TexturedBlock;
 import net.iceyleagons.frostedengineering.textures.base.TexturedItem;
 
@@ -48,13 +52,25 @@ public class TextureListeners implements Listener {
 		Block b = e.getBlock();
 		if (Textures.isTexturedBlock(b)) {
 			TexturedBlock cb = Textures.getBlock(b);
-			cb.onBroken(e);
 			if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {
 				for (ItemStack i : cb.getLootTable()) {
-					if (i != null && i.getType() != Material.AIR)
+					if (i != null && i.getType() != Material.AIR) {
+						EnergyUnit u = EnergyUnit.getEnergyUnitAtLocation(e.getBlock().getLocation());
+						if (u != null) {
+							 if (u instanceof Storage) {
+								 Storage s = (Storage)u;
+								 ItemMeta m = i.getItemMeta();
+								 m.setLore(Arrays.asList("#"+s.getUUID()));
+								 i.setItemMeta(m);
+								 System.out.println("storage");
+							 }
+						}
 						e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), i);
+						
+					}
 				}
 			}
+			cb.onBroken(e);
 
 			try {
 				BlockStorage ws = Textures.getBlockStorage(e.getBlock().getWorld());

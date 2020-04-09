@@ -22,7 +22,10 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -39,9 +42,30 @@ public class CustomCraftingTable extends TexturedBlock {
 		super(plugin, "crafting_table", "block/ccrafting_table", "§rCrafting Table");
 	}
 
+	@Override
+	public void onInteract(PlayerInteractEvent event) {
+		if (event.getClickedBlock() != null)
+			openCraftingTable(event.getClickedBlock().getLocation(), event.getPlayer());
+	}
+
+	
+	@Override
+	public void onBroken(BlockBreakEvent e) {
+		if (craftingTableMap.containsKey(e.getBlock().getLocation())) {
+			craftingTableMap.remove(e.getBlock().getLocation());
+		}
+	}
+
+	@Override
+	public void onPlacement(Block block, Player player) {
+		if (!craftingTableMap.containsKey(block.getLocation())) {
+			craftingTableMap.put(block.getLocation(), new InventoryFactory("Crafting Table", 54, FrostedItems.INVENTORY_FILLER, false));
+		}
+	}
+	
 	public static void openCraftingTable(Location location, Player player) {
-		if (!craftingTableMap.containsKey(location)) {
-			InventoryFactory fac = new InventoryFactory("Crafting Table", 54, FrostedItems.INVENTORY_FILLER, false);
+		if (craftingTableMap.containsKey(location)) {
+			InventoryFactory fac = craftingTableMap.get(location);
 			for (int i = 0; i <= 4; i++) {
 				for (int j = 2; j <= 6; j++) {
 					if (i > 0) {
@@ -65,8 +89,6 @@ public class CustomCraftingTable extends TexturedBlock {
 					});
 				}
 			}, 0L, 2L);
-		} else {
-			craftingTableMap.get(location).openInventory(player);
 		}
 	}
 

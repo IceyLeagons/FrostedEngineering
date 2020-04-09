@@ -26,6 +26,8 @@ import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
@@ -43,7 +45,10 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.textures.Textures;
 import net.iceyleagons.frostedengineering.textures.base.TexturedBase;
+import net.iceyleagons.frostedengineering.textures.events.TextureSetupEvent;
 import net.iceyleagons.frostedengineering.textures.initialization.McMeta;
+import net.iceyleagons.frostedengineering.textures.initialization.Sounds;
+import net.iceyleagons.frostedengineering.textures.initialization.Sounds.SoundData;
 
 public interface IUploadable {
 
@@ -176,13 +181,30 @@ public interface IUploadable {
 		printWriter.close();
 	}
 
+	public default void writeSounds(File file) throws IOException {
+		HashMap<String, SoundData> soundsMap = new HashMap<>();
+
+		Textures.sounds.forEach((sound) -> {
+			soundsMap.put(sound.getName(), new SoundData("master", Arrays.asList(sound.getModel())));
+		});
+
+		Sounds sounds = new Sounds(soundsMap);
+
+		FileWriter fw = new FileWriter(file);
+		fw.write(sounds.getJson());
+		fw.close();
+	}
+
 	public default void writeMcMeta(File file) throws IOException {
 		String finalJson = Textures.GSON.toJson(new McMeta(Textures.pack_format, Textures.pack_description));
+
 		FileWriter fW = new FileWriter(file);
-
 		fW.write(finalJson);
-
 		fW.close();
+	}
+
+	public default void throwEvent() {
+		Bukkit.getPluginManager().callEvent(new TextureSetupEvent());
 	}
 
 	public default void download(String link, File file) {

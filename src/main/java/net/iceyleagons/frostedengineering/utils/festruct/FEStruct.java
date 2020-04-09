@@ -62,7 +62,7 @@ public class FEStruct {
 	private void spawnChest(Location loc, Loot l,BlockData bd) {
 		Random r = new Random();
 		loc.getBlock().setType(Material.CHEST);
-		loc.getBlock().setBlockData(bd);
+		loc.getBlock().setBlockData(bd,false);
 		for (String s : l.getItems()) {
 			String[] split = s.split(">");
 			String item = split[0];
@@ -206,7 +206,7 @@ public class FEStruct {
 						if (toPaste.getBlock().getType() == Material.AIR && bd.getMaterial() == Material.AIR)
 							continue;
 
-						toPaste.getBlock().setBlockData(bd);
+						toPaste.getBlock().setBlockData(bd,false);
 					}
 				}
 				start.add(0, 0, 1);
@@ -247,7 +247,7 @@ public class FEStruct {
 	 * @param bds is the {@link BlockData} array
 	 */
 	private void paste(Block[] blocks, BlockData[] bds) {
-		blocks[i].setBlockData(bds[i]);
+		blocks[i].setBlockData(bds[i],false);
 		blocks[i].getLocation().getWorld().playSound(blocks[i].getLocation(), Sound.BLOCK_STONE_BREAK, 1L, 1L);
 		if (i >= blocks.length) {
 			stop();
@@ -272,7 +272,7 @@ public class FEStruct {
 	 */
 	@SuppressWarnings("resource")
 	public FEStruct load() throws FileNotFoundException {
-		Scanner s = new Scanner(f);
+		Scanner s = new Scanner(f, "UTF-16");
 		StringBuilder sb = new StringBuilder();
 		while (s.hasNextLine()) {
 			String data = s.nextLine();

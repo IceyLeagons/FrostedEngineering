@@ -17,8 +17,11 @@
 package net.iceyleagons.frostedengineering.utils.festruct;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +34,6 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import io.netty.util.internal.ThreadLocalRandom;
 import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.utils.Cuboid;
 import net.iceyleagons.frostedengineering.utils.RandomString;
@@ -49,7 +51,7 @@ public class FEStructSaver {
 	private int rarity;
 
 	/**
-	 * @param c is the {@link Cuboid} of the are we want to save
+	 * @param c is the {@link Cuboid} of the area we want to save
 	 * @param name is the name of the structure --> name of the file
 	 * @param entities the list of entity names which can spawn there
 	 * @param rarity is the rarity of the structure when generating
@@ -176,9 +178,13 @@ public class FEStructSaver {
 
 		File f = new File(folder, name + ".festruct");
 
+		Writer fw = null;
+		FileOutputStream fos = null;
+		
 		try {
+			fos = new FileOutputStream(f);
+			fw = new OutputStreamWriter(fos, StandardCharsets.UTF_16);
 			f.createNewFile();
-			FileWriter fw = new FileWriter(f);
 			fw.write("rarity "+rarity+"\n");
 			fw.write(";\n");
 			fw.write(entity.toString());
@@ -186,8 +192,9 @@ public class FEStructSaver {
 			fw.write(material.toString());
 			fw.write(layer.toString());
 
-			fw.close();
 			p.sendMessage("Successfully saved " + name + ".festruct !");
+			fw.close();
+			fos.close();
 		} catch (IOException e1) {
 			e1.printStackTrace();
 			p.sendMessage("There was an error trying to save " + name + ".festruct ! More info in console!" );
@@ -254,7 +261,6 @@ public class FEStructSaver {
 			datas.add(b.getBlockData());
 		}
 		Map<String, String> mats2 = new HashMap<String, String>();
-
 		for (BlockData d : datas) {
 			if (d.getMaterial() != Material.CHEST) {
 				if (!mats2.containsValue(d.getAsString()))
@@ -285,7 +291,7 @@ public class FEStructSaver {
 	/**
 	 * @return a random characther which hasn't been created before.
 	 */
-	RandomString gen = new RandomString(1, ThreadLocalRandom.current());
+	RandomString gen = new RandomString();
 	private String getRandomCharacter() {
 		String s = gen.nextString();//RandomStringUtils.randomAlphabetic(1);
 		if (s == ":" || s == ">" || s == "," || s == ";" || s == "." || blacklist.contains(s))

@@ -47,7 +47,6 @@ public class SaveStructCommand {
 			return CommandFinished.NOCONSOLE;
 
 		Player p = (Player) sender;
-
 		WorldEditPlugin wep = Main.MAIN.getWorldEdit();
 		if (wep == null) {
 			sender.sendMessage("Please install WorldEdit on your server first!");

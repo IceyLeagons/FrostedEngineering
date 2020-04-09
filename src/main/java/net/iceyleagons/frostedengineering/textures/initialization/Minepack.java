@@ -92,14 +92,18 @@ public class Minepack implements IUploadable {
 			deleteFile(new File(finalResourcesFolder, "pack.png"));
 
 		File blocksFolder = createFolder(new File(finalResourcesFolder, "assets/minecraft/textures/block"));
+		File minecraftFolder = createFolder(new File(finalResourcesFolder, "assets/minecraft"));
+		File soundsFile = new File(minecraftFolder, "sounds.json");
 		File mobSpawnerFile = new File(blocksFolder, "spawner.png");
 		deleteFile(mobSpawnerFile);
+		deleteFile(soundsFile);
 
 		File oldResourcePack = new File(Textures.homeFolder, "old-resourcepack.zip");
 		File finalResourcePack = new File(Textures.homeFolder, "final-resourcepack.zip");
 
 		try {
 			writeMcMeta(new File(finalResourcesFolder, "pack.mcmeta"));
+			writeSounds(soundsFile);
 			if (Textures.USE_PACK_IMAGE)
 				FileUtils.moveFile(new File(Textures.mainFolder, "pack.png"),
 						new File(finalResourcesFolder, "pack.png"));
@@ -172,6 +176,7 @@ public class Minepack implements IUploadable {
 			}
 		});
 
+		throwEvent();
 	}
 
 }

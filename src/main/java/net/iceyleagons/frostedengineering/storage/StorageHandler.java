@@ -16,15 +16,22 @@
  ******************************************************************************/
 package net.iceyleagons.frostedengineering.storage;
 
+import java.io.File;
+
 import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.storage.handlers.YamlHandler;
 
 public class StorageHandler {
 	
 	private static YamlHandler yamlHandler;
+	private static File folder;
 	
-	public static void init(Main main) {
-		if (yamlHandler != null) yamlHandler = new YamlHandler(main);
+	public static void init(Main main) {;
+		File dir = new File(Main.class.getProtectionDomain().getCodeSource().getLocation().getPath().replaceAll("%20", " "));
+		File plugins = new File(dir.getParentFile().getPath());
+		folder = new File(plugins, "FrostedDatabases");
+		if (!folder.exists()) folder.mkdirs();
+		yamlHandler = new YamlHandler(main);
 	}
 	
 	public static YamlHandler getYamlHandler() {

@@ -49,20 +49,29 @@ import org.reflections.util.FilterBuilder;
 import com.sk89q.worldedit.bukkit.WorldEditPlugin;
 
 import dev.arantes.inventorymenulib.listeners.InventoryListener;
-import net.iceyleagons.frostedengineering.api.APIHandler;
 import net.iceyleagons.frostedengineering.api.EngineersAPI;
+import net.iceyleagons.frostedengineering.api.EngineersAPIProvider;
 import net.iceyleagons.frostedengineering.commands.CommandManager;
-import net.iceyleagons.frostedengineering.energy.network.Unit;
-import net.iceyleagons.frostedengineering.energy.network.components.textured.TexturedGenerator;
-import net.iceyleagons.frostedengineering.entity.Registry;
 import net.iceyleagons.frostedengineering.generator.frosted.FrostedDimension;
 import net.iceyleagons.frostedengineering.generator.nether.NetherGenerator;
 import net.iceyleagons.frostedengineering.gui.CustomCraftingTable;
+import net.iceyleagons.frostedengineering.interfaces.ISecond;
+import net.iceyleagons.frostedengineering.interfaces.ITick;
 import net.iceyleagons.frostedengineering.items.FrostedItems;
 import net.iceyleagons.frostedengineering.items.GUIItem;
 import net.iceyleagons.frostedengineering.modules.ModuleManager;
 import net.iceyleagons.frostedengineering.modules.builtin.ExampleModule;
-import net.iceyleagons.frostedengineering.other.Changelog;
+import net.iceyleagons.frostedengineering.network.energy.EnergyAPI;
+import net.iceyleagons.frostedengineering.network.energy.components.sub.consumers.furnace.TexturedFurnace;
+import net.iceyleagons.frostedengineering.network.energy.components.sub.generators.coal.TexturedCoalGenerator;
+import net.iceyleagons.frostedengineering.network.energy.components.sub.generators.nonthermal.TexturedNonthermalGenerator;
+import net.iceyleagons.frostedengineering.network.energy.components.sub.storages.battery.TexturedBatteryStorage;
+import net.iceyleagons.frostedengineering.network.energy.components.sub.transformers.lowvoltage.TexturedLowVoltageTransformer;
+import net.iceyleagons.frostedengineering.particles.ParticleManager;
+import net.iceyleagons.frostedengineering.particles.effects.Effect1;
+import net.iceyleagons.frostedengineering.particles.effects.Effect2;
+import net.iceyleagons.frostedengineering.particles.effects.Effect3;
+import net.iceyleagons.frostedengineering.particles.effects.Effect4;
 import net.iceyleagons.frostedengineering.storage.StorageHandler;
 import net.iceyleagons.frostedengineering.storage.StorageType;
 import net.iceyleagons.frostedengineering.textures.Textures;
@@ -86,9 +95,11 @@ public class Main extends JavaPlugin implements CommandExecutor {
 	public static List<TexturedBase> customBases = new ArrayList<>();
 	public static Textures texturesMain;
 
-	public static TexturedGenerator TEXTURED_GENERATOR;
 	public static CustomCraftingTable CUSTOM_CRAFTING_TABLE;
 	public static GUIItem GUI_ITEM;
+
+	public static List<ITick> tickListeners = new ArrayList<ITick>();
+	public static List<ISecond> secondListeners = new ArrayList<ISecond>();
 
 	//public static CraftingTableDatabase CTD = null;
 
@@ -99,7 +110,7 @@ public class Main extends JavaPlugin implements CommandExecutor {
 	@Override
 	public void onLoad() {
 		//Registry.registerEntities();
-		Registry.load();
+		//EnergySaver.saveEnergyNetworks();
 	}
 
 	@SuppressWarnings("deprecation")
@@ -110,6 +121,7 @@ public class Main extends JavaPlugin implements CommandExecutor {
 		printLogo();
 
 		//=-=-=Init stuff=-=-=//
+		new EnergyAPI();
 		initStorage();
 		setupCommands();
 		initModules();
@@ -121,19 +133,24 @@ public class Main extends JavaPlugin implements CommandExecutor {
 		setupCustomItemsAndCrafting();
 		StorageHandler.init(MAIN);
 		Bukkit.getServer().getPluginManager().registerEvents(new Listeners(this), MAIN);
-
 		//=-=-=Web stuff=-=-=//
 		//WebAPI.getAvailableLanguages();
 		new Metrics(this, PLUGIN_ID);
 
 		//=-=-=API stuff=-=-=//
-		Bukkit.getServicesManager().register(EngineersAPI.class, new APIHandler(), MAIN, ServicePriority.High);
+		Bukkit.getServicesManager().register(EngineersAPI.class, new EngineersAPIProvider(), MAIN,
+				ServicePriority.High);
 
-		Changelog.populateBook();
+		//EnergySaver.createFolders();
+		ParticleManager.register(new Effect1(1, "Test"));
+		ParticleManager.register(new Effect2(2,"Test2"));
+		ParticleManager.register(new Effect3(3,"Test3"));
+		ParticleManager.register(new Effect4(4,"Test4"));
 	}
 
 	@Override
 	public void onDisable() {
+		//EnergySaver.saveEnergyNetworks();
 		texturesMain.onDisable();
 	}
 
@@ -170,13 +187,13 @@ public class Main extends JavaPlugin implements CommandExecutor {
 
 	private void startSchedulers() {
 		Bukkit.getScheduler().runTaskTimer(this, () -> {
-			Unit.tickListeners.forEach(l -> {
+			tickListeners.forEach(l -> {
 				l.onTick();
 			});
 		}, 0L, 1L);
 
 		Bukkit.getScheduler().runTaskTimer(this, () -> {
-			Unit.secondListeners.forEach(l -> {
+			secondListeners.forEach(l -> {
 				l.onSecond();
 			});
 		}, 0L, 20L);
@@ -192,7 +209,11 @@ public class Main extends JavaPlugin implements CommandExecutor {
 	}
 
 	private void setupCustomItemsAndBlocks() {
-		customBases.add(TEXTURED_GENERATOR = new TexturedGenerator());
+		customBases.add(new TexturedBatteryStorage());
+		customBases.add(new TexturedCoalGenerator());
+		customBases.add(new TexturedNonthermalGenerator());
+		customBases.add(new TexturedFurnace());
+		customBases.add(new TexturedLowVoltageTransformer());
 		customBases.add(CUSTOM_CRAFTING_TABLE = new CustomCraftingTable(this));
 		customBases.add(GUI_ITEM = new GUIItem(this));
 		customBases.forEach((base) -> {
@@ -286,8 +307,61 @@ public class Main extends JavaPlugin implements CommandExecutor {
 		if (!DEBUG)
 			return;
 		Bukkit.broadcastMessage("§b[FrostedEngineering - DEBUG](Exception) §c" + e.getMessage());
-		System.out.println("[FrostedEngineering - DEBUG](Exception) ");
 		e.printStackTrace();
+	}
+
+	/*
+	 * ITicks & ISeconds
+	 */
+
+	/**
+	 * @return the list of {@link ITick}s registered
+	 */
+	public static List<ITick> getITicks() {
+		return tickListeners;
+	}
+
+	/**
+	 * @return the list of {@link ISecond}s registered
+	 */
+	public static List<ISecond> getISeconds() {
+		return secondListeners;
+	}
+
+	/**
+	 * Used to register {@link ITick}s to the runnable
+	 * 
+	 * @param itick is the {@link ITick} to register
+	 */
+	public static void registerITick(ITick itick) {
+		tickListeners.add(itick);
+	}
+
+	/**
+	 * Used to unregister {@link ITick}s
+	 * 
+	 * @param itick is the {@link ITick} to unregister
+	 */
+	public static void unregisterITick(ITick itick) {
+		tickListeners.remove(itick);
+	}
+
+	/**
+	 * Used to register {@link ISecond}s to the runnable
+	 * 
+	 * @param itick is the {@link ISecond} to register
+	 */
+	public static void registerISecond(ISecond isecond) {
+		secondListeners.add(isecond);
+	}
+
+	/**
+	 * Used to unregister {@link ITick}s
+	 * 
+	 * @param itick is the {@link ITick} to unregister
+	 */
+	public static void unregisterISecond(ISecond isecond) {
+		secondListeners.remove(isecond);
 	}
 
 	@Override

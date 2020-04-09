@@ -42,6 +42,8 @@ import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.textures.base.TexturedBase;
 import net.iceyleagons.frostedengineering.textures.base.TexturedBlock;
 import net.iceyleagons.frostedengineering.textures.base.TexturedItem;
+import net.iceyleagons.frostedengineering.textures.base.TexturedSound;
+import net.iceyleagons.frostedengineering.textures.events.TextureInitializationEvent;
 import net.iceyleagons.frostedengineering.textures.initialization.Minepack;
 import net.iceyleagons.frostedengineering.utils.Reflections;
 
@@ -49,6 +51,7 @@ public class Textures {
 
 	public static ArrayList<TexturedBlock> blocks = new ArrayList<>();
 	public static ArrayList<TexturedItem> items = new ArrayList<>();
+	public static ArrayList<TexturedSound> sounds = new ArrayList<>();
 	public static ArrayList<Plugin> plugins = new ArrayList<>();
 
 	public static HashMap<String, Integer> idMap;
@@ -259,13 +262,19 @@ public class Textures {
 		if (!plugins.contains(base.getPlugin()))
 			plugins.add(base.getPlugin());
 
-		create(base);
+		if (!(base instanceof TexturedSound))
+			create(base);
 
 		if (base instanceof TexturedBlock)
 			blocks.add((TexturedBlock) base);
 
 		if (base instanceof TexturedItem)
 			items.add((TexturedItem) base);
+
+		if (base instanceof TexturedSound)
+			sounds.add((TexturedSound) base);
+
+		Bukkit.getPluginManager().callEvent(new TextureInitializationEvent(base));
 
 		if (base.getRecipe() != null)
 			Bukkit.addRecipe(base.getRecipe());

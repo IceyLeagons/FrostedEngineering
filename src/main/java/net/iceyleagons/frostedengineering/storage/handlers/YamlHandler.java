@@ -26,7 +26,7 @@ import net.iceyleagons.frostedengineering.storage.yaml.CheatConfig;
 import net.iceyleagons.frostedengineering.storage.yaml.Config;
 import net.iceyleagons.frostedengineering.storage.yaml.DefaultConfig;
 
-public class YamlHandler {
+public class YamlHandler{
 
 	private List<Config> configs;
 	private Main main;
@@ -60,5 +60,6 @@ public class YamlHandler {
 				return c;
 		return null;
 	}
+
 	
 }

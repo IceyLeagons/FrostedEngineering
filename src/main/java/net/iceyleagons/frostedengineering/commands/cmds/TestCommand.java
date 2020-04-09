@@ -25,12 +25,13 @@ import org.bukkit.entity.Player;
 import net.iceyleagons.frostedengineering.commands.CommandManager.Arg.ArgInteger;
 import net.iceyleagons.frostedengineering.commands.CommandManager.Cmd;
 import net.iceyleagons.frostedengineering.commands.CommandManager.CommandFinished;
+import net.iceyleagons.frostedengineering.particles.ParticleManager;
 import net.iceyleagons.frostedengineering.utils.festruct.FEStruct;
 
 public class TestCommand {
 	
 	@Cmd(cmd = "test",
-			args = "<id>",
+			args = "<id> [id - only effects]",
 			argTypes = {ArgInteger.class},
 			help = "Test.",
 			longhelp = "Test.",
@@ -42,7 +43,7 @@ public class TestCommand {
 			Player p = (Player)sender;
 			FEStruct s = new FEStruct(new File("consept.festruct")).load();
 			if (id == 1) {
-				s.pasteToLocationBlockByBlock(p.getLocation());
+				ParticleManager.run(Integer.parseInt((String)args[1]), p.getLocation());
 			} else if (id == 2) {
 				s.pasteToLocation(p.getLocation());
 			} else {

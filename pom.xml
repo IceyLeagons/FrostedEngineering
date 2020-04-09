@@ -33,10 +33,6 @@
 			<url>https://jitpack.io</url>
 		</repository>
 		<repository>
-			<id>arantes-repo</id>
-			<url>https://mvn.arantes.dev/repository/maven-releases/</url>
-		</repository>
-		<repository>
 			<id>enginehub-maven</id>
 			<url>http://maven.enginehub.org/repo/</url>
 		</repository>
@@ -66,7 +62,7 @@
 		<dependency>
 			<groupId>com.destroystokyo.paper</groupId>
 			<artifactId>paper-api</artifactId>
-			<version>1.14.1-R0.1-SNAPSHOT</version>
+			<version>1.15.2-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -88,11 +84,6 @@
 			<groupId>org.mongodb</groupId>
 			<artifactId>mongodb-driver</artifactId>
 			<version>3.0.4</version>
-		</dependency>
-		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot</artifactId>
-			<version>1.14.2</version>
 		</dependency>
 
 		<dependency>
@@ -131,12 +122,7 @@
 		<dependency>
 			<groupId>com.github.WesJD</groupId>
 			<artifactId>AnvilGUI</artifactId>
-			<version>8853507add</version>
-		</dependency>
-		<dependency>
-			<groupId>dev.arantes</groupId>
-			<artifactId>InventoryMenuLib</artifactId>
-			<version>1.0</version>
+			<version>8853507add</version><!-- -->
 		</dependency>
 	</dependencies>
 
@@ -211,6 +197,9 @@
 									<exclude>com.google.code.findbugs:jsr305:jar:</exclude>
 									<exclude>org.spigotmc:spigot:jar:</exclude>
 									<exclude>com.comphenix.protocol:ProtocolLib:jar:</exclude>
+									<exclude>com.sk89q.worldedit.worldedit-libs:bukkit:jar:</exclude>
+									<exclude>org.bukkit:bukkit:jar:</exclude>
+									<exclude>io.papermc:paperlib:jar:</exclude>
 								</excludes>
 							</artifactSet>
 						</configuration>

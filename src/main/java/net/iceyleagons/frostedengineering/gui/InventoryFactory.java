@@ -50,6 +50,7 @@ public class InventoryFactory {
 	private int currentOpen = 0;
 	private boolean registered = false;
 	private Listener listener;
+	private List<Player> opened = new ArrayList<Player>();
 	
 	public InventoryFactory(String name, int size) {
 		new InventoryFactory(name, size, null,true);
@@ -102,6 +103,7 @@ public class InventoryFactory {
 			@EventHandler
 			public void onClose(InventoryCloseEvent e) {
 				if (e.getPlayer() instanceof Player) {
+					opened.remove(e.getPlayer());
 					if (inventories.containsKey(e.getInventory())) {
 						InventoryFactory current = inventories.get(e.getInventory());
 
@@ -135,6 +137,10 @@ public class InventoryFactory {
 	
 	public Inventory getSourceInventory() {
 		return inv;
+	}
+	
+	public List<Player> getOpened() {
+		return opened;
 	}
 	
 	public void updateInventory() {
@@ -189,6 +195,7 @@ public class InventoryFactory {
 	public void openInventory(Player player) {
 		currentOpen++;
 		register();
+		opened.add(player);
 		player.openInventory(getSourceInventory());
 	}
 	
