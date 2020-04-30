@@ -1,0 +1,4 @@
+{
+	"parent":"item/parent",
+	"textures": {"layer0":"custom_gui/test"}
+}

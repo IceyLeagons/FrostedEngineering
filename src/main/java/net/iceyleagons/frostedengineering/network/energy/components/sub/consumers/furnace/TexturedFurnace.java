@@ -6,9 +6,9 @@ import net.iceyleagons.frostedengineering.textures.base.TexturedBlock;
 
 public class TexturedFurnace extends TexturedBlock {
 
-	public TexturedFurnace() {
-		super(Main.MAIN, "eletric_furnace", "block/electric_furnace", "§rElectric furnace");
-		ComponentManager.registerComponent("fe:electricfurnace", this);
-	}
+    public TexturedFurnace() {
+        super(Main.MAIN, "eletric_furnace", "block/electric_furnace", "§rElectric furnace");
+        ComponentManager.registerComponent("fe:electricfurnace", this);
+    }
 
 }

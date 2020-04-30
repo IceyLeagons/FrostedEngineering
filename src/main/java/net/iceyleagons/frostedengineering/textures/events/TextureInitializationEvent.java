@@ -7,20 +7,20 @@ import net.iceyleagons.frostedengineering.textures.base.TexturedBase;
 
 public class TextureInitializationEvent extends Event {
 
-	private TexturedBase texturedBase;
-	protected static HandlerList handlers = new HandlerList();
+    private TexturedBase texturedBase;
+    protected static HandlerList handlers = new HandlerList();
 
-	public TextureInitializationEvent(TexturedBase base) {
-		this.texturedBase = base;
-	}
+    public TextureInitializationEvent(TexturedBase base) {
+        this.texturedBase = base;
+    }
 
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
+    @Override
+    public HandlerList getHandlers() {
+        return handlers;
+    }
 
-	public TexturedBase getTexturedBase() {
-		return texturedBase;
-	}
+    public TexturedBase getTexturedBase() {
+        return texturedBase;
+    }
 
 }

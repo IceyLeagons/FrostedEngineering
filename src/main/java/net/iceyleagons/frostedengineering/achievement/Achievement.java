@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package net.iceyleagons.frostedengineering.achievement;
 
@@ -16,9 +16,11 @@ import java.lang.annotation.Target;
  *
  */
 public @interface Achievement {
-	
-	String name();
-	String description();
-	AchievementType type();
+
+    String name();
+
+    String description();
+
+    AchievementType type();
 
 }

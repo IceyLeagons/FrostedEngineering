@@ -35,7 +35,7 @@ public class SoundEvent extends Event implements Cancellable {
     public void setCancelled(boolean cancel) {
         cancelled = cancel;
     }
-    
+
     public EventType getType() {
         return type;
     }
@@ -47,7 +47,7 @@ public class SoundEvent extends Event implements Cancellable {
     public TexturedSound getSound() {
         return sound;
     }
-    
+
     public static enum EventType {
         PLAY, STOP;
     }

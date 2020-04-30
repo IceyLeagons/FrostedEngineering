@@ -6,8 +6,8 @@ import net.iceyleagons.frostedengineering.textures.base.TexturedSound;
 
 public class CoalGeneratorSound extends TexturedSound {
 
-	public CoalGeneratorSound(JavaPlugin plugin) {
-		super(plugin, "generator", "frosted/generator", (short) 100, 0.75f, 1.f);
-	}
+    public CoalGeneratorSound(JavaPlugin plugin) {
+        super(plugin, "generator", "frosted/generator", (short) 100, 0.75f, 1.f);
+    }
 
 }

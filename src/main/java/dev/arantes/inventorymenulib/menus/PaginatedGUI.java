@@ -52,7 +52,7 @@ public class PaginatedGUI {
         pages.set(pos, page);
     }
 
-    public void removePage(int pos){
+    public void removePage(int pos) {
         pages.remove(pos);
     }
 

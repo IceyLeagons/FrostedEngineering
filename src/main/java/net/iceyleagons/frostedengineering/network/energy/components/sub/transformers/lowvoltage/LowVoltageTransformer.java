@@ -9,12 +9,12 @@ import net.iceyleagons.frostedengineering.network.energy.components.Transformato
 
 public class LowVoltageTransformer extends Transformator {
 
-	public LowVoltageTransformer(Location loc, UUID uuid, EnergyNetworkType capable) {
-		super(loc, uuid, capable);
-	}
-	
-	public LowVoltageTransformer(Location loc,EnergyNetworkType capable) {
-		super(loc, capable);
-	}
+    public LowVoltageTransformer(Location loc, UUID uuid, EnergyNetworkType capable) {
+        super(loc, uuid, capable);
+    }
+
+    public LowVoltageTransformer(Location loc, EnergyNetworkType capable) {
+        super(loc, capable);
+    }
 
 }

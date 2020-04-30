@@ -8,9 +8,9 @@ import net.iceyleagons.frostedengineering.achievement.AchievementType;
 
 @Achievement(name = "", description = "", type = AchievementType.EASY)
 public class Example {
-	
-	@AchievementAward
-	public void awardPlayer(Player p) {
-		
-	}
+
+    @AchievementAward
+    public void awardPlayer(Player p) {
+
+    }
 }

@@ -5,11 +5,11 @@ import org.bukkit.event.HandlerList;
 
 public class TextureSetupEvent extends Event {
 
-	protected static HandlerList handlers = new HandlerList();
+    protected static HandlerList handlers = new HandlerList();
 
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
+    @Override
+    public HandlerList getHandlers() {
+        return handlers;
+    }
 
 }
