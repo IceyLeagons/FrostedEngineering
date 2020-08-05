@@ -292,7 +292,13 @@ public interface IUploadable {
             BufferedInputStream bIS = new BufferedInputStream(new URL(link).openStream());
 
             FileOutputStream fOS = new FileOutputStream(file);
-            fOS.write(bIS.readAllBytes());
+
+            byte[] buff = new byte[32*1024];
+            int len=0;
+            while((len = bIS.read(buff)) > 0)
+                fOS.write(buff,0,len);
+
+            // fOS.write(bIS.readAllBytes());
 
             fOS.close();
             bIS.close();

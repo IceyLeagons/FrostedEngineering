@@ -32,11 +32,7 @@ import net.iceyleagons.frostedengineering.items.FrostedItems;
 import net.iceyleagons.frostedengineering.items.GUIItem;
 import net.iceyleagons.frostedengineering.modules.ModuleManager;
 import net.iceyleagons.frostedengineering.modules.builtin.ExampleModule;
-import net.iceyleagons.frostedengineering.network.energyold.EnergyAPI;
-import net.iceyleagons.frostedengineering.network.energyold.components.sub.consumers.furnace.TexturedFurnace;
-import net.iceyleagons.frostedengineering.network.energyold.components.sub.generators.coal.TexturedCoalGenerator;
-import net.iceyleagons.frostedengineering.network.energyold.components.sub.generators.nonthermal.TexturedNonthermalGenerator;
-import net.iceyleagons.frostedengineering.network.energyold.components.sub.storages.battery.TexturedBatteryStorage;
+import net.iceyleagons.frostedengineering.network.energy.components.impl.storages.battery.TexturedBattery;
 import old.particles.ParticleManager;
 import old.particles.effects.Effect1;
 import old.particles.effects.Effect2;
@@ -66,6 +62,8 @@ import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
+
+
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
@@ -122,7 +120,6 @@ public class Main extends JavaPlugin implements CommandExecutor {
         }
 
         //=-=-=Init stuff=-=-=//
-        new EnergyAPI();
         initStorage();
         setupCommands();
         initModules();
@@ -229,10 +226,11 @@ public class Main extends JavaPlugin implements CommandExecutor {
     }
 
     private void setupCustomItemsAndBlocks() {
-        customBases.add(new TexturedBatteryStorage());
-        customBases.add(new TexturedCoalGenerator());
-        customBases.add(new TexturedNonthermalGenerator());
-        customBases.add(new TexturedFurnace());
+        //customBases.add(new TexturedBatteryStorage());
+        //customBases.add(new TexturedCoalGenerator());
+        //customBases.add(new TexturedNonthermalGenerator());
+        //customBases.add(new TexturedFurnace());
+        customBases.add(new TexturedBattery());
         customBases.add(CUSTOM_CRAFTING_TABLE = new CustomCraftingTable(this));
         customBases.add(GUI_ITEM = new GUIItem(this));
         customBases.forEach(Textures::register);

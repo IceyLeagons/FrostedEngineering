@@ -41,7 +41,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.network.energy.EnergyUnit;
-import net.iceyleagons.frostedengineering.network.energyold.components.Storage;
+//import net.iceyleagons.frostedengineering.network.energyold.components.Storage;
 import net.iceyleagons.frostedengineering.textures.base.TexturedBlock;
 import net.iceyleagons.frostedengineering.textures.base.TexturedItem;
 
@@ -49,21 +49,13 @@ public class TextureListeners implements Listener {
 
     @EventHandler
     public void onBreakBlock(BlockBreakEvent e) {
+
         Block b = e.getBlock();
         if (Textures.isTexturedBlock(b)) {
             TexturedBlock cb = Textures.getBlock(b);
             if (e.getPlayer().getGameMode() != GameMode.CREATIVE)
                 for (ItemStack i : cb.getLootTable())
                     if (i != null && i.getType() != Material.AIR) {
-                        EnergyUnit u = EnergyUnit.getEnergyUnitAtLocation(e.getBlock().getLocation());
-                        if (u != null)
-                            if (u instanceof Storage) {
-                                Storage s = (Storage) u;
-                                ItemMeta m = i.getItemMeta();
-                                m.setLore(Arrays.asList("#" + s.getUUID()));
-                                i.setItemMeta(m);
-                                System.out.println("storage");
-                            }
                         e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), i);
                     }
             cb.onBroken(e);

@@ -20,7 +20,11 @@ public class Tracer {
     }
 
     private static void traceMerge(@NonNull Unit unit) {
+        System.out.println("tracing");
+        unit.getNeighbours().forEach(System.out::println);
+
         List<Unit> connections = dfs(unit);
+        connections.forEach(System.out::println);
         Network network = unit.getNetwork().generateSameType();
         connections.forEach(u -> {
             try {
@@ -60,7 +64,7 @@ public class Tracer {
 
         while (!stack.isEmpty()) {
             Unit element = stack.pop();
-            if (element.isVisited()) {
+            if (!element.isVisited()) {
                 element.visit();
                 graph.add(element);
             }
@@ -68,7 +72,7 @@ public class Tracer {
             List<Unit> neighbours = element.getNeighbours();
             for (Unit n : neighbours) {
                 if (n != null && !n.isVisited() && !n.isDestroyed())
-                    stack.add(n);
+                    stack.push(n);
             }
         }
         return graph;

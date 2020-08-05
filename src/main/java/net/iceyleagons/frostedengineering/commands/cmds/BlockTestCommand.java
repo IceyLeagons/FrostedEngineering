@@ -25,7 +25,6 @@ import org.bukkit.entity.Player;
 import net.iceyleagons.frostedengineering.commands.CommandManager.Cmd;
 import net.iceyleagons.frostedengineering.commands.CommandManager.CommandFinished;
 import net.iceyleagons.frostedengineering.network.energy.ComponentManager;
-import net.iceyleagons.frostedengineering.network.energyold.components.sub.generators.coal.TexturedCoalGenerator;
 
 public class BlockTestCommand {
     @Cmd(cmd = "blocktest", args = "", argTypes = {}, help = "Gives you a test block.", longhelp = "Gives you a test block.", permission = net.iceyleagons.frostedengineering.other.permission.Permissions.COMMAND_DEBUG)
@@ -38,7 +37,7 @@ public class BlockTestCommand {
                 new Tree(2, 2, 3, 3, 8, 10)
                         .place(b, new Tree.TreeParameters(Material.OAK_LOG, Material.OAK_LEAVES, Material.OAK_LOG,
                                 3, 3, 100, 5, 3, true));
-            player.getInventory().addItem(((TexturedCoalGenerator) ComponentManager.getComponent("fe:coalgenerator")).getItem());
+            //.getInventory().addItem(((TexturedCoalGenerator) ComponentManager.getComponent("fe:coalgenerator")).getItem());
             return CommandFinished.DONE;
         }
         return CommandFinished.NOCONSOLE;

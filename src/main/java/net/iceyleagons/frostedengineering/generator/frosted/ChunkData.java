@@ -90,13 +90,11 @@ public class ChunkData {
 
     private void setup(long seed) {
         MathUtils utils = MathUtils.getInstance(seed);
-        if (ChunkData.noise != null && ChunkData.caveNoise != null) {
-            // Terrain noise
-            ChunkData.noise = utils.getNoise(MathUtils.NoiseClass.TERRAIN);
+        // Terrain noise
+        ChunkData.noise = utils.getNoise(MathUtils.NoiseClass.TERRAIN);
 
-            // Chunk noise
-            ChunkData.caveNoise = utils.getNoise(MathUtils.NoiseClass.CAVE);
-        }
+        // Chunk noise
+        ChunkData.caveNoise = utils.getNoise(MathUtils.NoiseClass.CAVE);
 
         ChunkData.erosion = utils.getErosion() != null ? utils.getErosion()
                 : utils.getErosion(mapSize, 1f, 1f, 128, 10f, .01f, .8f, .8f, 01f, 4f, .3f, 4, erosionIterations);

@@ -33,8 +33,6 @@ import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.gui.InventoryFactory;
 import net.iceyleagons.frostedengineering.network.Network;
 import net.iceyleagons.frostedengineering.network.Unit;
-import net.iceyleagons.frostedengineering.network.energyold.components.Generator;
-import net.iceyleagons.frostedengineering.network.energyold.components.sub.generators.coal.TexturedCoalGenerator;
 
 /**
  * @author TOTHT
@@ -59,6 +57,7 @@ public abstract class EnergyUnit implements Unit, Serializable {
      *                network is done automatically)
      */
     public EnergyUnit(Location loc, EnergyNetwork network) throws UnsupportedUnitType {
+        units.add(this);
         this.loc = loc;
         this.network = network;
         this.network.addUnit(this);
@@ -75,6 +74,7 @@ public abstract class EnergyUnit implements Unit, Serializable {
      * @param itemsInside is the items inside the Unit (used when loading)
      */
     public EnergyUnit(Location loc, EnergyNetwork network, UUID uuid, List<ItemStack> itemsInside) throws UnsupportedUnitType {
+        units.add(this);
         this.loc = loc;
         this.network = network;
         this.network.addUnit(this);
@@ -148,8 +148,7 @@ public abstract class EnergyUnit implements Unit, Serializable {
         /*
          * Merging
          */
-        if (traceractivated)
-            Tracer.trace(this);
+        Tracer.trace(this);
     }
 
 

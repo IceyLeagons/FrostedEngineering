@@ -35,8 +35,8 @@ public class CustomCrafting {
     private Map<String, ItemStack> recipeItems = new HashMap<String, ItemStack>();
     private String[] recipe;
 
-    public CustomCrafting(@NonNull ItemStack inputItem, @NonNull ItemStack outputItem, @Nullable ItemStack powerItem,
-                          String[] recipe) {
+    public CustomCrafting(@Nullable ItemStack inputItem, @NonNull ItemStack outputItem, @Nullable ItemStack powerItem,
+                          @NonNull String[] recipe) {
         this.outputItem = outputItem;
         this.inputItem = inputItem;
         this.powerItem = powerItem;

@@ -16,6 +16,7 @@
  ******************************************************************************/
 package net.iceyleagons.frostedengineering;
 
+import com.gargoylesoftware.htmlunit.javascript.host.Storage;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -39,11 +40,11 @@ import net.iceyleagons.frostedengineering.commands.cmds.SaplingCommand;
 import net.iceyleagons.frostedengineering.commands.cmds.StickCommand;
 import net.iceyleagons.frostedengineering.gui.CustomCraftingTable;
 import net.iceyleagons.frostedengineering.network.energy.EnergyUnit;
-import net.iceyleagons.frostedengineering.network.energyold.components.Cable;
+/*import net.iceyleagons.frostedengineering.network.energyold.components.Cable;
 import net.iceyleagons.frostedengineering.network.energyold.components.Consumer;
 import net.iceyleagons.frostedengineering.network.energyold.components.Generator;
 import net.iceyleagons.frostedengineering.network.energyold.components.Storage;
-import net.iceyleagons.frostedengineering.quests.QuestNPC;
+import net.iceyleagons.frostedengineering.quests.QuestNPC;*/
 import net.md_5.bungee.api.ChatColor;
 
 public class Listeners implements Listener {
@@ -76,7 +77,7 @@ public class Listeners implements Listener {
     @EventHandler
     public void onLoaded(WorldLoadEvent e) {
         if (e.getWorld().getName().equals("island")) {
-            Bukkit.getScheduler().runTaskLater(Main.MAIN, QuestNPC::spawn, 100L);
+            //Bukkit.getScheduler().runTaskLater(Main.MAIN, QuestNPC::spawn, 100L);
         }
     }
 
@@ -205,7 +206,7 @@ public class Listeners implements Listener {
                     }
                     p.sendMessage("§e§l[Energy Debug] §rUnit found!");
                     p.sendMessage("§f - Neighbours: §b" + u.getEnergyNeighbours().size());
-                    if (u instanceof Storage) {
+                    /*if (u instanceof Storage) {
                         p.sendMessage("§f - Unit type: §bStorage");
                     } else if (u instanceof Generator) {
                         p.sendMessage("§f - Unit type: §bGenerator");
@@ -214,13 +215,13 @@ public class Listeners implements Listener {
                     } else if (u instanceof Cable) {
                         p.sendMessage("§f - Unit type: §bCable");
                     } else {
-                        p.sendMessage("§f - Unit type: §bNot defined?? How this even happened?");
-                    }
+                        p.sendMessage("§f - Unit type: §bNot defined?? How does this even happen?");
+                    }*/
 
                     p.sendMessage("§f - Energy network: §b" + u.getEnergyNetwork().toString().split("@")[1]);
-                    p.sendMessage("§f    - Capacity: §b" + u.getEnergyNetwork().getCapacity());
-                    p.sendMessage("§f    - Stored: §b" + u.getEnergyNetwork().getFP());
-                    p.sendMessage("§f    - Storages: §b" + u.getEnergyNetwork().getStorages().size());
+                    //p.sendMessage("§f    - Capacity: §b" + u.getEnergyNetwork().getCapacity());
+                    //p.sendMessage("§f    - Stored: §b" + u.getEnergyNetwork().getFP());
+                    //p.sendMessage("§f    - Storages: §b" + u.getEnergyNetwork().getStorages().size());
                     p.sendMessage("§f    - Units: §b" + u.getEnergyNetwork().getUnits().size());
                     p.sendMessage("§f    - NetworkType: §b" + u.getEnergyNetwork().getType().toString());
                     e.setCancelled(true);

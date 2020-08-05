@@ -27,10 +27,9 @@ public class AddonDescription {
         main = obj.getString("main");
         authors = obj.getString("authors");
 
-        if (name.isBlank() || version.isBlank() || description.isBlank() || main.isBlank() || authors.isBlank())
+        if (name.isEmpty() || version.isEmpty() || description.isEmpty() || main.isEmpty() || authors.isEmpty())
             throw new InvalidAddonDescriptionException(fileName);
-         else if (name.isEmpty() || version.isEmpty() || description.isEmpty() || main.isEmpty() || authors.isEmpty())
-            throw new InvalidAddonDescriptionException(fileName);
+
 
     }
 
