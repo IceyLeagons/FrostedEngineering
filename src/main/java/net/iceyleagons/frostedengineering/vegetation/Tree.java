@@ -80,7 +80,8 @@ public class Tree {
         type = 1;
         this.result = this.axiom = axiom;
         this.iterations = iterations;
-        this.lSystem = new LSystem(axiom, new LSystem.Ruleset(new Rule("B", "BB-[-<B+>B+>B]+[+>L-<B-<B]")));
+        this.lSystem = new LSystem(axiom, new LSystem.Ruleset(new Rule("B", "BB-[-<B+>B+>B]+[+>L-<B-<B]"),
+                new Rule("L", "BB-[-<B+>B+>B]+[+>L-<B-<B]")));
     }
 
     /*

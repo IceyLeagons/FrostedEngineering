@@ -21,7 +21,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import lombok.Data;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.util.Vector;
 
 import net.iceyleagons.frostedengineering.utils.math.Range;
@@ -36,8 +35,7 @@ public class MathUtils {
 
     public static MathUtils instance;
 
-    private Map<NoiseClass, Map.Entry<FastNoise, Optional<FastNoise>>> noiseMap = new HashMap<>();
-    private FastNoise noiser;
+    private final Map<NoiseClass, Map.Entry<FastNoise, Optional<FastNoise>>> noiseMap = new HashMap<>();
     private Erosion erosionModel;
 
     private static long seed = 1337L;
