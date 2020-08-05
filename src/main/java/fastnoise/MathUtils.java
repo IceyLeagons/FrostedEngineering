@@ -16,9 +16,12 @@
  ******************************************************************************/
 package fastnoise;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
+import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.util.Vector;
 
 import net.iceyleagons.frostedengineering.utils.math.Range;
@@ -33,6 +36,7 @@ public class MathUtils {
 
     public static MathUtils instance;
 
+    private Map<NoiseClass, Map.Entry<FastNoise, Optional<FastNoise>>> noiseMap = new HashMap<>();
     private FastNoise noiser;
     private Erosion erosionModel;
 
@@ -72,11 +76,10 @@ public class MathUtils {
         return this.erosionModel;
     }
 
-    public FastNoise getNoiser() {
-        if (this.noiser == null)
-            return this.noiser = new FastNoise();
+    public Map.Entry<FastNoise, Optional<FastNoise>> getNoise(NoiseClass noiseClass) {
+        setupNoise(noiseClass);
 
-        return this.noiser;
+        return noiseMap.get(noiseClass);
     }
 
     public MathUtils() {
@@ -86,6 +89,41 @@ public class MathUtils {
     public MathUtils(long seed) {
         MathUtils.seed = seed;
         MathUtils.instance = this;
+    }
+
+    public enum NoiseClass {
+        CAVE, TERRAIN
+    }
+
+    public void setupNoise(NoiseClass noiseClass) {
+        if (noiseMap.containsKey(noiseClass))
+            return;
+        switch (noiseClass) {
+            default:
+            case TERRAIN:
+                MapEntry<FastNoise, Optional<FastNoise>> mapEntry = MapEntry.of(new FastNoise().setNoiseType(FastNoise.NoiseType.FRACTAL_SIMPLEX)
+                                .setFractalOctaves(8).setFractalLacunarity(2.f).setFractalGain(.5f).setFractalType(FastNoise.FractalType.FBM),
+                        Optional.of(new FastNoise().setNoiseType(FastNoise.NoiseType.CELLULAR)));
+                noiseMap.put(noiseClass, mapEntry);
+                break;
+            case CAVE:
+                FastNoise firstNoise = new FastNoise().setNoiseType(FastNoise.NoiseType.FRACTAL_SIMPLEX).setFractalGain(.5f).setFractalLacunarity(2.f)
+                        .setFractalType(FastNoise.FractalType.FBM).setFractalOctaves(4);
+                FastNoise secondNoise = firstNoise.clone().setSeed(firstNoise.getSeed() + ThreadLocalRandom.current().nextInt(99000) + 1000);
+                MapEntry<FastNoise, Optional<FastNoise>> mapEntry1 = MapEntry.of(firstNoise, Optional.of(secondNoise));
+                noiseMap.put(noiseClass, mapEntry1);
+                break;
+        }
+    }
+
+    public static class MapEntry<K, V> extends AbstractMap.SimpleEntry<K, V> {
+        public MapEntry(K key, V value) {
+            super(key, value);
+        }
+
+        public static <K, V> MapEntry<K, V> of(K key, V value) {
+            return new MapEntry<>(key, value);
+        }
     }
 
     // FastNoise.java
@@ -136,7 +174,7 @@ public class MathUtils {
             CELL_VALUE, NOISE_LOOKUP, DISTANCE, DISTANCE2, DISTANCE2_ADD, DISTANCE2_SUB, DISTANCE2_MUL, DISTANCE2_DIV
         }
 
-        private long m_seed = 1337;
+        private long m_seed;
         private float m_frequency = (float) 0.01;
         private Interp m_interp = Interp.QUINTIC;
         private NoiseType m_noiseType = NoiseType.SIMPLEX;
@@ -164,11 +202,6 @@ public class MathUtils {
             calculateFractalBounding();
         }
 
-        // Returns a 0 float/double
-        public static float getDecimalType() {
-            return 0;
-        }
-
         // Returns the seed used by this object
         public long getSeed() {
             return m_seed;
@@ -176,14 +209,16 @@ public class MathUtils {
 
         // Sets seed used for all noise types
         // Default: 1337
-        public void setSeed(long seed) {
+        public FastNoise setSeed(long seed) {
             m_seed = seed;
+            return this;
         }
 
         // Sets frequency for all noise types
         // Default: 0.01
-        public void setFrequency(float frequency) {
+        public FastNoise setFrequency(float frequency) {
             m_frequency = frequency;
+            return this;
         }
 
         // Changes the interpolation method used to smooth between noise values
@@ -193,59 +228,68 @@ public class MathUtils {
         // - Quintic
         // Used in Value, Gradient Noise and Position Perturbing
         // Default: Quintic
-        public void setInterp(Interp interp) {
+        public FastNoise setInterp(Interp interp) {
             m_interp = interp;
+            return this;
         }
 
         // Sets noise return type of GetNoise(...)
         // Default: Simplex
-        public void setNoiseType(NoiseType noiseType) {
+        public FastNoise setNoiseType(NoiseType noiseType) {
             m_noiseType = noiseType;
+            return this;
         }
 
         // Sets octave count for all fractal noise types
         // Default: 3
-        public void setFractalOctaves(int octaves) {
+        public FastNoise setFractalOctaves(int octaves) {
             m_octaves = octaves;
             calculateFractalBounding();
+            return this;
         }
 
         // Sets octave lacunarity for all fractal noise types
         // Default: 2.0
-        public void setFractalLacunarity(float lacunarity) {
+        public FastNoise setFractalLacunarity(float lacunarity) {
             m_lacunarity = lacunarity;
+            return this;
         }
 
         // Sets octave gain for all fractal noise types
         // Default: 0.5
-        public void setFractalGain(float gain) {
+        public FastNoise setFractalGain(float gain) {
             m_gain = gain;
             calculateFractalBounding();
+            return this;
         }
 
         // Sets method for combining octaves in all fractal noise types
         // Default: FBM
-        public void setFractalType(FractalType fractalType) {
+        public FastNoise setFractalType(FractalType fractalType) {
             m_fractalType = fractalType;
+            return this;
         }
 
         // Sets return type from cellular noise calculations
         // Note: NoiseLookup requires another FastNoise object be set with SetCellularNoiseLookup() to function
         // Default: CellValue
-        public void setCellularDistanceFunction(CellularDistanceFunction cellularDistanceFunction) {
+        public FastNoise setCellularDistanceFunction(CellularDistanceFunction cellularDistanceFunction) {
             m_cellularDistanceFunction = cellularDistanceFunction;
+            return this;
         }
 
         // Sets distance function used in cellular noise calculations
         // Default: Euclidean
-        public void setCellularReturnType(CellularReturnType cellularReturnType) {
+        public FastNoise setCellularReturnType(CellularReturnType cellularReturnType) {
             m_cellularReturnType = cellularReturnType;
+            return this;
         }
 
         // Noise used to calculate a cell value if cellular return type is NoiseLookup
         // The lookup value is acquired through GetNoise() so ensure you SetNoiseType() on the noise lookup, value, gradient or simplex is recommended
-        public void setCellularNoiseLookup(FastNoise noise) {
+        public FastNoise setCellularNoiseLookup(FastNoise noise) {
             m_cellularNoiseLookup = noise;
+            return this;
         }
 
         private static final Vector2[] GRAD_2D = {new Vector2(-1, -1), new Vector2(1, -1), new Vector2(-1, 1),
@@ -2232,6 +2276,74 @@ public class MathUtils {
         }
     }
 
+    public enum RotationAxis {
+        X, Y, Z
+    }
+
+    @Data
+    public static class Rotation {
+
+        @NonNull
+        public float x, y, z;
+        float rX, rY, rZ;
+
+        public Vector3 realVector() {
+            return new Vector3(x, y, z);
+        }
+
+        public Vector3 toVector() {
+            return new Vector3(rX, rY, rZ);
+        }
+
+        public Rotation(float x, float y, float z) {
+            this.x = x;
+            this.y = y;
+            this.z = z;
+
+            recalculateValues();
+        }
+
+        public void addRotation(float rotation, RotationAxis axis) {
+            switch (axis) {
+                default:
+                case X:
+                    this.x += rotation;
+                    break;
+                case Y:
+                    this.y += rotation;
+                    break;
+                case Z:
+                    this.z += rotation;
+                    break;
+            }
+
+            recalculateValues();
+        }
+
+        void recalculateValues() {
+            if (x < -180 || x > 180)
+                x = -(x) + (x % 180 * 2);
+            if (y < -180 || y > 180)
+                y = -(y) + (y % 180 * 2);
+            if (z < -180 || z > 180)
+                z = -(z) + (z % 180 * 2);
+
+            rX = map(x);
+            rY = map(y);
+            rZ = map(z);
+        }
+    }
+
+    /**
+     * Maps values to fit in the range of 1 to -1.
+     *
+     * @param value the value. (between -180 and 180)
+     * @return mapped value.
+     */
+    static float map(float value) {
+        return (value + 180.f) * 2.f / (180.f + 180.f);
+    }
+
     public static class Vector3 {
         public float x, y, z;
 
@@ -2262,6 +2374,10 @@ public class MathUtils {
 
         public static Vector3 mul(final Vector3 vec1, final int n) {
             return new Vector3(vec1.x * n, vec1.y * n, vec1.z * n);
+        }
+
+        public static Vector3 mul(final Vector3 vec1, final Vector3 vec2) {
+            return new Vector3(vec1.x * vec2.x, vec1.y * vec2.y, vec1.z * vec2.z);
         }
 
         public static Vector3 normalize(Vector3 vec1) {

@@ -38,8 +38,6 @@ public class FrostedDimension extends ChunkGenerator {
     @Override
     public ChunkData generateChunkData(World world, Random random, int chunkX, int chunkZ,
                                        ChunkGenerator.BiomeGrid biomes) {
-        @SuppressWarnings("unused")
-        long timeNow = System.currentTimeMillis();
         ChunkData chunk = this.createChunkData(world);
 
         int rx = chunkX * 16;
@@ -99,26 +97,12 @@ public class FrostedDimension extends ChunkGenerator {
                                         chunk.setBlock(x, i2 + 1, z, Material.STONE);
                                         i2 = noiseData.pointType.offset - 1;
                                     }
-                                    mat = null;
                                 }
                             }
 
                             if (biome != null)
                                 for (int j = 0; j < 256; j++)
                                     biomes.setBiome(x, j, z, biome.biome);
-
-                            for (int j = 0; j < 255; j++)
-                                if (chunk.getType(rx + x, y, rz + z) != Material.AIR)
-                                    if (j % 3 == 0)
-                                        if (chunkBase.empty(rx + x, j, rz + z)) {
-                                            chunk.setBlock(rx + x, j, rz + z, Material.AIR);
-                                            if (chunkBase.empty(rx + x, j - 1, rz + z)) {
-                                                chunk.setBlock(rx + x, j - 1, rz + z, Material.AIR);
-                                                if (chunkBase.empty(rx + x, j - 2, rz + z))
-                                                    chunk.setBlock(rx + x, j - 2, rz + z, Material.AIR);
-                                            }
-                                        }
-
 
                             continue z;
                         }

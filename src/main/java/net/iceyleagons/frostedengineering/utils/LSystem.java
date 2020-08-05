@@ -1,9 +1,18 @@
 package net.iceyleagons.frostedengineering.utils;
 
+import fastnoise.MathUtils.Vector3;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
+import net.iceyleagons.frostedengineering.vegetation.Branch;
+import net.iceyleagons.frostedengineering.vegetation.Leaf;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.concurrent.CompletableFuture;
+
+import static fastnoise.MathUtils.*;
 
 /**
  * Wikipedia sure is useful.
@@ -55,6 +64,136 @@ public class LSystem {
     }
 
     /**
+     * Processes V with the provided options.
+     *
+     * @param V       derived l-system scheme.
+     * @param options options for generation.
+     * @return instructions for branches and leaves.
+     */
+    public CompletableFuture<Instructions> process(String V, Options options) {
+        return CompletableFuture.supplyAsync(() -> {
+            Instructions instructions = new Instructions();
+            Branch mainBranch = null;
+            Vector3 position = new Vector3(0.f, 0.f, 0.f);
+            Rotation rotation = new Rotation(0.f, 0.f, 0.f);
+
+            LinkedList<PositionData> memory = new LinkedList<>();
+            for (char v : V.toCharArray()) {
+                switch (v) {
+                    case 'B':
+                        Vector3 oldPos = position;
+                        position = Vector3.mul(position, Vector3.add(rotation.toVector(), new Vector3((float) Math.random() * options.angleVariation,
+                                (float) Math.random() * options.angleVariation, (float) Math.random() * options.angleVariation)));
+                        Branch branch = new Branch(mainBranch, rotation.realVector(), oldPos);
+                        instructions.getBranches().add(branch);
+                        mainBranch = branch;
+                        break;
+                    case 'L':
+                        instructions.getLeaves().add(new Leaf(Vector3.mul(position, Vector3.add(rotation.toVector(), new Vector3((float) Math.random() * options.angleVariation,
+                                (float) Math.random() * options.angleVariation, (float) Math.random() * options.angleVariation)))));
+                        break;
+                    case '<':
+                        rotation.addRotation(-options.twist, RotationAxis.Y);
+                        break;
+                    case '>':
+                        rotation.addRotation(options.twist, RotationAxis.Y);
+                        break;
+                    case '+':
+                        rotation.addRotation(options.vTilt, RotationAxis.Z);
+                        break;
+                    case '-':
+                        rotation.addRotation(-options.vTilt, RotationAxis.Z);
+                        break;
+                    case '\\':
+                        rotation.addRotation(-options.uTilt, RotationAxis.X);
+                        break;
+                    case '/':
+                        rotation.addRotation(options.uTilt, RotationAxis.X);
+                        break;
+                    case '[':
+                        memory.add(new PositionData(mainBranch, rotation, position));
+                        break;
+                    case ']':
+                        PositionData data = memory.removeLast();
+                        mainBranch = data.parent;
+                        position = data.position;
+                        rotation = data.rotation;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            return instructions;
+        });
+    }
+
+    /**
+     * Basic data class containing data about the position.
+     */
+    @Data
+    @AllArgsConstructor
+    static
+    class PositionData {
+        /**
+         * Parent of the branch.
+         */
+        Branch parent;
+        /**
+         * Rotation of the branch.
+         */
+        Rotation rotation;
+        /**
+         * Position of the branch.
+         */
+        Vector3 position;
+    }
+
+    /**
+     * Basic data class containing options for the l-system.
+     */
+    @Data
+    @AllArgsConstructor
+    public static class Options {
+        /**
+         * The rotation value in the \/ (local x-axis)
+         */
+        float uTilt;
+        /**
+         * The rotation value in the +- (local z-axis)
+         */
+        float vTilt;
+        /**
+         * The rotation value in the <> (local y-axis)
+         */
+        float twist;
+        /**
+         * The value for randomness in the angle of a branch
+         */
+        float angleVariation;
+        /**
+         * The value for randomness in the length of a branch
+         */
+        float lengthVariation;
+    }
+
+    /**
+     * Basic data class containing information about the l-system tree.
+     */
+    public static class Instructions {
+        /**
+         * The list of branches.
+         */
+        @Getter
+        ArrayList<Branch> branches = new ArrayList<>();
+        /**
+         * The list of leaves.
+         */
+        @Getter
+        ArrayList<Leaf> leaves = new ArrayList<>();
+    }
+
+    /**
      * Contains a set of rules. Pretty self-explanatory if I do say so myself.
      *
      * @author Gabe
@@ -97,7 +236,7 @@ public class LSystem {
          * @return the rule matching the given V.
          */
         public Rule getByV(String V) {
-            return ruleArrayList.stream().parallel().filter(rule -> rule.getV().equals(V)).findFirst().get();
+            return ruleArrayList.stream().parallel().filter(rule -> rule.getV().equals(V)).findFirst().orElse(null);
         }
     }
 

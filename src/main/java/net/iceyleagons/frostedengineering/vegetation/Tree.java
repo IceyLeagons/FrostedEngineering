@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.utils.LSystem;
+import net.iceyleagons.frostedengineering.utils.LSystem.Options;
 import net.iceyleagons.frostedengineering.utils.LSystem.Rule;
 import org.bukkit.Axis;
 import org.bukkit.Material;
@@ -74,17 +75,12 @@ public class Tree {
      *
      * @param axiom      the starting symbols.
      * @param iterations the number of l-system iterations to go thru.
-     * @deprecated Don't use. Not done yet.
      */
-    @Deprecated
     public Tree(String axiom, int iterations) {
         type = 1;
         this.result = this.axiom = axiom;
         this.iterations = iterations;
-        this.lSystem = new LSystem(axiom, new LSystem.Ruleset(new Rule("A", "^fB>>>B>>>>>B"),
-                new Rule("B", "[^^f>>>>>>A]"), new Rule("f", "f"),
-                new Rule("^", "^"), new Rule(">", ">"), new Rule("]", "]"),
-                new Rule("[", "[")));
+        this.lSystem = new LSystem(axiom, new LSystem.Ruleset(new Rule("B", "BB-[-<B+>B+>B]+[+>L-<B-<B]")));
     }
 
     /*
@@ -100,12 +96,23 @@ public class Tree {
     public void place(Block block, TreeParameters parameters) {
         switch (type) {
             case 1:
+                final long start = System.currentTimeMillis();
+                createTree().thenAccept(ignored -> new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        render(block, parameters);
+                        leaves(block, parameters);
+                        roots(block, parameters);
+
+                        replaceMap.forEach(Block::setType);
+                        System.out.println("Took " + (System.currentTimeMillis() - start) + " ms' to finish.");
+                    }
+                }.runTask(Main.MAIN));
                 break;
             default:
             case 0:
-                final long start = System.currentTimeMillis();
-                createTree();
-                grow(parameters).thenAccept(ignored -> {
+                final long start2 = System.currentTimeMillis();
+                createTree().thenAccept(ignore -> grow(parameters).thenAccept(ignored -> {
                     leaves.clear();
                     new BukkitRunnable() {
                         @Override
@@ -115,10 +122,10 @@ public class Tree {
                             roots(block, parameters);
 
                             replaceMap.forEach(Block::setType);
-                            System.out.println("Took " + (System.currentTimeMillis() - start) + " ms' to finish.");
+                            System.out.println("Took " + (System.currentTimeMillis() - start2) + " ms' to finish.");
                         }
                     }.runTask(Main.MAIN);
-                });
+                }));
                 break;
         }
     }
@@ -238,31 +245,41 @@ public class Tree {
 
     /**
      * This function generates the tree structure.
+     *
+     * @return ignore.
      */
-    void createTree() {
-        switch (type) {
-            case 1:
-                result = lSystem.derive(iterations);
-                break;
-            default:
-            case 0:
-                ThreadLocalRandom rng = ThreadLocalRandom.current();
-                for (int i = 0; i < leafDensity; ++i)
-                    leaves.add(new Leaf(new Vector3(rng.nextInt(this.leafWidth) - Math.round((float) (this.leafWidth / 2)),
-                            rng.nextInt(this.leafHeight - this.stemLength) + this.stemLength,
-                            rng.nextInt(this.leafWidth) - Math.round((float) (this.leafWidth / 2)))));
+    CompletableFuture<Boolean> createTree() {
+        return CompletableFuture.supplyAsync(() -> {
+            switch (type) {
+                case 1:
+                    lSystem.process(lSystem.derive(iterations),
+                            new Options(0.f, 22.f, 67.f, 0.2f, 0.f)).thenAccept(instructions -> {
+                        branches.addAll(instructions.getBranches());
+                        leaves.addAll(instructions.getLeaves());
+                    });
+                    break;
+                default:
+                case 0:
+                    ThreadLocalRandom rng = ThreadLocalRandom.current();
+                    for (int i = 0; i < leafDensity; ++i)
+                        leaves.add(new Leaf(new Vector3(rng.nextInt(this.leafWidth) - Math.round((float) (this.leafWidth / 2)),
+                                rng.nextInt(this.leafHeight - this.stemLength) + this.stemLength,
+                                rng.nextInt(this.leafWidth) - Math.round((float) (this.leafWidth / 2)))));
 
-                // No parent -> root
-                Branch root = new Branch(null, new Vector3(0.f, 1.f, 0.f), new Vector3(0.f, -1.f, 0.f));
-                branches.add(root);
+                    // No parent -> root
+                    Branch root = new Branch(null, new Vector3(0.f, 1.f, 0.f), new Vector3(0.f, -1.f, 0.f));
+                    branches.add(root);
 
-                Branch trunk;
-                for (Branch current = new Branch(root); !isClose(current); current = trunk) {
-                    trunk = new Branch(current);
-                    branches.add(trunk);
-                }
-                break;
-        }
+                    Branch trunk;
+                    for (Branch current = new Branch(root); !isClose(current); current = trunk) {
+                        trunk = new Branch(current);
+                        branches.add(trunk);
+                    }
+                    break;
+            }
+
+            return true;
+        });
     }
 
     /**

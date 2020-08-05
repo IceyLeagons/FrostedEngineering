@@ -16,39 +16,43 @@
  ******************************************************************************/
 package net.iceyleagons.frostedengineering.generator.frosted;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
+import java.util.concurrent.ThreadLocalRandom;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.bukkit.Material;
 
 import fastnoise.MathUtils;
 import fastnoise.MathUtils.Erosion;
 import fastnoise.MathUtils.FastNoise;
-import fastnoise.MathUtils.FastNoise.Interp;
-import fastnoise.MathUtils.FastNoise.NoiseType;
 import net.iceyleagons.frostedengineering.generator.frosted.ChunkData.PointData.PointType;
 
 // 7/30/2020 Added masks.
 // 2/26/2020 General optimizations
 // 2/26/2020 Replaced reflections with direct calling (ModificationType)
 public class ChunkData {
-    int erosionIterations = 2000;
+    int erosionIterations = 2048;
     static int mapSize = 16;
-    static int terraceNumber = 11;
     static int vegetationNumber = 1; // add + 1 for max possible trees.
     static int vegetationOverflow = 2; // this is in blocks.
     final float cloudNoiseLimit = 0.75f;
-    static double vegetationChance = .2D;
     int iceHeight = 16;
     int waterHeight = 6;
+    // static double vegetationChance = .2D;
     static int amplitudePower = 5;
     static int maskLength = 287;
-    float caveThreshold = .5f;
+    static float caveDecidingFactor = .5f;
+
+    float secondaryNoiseMultiplier = .5f;
 
     final boolean caves;
-    private MathUtils utils;
-    private static FastNoise noiser;
-    private static FastNoise caveNoiser;
+    private static Map.Entry<FastNoise, Optional<FastNoise>> noise;
+    private static Map.Entry<FastNoise, Optional<FastNoise>> caveNoise;
     private static Erosion erosion;
 
     static int typeSize = PointData.PointType.values().length;
@@ -85,26 +89,17 @@ public class ChunkData {
     }
 
     private void setup(long seed) {
-        this.utils = MathUtils.getInstance(seed);
-        if (ChunkData.noiser != null && ChunkData.caveNoiser != null) {
-            // Terrain noiser
-            ChunkData.noiser = utils.getNoiser();
-            ChunkData.noiser.setNoiseType(NoiseType.PERLIN);
-            ChunkData.noiser.setInterp(Interp.QUINTIC);
+        MathUtils utils = MathUtils.getInstance(seed);
+        if (ChunkData.noise != null && ChunkData.caveNoise != null) {
+            // Terrain noise
+            ChunkData.noise = utils.getNoise(MathUtils.NoiseClass.TERRAIN);
 
-            // Cave noiser
-            ChunkData.caveNoiser = noiser.clone();
-            ChunkData.caveNoiser.setNoiseType(NoiseType.FRACTAL_PERLIN);
-            ChunkData.caveNoiser.setFractalOctaves(5);
-            ChunkData.caveNoiser.setFractalType(FastNoise.FractalType.FBM);
-            ChunkData.caveNoiser.setSeed(this.utils.randomLong());
+            // Chunk noise
+            ChunkData.caveNoise = utils.getNoise(MathUtils.NoiseClass.CAVE);
         }
+
         ChunkData.erosion = utils.getErosion() != null ? utils.getErosion()
                 : utils.getErosion(mapSize, 1f, 1f, 128, 10f, .01f, .8f, .8f, 01f, 4f, .3f, 4, erosionIterations);
-    }
-
-    public boolean empty(float x, int y, float z) {
-        return (caves && this.utils.fastPow(ChunkData.caveNoiser.getPerlinFractal(x, y, z), amplitudePower) > caveThreshold) ? true : false;
     }
 
     public PointData[] createNoiseMap(int rx, int rz) {
@@ -117,9 +112,9 @@ public class ChunkData {
             PointType type = PointData.PointType.values()[i];
 
             for (int x = 0; x < mapSize; x++)
-                for (int z = 0; z < mapSize; z++) {
-                    heightMap[x][z] = noise(rx + x, rz + z, Technique.REGULAR, type.amplitude);
-                }
+                for (int z = 0; z < mapSize; z++)
+                    heightMap[x][z] = noise(noise, rx + x, rz + z, type.amplitude);
+
             pointMap[i] = new PointData(heightMap, type);
         }
 
@@ -128,16 +123,39 @@ public class ChunkData {
         return pointMap;
     }
 
+    public static List<CaveInstruction> generateCaveSystem(int size) {
+        List<CaveInstruction> instructions = new ArrayList<>(size);
+        int currentSize = size;
+
+        for (int i = 0; i < size; i++) {
+            CaveInstruction instruction = new CaveInstruction(false, false, false, false,
+                    (currentSize -= (ThreadLocalRandom.current().nextBoolean() ? 1 : 0)));
+            if (noise(caveNoise.getKey(), i, i) > caveDecidingFactor)
+                instruction.setUp(true);
+            else
+                instruction.setDown(true);
+
+            if (noise(caveNoise.getValue().orElse(caveNoise.getKey()), i, i) > caveDecidingFactor)
+                instruction.setLeft(true);
+            else
+                instruction.setRight(true);
+
+            instructions.add(instruction);
+        }
+
+        return instructions;
+    }
+
     public CompletableFuture<PointData[]> modify(PointData[] inputData) {
         long timeNow = System.currentTimeMillis();
 
         return CompletableFuture.supplyAsync(() -> {
-            for (int i = 0; i < inputData.length; i++) {
-                float[][] input = inputData[i].height;
+            for (PointData inputDatum : inputData) {
+                float[][] input = inputDatum.height;
 
-                for (ModificationType mod : inputData[i].pointType.modificationTypes)
+                for (ModificationType mod : inputDatum.pointType.modificationTypes)
                     input = mod.method.run(input);
-                inputData[i].height = input;
+                inputDatum.height = input;
             }
 
             timeTookModifying += System.currentTimeMillis() - timeNow;
@@ -146,38 +164,33 @@ public class ChunkData {
         });
     }
 
-    public float noise(float x, float y, Technique mode, float amplitude) {
-        float noiseValue;
-
-        switch (mode) {
-            default:
-            case REGULAR:
-                noiseValue = (1.f * noiseValue(1 * x, 1 * y, Technique.REGULAR)
-                        + .5f * noiseValue(2 * x, 2 * y, Technique.REGULAR)
-                        + .25f * noiseValue(4 * x, 4 * y, Technique.REGULAR)
-                        + .13f * noiseValue(8 * x, 8 * y, Technique.REGULAR)
-                        + .06f * noiseValue(16 * x, 16 * y, Technique.REGULAR)
-                        + .03f * noiseValue(32 * x, 32 * y, Technique.REGULAR));
-                noiseValue /= (1.f + .50f + .25f + .13f + .06f + .03f);
-            case RIDGED:
-                float e1 = 1f * noise(1 * x, 1 * y, Technique.RIDGED, amplitude);
-                float e2 = 0.5f * noise(2 * x, 2 * y, Technique.RIDGED, amplitude) * e1;
-                float e3 = 0.25f * noise(4 * x, 4 * y, Technique.RIDGED, amplitude) * (e1 + e2);
-                noiseValue = e1 + e2 + e3;
-        }
-        noiseValue = (float) Math.pow(noiseValue, amplitudePower);
+    public float noise(Map.Entry<FastNoise, Optional<FastNoise>> noise, float x, float y, float amplitude) {
+        float noiseValue = (float) Math.pow(noise(noise, x, y), amplitudePower);
 
         return noiseValue * amplitude;
     }
 
-    private float noiseValue(float x, float y, Technique mode) {
-        switch (mode) {
-            case RIDGED:
-                return (float) (2 * (0.5 - Math.abs(0.5 - noiseValue(x, y, Technique.REGULAR))));
-            default:
-            case REGULAR:
-                return noiser.getNoise(x, y) / 2f + 0.5f;
-        }
+    public float noise(Map.Entry<FastNoise, Optional<FastNoise>> noise, float x, float y) {
+        FastNoise primaryNoise = noise.getKey();
+        float noiseValue;
+
+        if (noise.getValue().isPresent())
+            noiseValue = primaryNoise.getNoise(x, y) + noise.getValue().orElse(noise.getKey()).getNoise(x, y) * secondaryNoiseMultiplier;
+        else
+            noiseValue = primaryNoise.getNoise(x, y);
+
+        return noiseValue;
+    }
+
+    public static float noise(FastNoise noise, float x, float y) {
+        return noise.getNoise(x, y);
+    }
+
+    @Data
+    @AllArgsConstructor(staticName = "of")
+    public static class CaveInstruction {
+        boolean up, left, down, right;
+        int size;
     }
 
     public static class PointData {
@@ -236,13 +249,6 @@ public class ChunkData {
 
     public enum ModificationType {
         EROSION("Eroding", input -> erosion.erode(input)),
-        TERRACE("Terracing", input -> {
-            for (int i = 0; i < typeSize; i++)
-                for (int x = 0; x < mapSize; x++)
-                    for (int z = 0; z < mapSize; z++)
-                        input[x][z] = MathUtils.fastRound(input[x][z] * terraceNumber) / terraceNumber;
-            return input;
-        }),
         ISLAND_MASK("Masking", input -> {
             for (int x = 0; x < mapSize; x++)
                 for (int z = 0; z < mapSize; z++)
@@ -263,9 +269,5 @@ public class ChunkData {
             this.name = name;
             this.method = runnable;
         }
-    }
-
-    public enum Technique {
-        RIDGED, REGULAR;
     }
 }
