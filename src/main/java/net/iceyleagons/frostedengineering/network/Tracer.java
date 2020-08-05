@@ -1,196 +1,78 @@
-/*******************************************************************************
- * Copyright (C) IceyLeagons(https://iceyleagons.net/) 
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ******************************************************************************/
 package net.iceyleagons.frostedengineering.network;
 
+import lombok.NonNull;
+import net.iceyleagons.frostedengineering.Main;
+import net.iceyleagons.frostedengineering.network.energy.exceptions.UnsupportedUnitType;
+
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Stack;
 
-import org.bukkit.Location;
-
-import net.iceyleagons.frostedengineering.network.energy.EnergyNetwork;
-import net.iceyleagons.frostedengineering.network.energy.EnergyUnit;
-
-/**
- * @author TOTHT
- * <p>
- * This class handles the connecting,disconnection ability of an energy
- * network.
- */
 public class Tracer {
 
-    private List<Unit> visited;
-    private Location start;
-
-    /**
-     * @param start is the start location (use {@link EnergyUnit#getLocation()})
-     */
-    public Tracer(Location start) {
-        this.start = start;
-        visited = new ArrayList<Unit>();
-
+    public static void trace(@NonNull Unit unit) {
+        Main.executor.execute(() -> {
+            if (unit.isDestroyed())
+                traceSplit(unit);
+            else
+                traceMerge(unit);
+        });
     }
 
-    /**
-     * This is used to easily modify EnergyNetworks
-     *
-     * @param unit       is the target
-     * @param newNetwork is the {@link Network} to set the
-     *                   {@link Unit}'s EnergyNetwork to
-     */
-    private void modifyUnitNetwork(Unit unit, Network newNetwork) {
-        if (unit.getNetwork() != null)
-            unit.getNetwork().removeUnit(unit);
-        unit.setNetwork(newNetwork);
-        unit.getNetwork().addUnit(unit);
-    }
-
-    /*
-     * Splitting
-     */
-
-    /**
-     * This will split the networks at that location. (Ex.: If you have 3 units next
-     * to each other & break the middle one there will be 2 EnergyNetworks)
-     */
-    public void splitNetworks() {
-        new Thread() {
-            @Override
-            public void run() {
-                visited.clear();
-                Unit startUnit = getUnitAtLocation(start);
-                if (startUnit != null) {
-                    visited.add(startUnit);
-                    startUnit.getNetwork().removeUnit(startUnit);
-                    startUnit.setDestroyed(true);
-                    startUnit.setNetwork(null);
-                    Tracer.removeUnit(startUnit);
-                    Iterator<Unit> startunitNeighbours = startUnit.getNeighbours().iterator();
-                    while (startunitNeighbours.hasNext()) {
-                        Unit startunitNeighbour = startunitNeighbours.next();
-                        EnergyNetwork net = new EnergyNetwork();
-                        System.out.println(net.toString());
-                        net.addUnit(startunitNeighbour);
-                        startunitNeighbour.getNetwork().removeUnit(startunitNeighbour);
-                        startunitNeighbour.setNetwork(net);
-                        new Tracer(startunitNeighbour.getLocation()).mergeIntoOneNetworkForSplitting(startUnit);
-                    }
-                }
-
+    private static void traceMerge(@NonNull Unit unit) {
+        List<Unit> connections = dfs(unit);
+        Network network = unit.getNetwork().generateSameType();
+        connections.forEach(u -> {
+            try {
+                addToNetwork(u, network);
+            } catch (UnsupportedUnitType unsupportedUnitType) {
+                unsupportedUnitType.printStackTrace();
             }
-        }.start();
+            u.unvisit();
+        });
     }
 
-    /*
-     * Merging
-     */
-
-    /**
-     * This will merge networks together only used by the Tracer itself (in
-     * {@link #splitNetworks()}).
-     *
-     * @param startU is the Unit to start from
-     */
-    private void mergeIntoOneNetworkForSplitting(Unit startU) {
-        visited.clear();
-        visited.add(startU);
-        Unit startUnit = getUnitAtLocation(start);
-        if (startUnit != null) {
-            visited.add(startUnit);
-            Network newNetwork = startUnit.getNetwork();
-            Iterator<Unit> startunitNeighbours = startUnit.getNeighbours().iterator();
-            while (startunitNeighbours.hasNext()) {
-                Unit startunitNeighbour = startunitNeighbours.next();
-                if (!visited.contains(startunitNeighbour)) {
-                    modifyUnitNetwork(startunitNeighbour, newNetwork);
-                    visited.add(startunitNeighbour);
-                    mergeIntoOneNetwork(startunitNeighbour);
+    private static void traceSplit(@NonNull Unit unit) {
+        List<Unit> neighbours = unit.getNeighbours();
+        for (Unit neighbour : neighbours) {
+            List<Unit> connections = dfs(neighbour);
+            Network network = unit.getNetwork().generateSameType();
+            connections.forEach(u -> {
+                try {
+                    addToNetwork(u, network);
+                } catch (UnsupportedUnitType unsupportedUnitType) {
+                    unsupportedUnitType.printStackTrace();
                 }
-            }
+                u.unvisit();
+            });
         }
     }
 
-    /**
-     * This will merge networks together in to one EnergyNetwork
-     */
-    public void mergeIntoOneNetwork() {
-        new Thread() {
-            @Override
-            public void run() {
-                visited.clear();
-                Unit startUnit = getUnitAtLocation(start);
-                if (startUnit != null) {
-                    visited.add(startUnit);
-                    Network newNetwork = startUnit.getNetwork();
-                    Iterator<Unit> startunitNeighbours = startUnit.getNeighbours().iterator();
-                    while (startunitNeighbours.hasNext()) {
-                        Unit startunitNeighbour = startunitNeighbours.next();
-                        if (!visited.contains(startunitNeighbour)) {
-                            modifyUnitNetwork(startunitNeighbour, newNetwork);
-                            visited.add(startunitNeighbour);
-                            mergeIntoOneNetwork(startunitNeighbour);
-                        }
-                    }
-                }
-            }
-        }.start();
+    public static void addToNetwork(@NonNull Unit unit, @NonNull Network network) throws UnsupportedUnitType {
+        unit.setNetwork(network);
+        network.addUnit(unit);
     }
 
-    /**
-     * This is used for looping in {@link #mergeIntoOneNetwork()} (Note that we have
-     * a visited list to prevent infinite loops)
-     *
-     * @param from is the Unit to start the madness again.
-     */
-    private void mergeIntoOneNetwork(Unit from) {
-        if (from != null) {
-            Iterator<Unit> fromNeighbours = from.getNeighbours().iterator();
-            while (fromNeighbours.hasNext()) {
-                Unit fromNeighbour = fromNeighbours.next();
-                if (!visited.contains(fromNeighbour)) {
-                    modifyUnitNetwork(fromNeighbour, from.getNetwork());
-                    visited.add(fromNeighbour);
-                    mergeIntoOneNetwork(fromNeighbour);
-                }
+    private static List<Unit> dfs(@NonNull Unit unit) {
+        Stack<Unit> stack = new Stack<>();
+        List<Unit> graph = new ArrayList<>();
+        stack.add(unit);
+
+        while (!stack.isEmpty()) {
+            Unit element = stack.pop();
+            if (element.isVisited()) {
+                element.visit();
+                graph.add(element);
+            }
+
+            List<Unit> neighbours = element.getNeighbours();
+            for (Unit n : neighbours) {
+                if (n != null && !n.isVisited() && !n.isDestroyed())
+                    stack.add(n);
             }
         }
+        return graph;
     }
 
-    public static HashMap<Location, Unit> units = new HashMap<Location, Unit>();
-
-    /**
-     * @param location is the location to check for
-     * @return a {@link Unit} if there is one at that location.
-     */
-    public static Unit getUnitAtLocation(Location location) {
-        return units.containsKey(location) ? units.get(location) : null;
-    }
-
-    public static void addUnit(Unit u) {
-        if (u instanceof EnergyUnit)
-            EnergyUnit.addUnit(u);
-        units.put(u.getLocation(), u);
-    }
-
-    public static void removeUnit(Unit u) {
-        if (u instanceof EnergyUnit)
-            EnergyUnit.removeUnit(u);
-        units.remove(u.getLocation());
-    }
 
 }

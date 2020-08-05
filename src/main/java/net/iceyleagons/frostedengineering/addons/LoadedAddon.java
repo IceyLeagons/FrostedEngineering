@@ -21,8 +21,8 @@ public class LoadedAddon implements IAddon {
     }
 
     @Override
-    public void onLoad(AddonManager manager) {
-        originatingFrom.onLoad(manager);
+    public void onLoad() {
+        originatingFrom.onLoad();
     }
 
     public AddonDescription getDescription() {

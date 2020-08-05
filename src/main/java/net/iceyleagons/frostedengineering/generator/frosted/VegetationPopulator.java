@@ -24,10 +24,10 @@ import org.bukkit.World;
 import org.bukkit.generator.BlockPopulator;
 
 import net.iceyleagons.frostedengineering.generator.frosted.Biome.VegetationType;
-import net.iceyleagons.frostedengineering.vegetation.Genes;
-import net.iceyleagons.frostedengineering.vegetation.Genes.GeneType;
-import net.iceyleagons.frostedengineering.vegetation.habitats.Forest;
-import net.iceyleagons.frostedengineering.vegetation.habitats.IHabitat;
+import old.vegetationold.Genes;
+import old.vegetationold.Genes.GeneType;
+import old.vegetationold.habitats.Forest;
+import old.vegetationold.habitats.IHabitat;
 
 public class VegetationPopulator extends BlockPopulator {
 

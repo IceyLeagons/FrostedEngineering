@@ -23,7 +23,7 @@ import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
 
 import fastnoise.MathUtils.Vector2;
-import net.iceyleagons.frostedengineering.vegetation.SegmentIterator;
+import old.vegetationold.SegmentIterator;
 
 @SuppressWarnings("serial")
 public class FunctionIterator extends ArrayList<Block> {

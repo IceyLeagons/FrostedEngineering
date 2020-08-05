@@ -16,11 +16,15 @@
  ******************************************************************************/
 package net.iceyleagons.frostedengineering.network.energy;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import net.iceyleagons.frostedengineering.network.Tracer;
+import net.iceyleagons.frostedengineering.network.energy.EnergyNetwork;
+import net.iceyleagons.frostedengineering.network.energy.exceptions.UnsupportedUnitType;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -28,10 +32,9 @@ import org.bukkit.inventory.ItemStack;
 import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.gui.InventoryFactory;
 import net.iceyleagons.frostedengineering.network.Network;
-import net.iceyleagons.frostedengineering.network.Tracer;
 import net.iceyleagons.frostedengineering.network.Unit;
-import net.iceyleagons.frostedengineering.network.energy.components.Generator;
-import net.iceyleagons.frostedengineering.network.energy.components.sub.generators.coal.TexturedCoalGenerator;
+import net.iceyleagons.frostedengineering.network.energyold.components.Generator;
+import net.iceyleagons.frostedengineering.network.energyold.components.sub.generators.coal.TexturedCoalGenerator;
 
 /**
  * @author TOTHT
@@ -40,12 +43,11 @@ import net.iceyleagons.frostedengineering.network.energy.components.sub.generato
  * components have relations with this superclass (except
  * Transformators, those aren't units)
  */
-public abstract class EnergyUnit implements Unit {
+public abstract class EnergyUnit implements Unit, Serializable {
 
     private Location loc;
     private List<EnergyUnit> neighbours;
     private EnergyNetwork network;
-    private InventoryFactory inv;
     private boolean destroy = false;
     private UUID uuid;
     private List<ItemStack> itemsInside;
@@ -56,7 +58,7 @@ public abstract class EnergyUnit implements Unit {
      * @param network is the {@link EnergyNetwork} it's in(adding to the energy
      *                network is done automatically)
      */
-    public EnergyUnit(Location loc, EnergyNetwork network) {
+    public EnergyUnit(Location loc, EnergyNetwork network) throws UnsupportedUnitType {
         this.loc = loc;
         this.network = network;
         this.network.addUnit(this);
@@ -72,7 +74,7 @@ public abstract class EnergyUnit implements Unit {
      * @param uuid        is the {@link UUID} of the Unit (used when loading)
      * @param itemsInside is the items inside the Unit (used when loading)
      */
-    public EnergyUnit(Location loc, EnergyNetwork network, UUID uuid, List<ItemStack> itemsInside) {
+    public EnergyUnit(Location loc, EnergyNetwork network, UUID uuid, List<ItemStack> itemsInside) throws UnsupportedUnitType {
         this.loc = loc;
         this.network = network;
         this.network.addUnit(this);
@@ -110,34 +112,18 @@ public abstract class EnergyUnit implements Unit {
         Main.debug("Destorying unit at location " + loc.toString());
         setDestroyed(true);
         System.out.println("destory");
-        new Tracer(this.getLocation()).splitNetworks();
-        closeInventory();
-        if (this instanceof Generator) {
-            TexturedCoalGenerator.sound.stop(getLocation());
-        }
-    }
-
-    private void closeInventory() {
-        if (inv != null) {
-            Iterator<Player> it = inv.getOpened().iterator();
-            while (it.hasNext()) {
-                it.next().closeInventory();
-            }
-        }
+        Tracer.trace(this);//new TracerOld(this.getLocation()).splitNetworks();
+        //closeInventory();
+        //if (this instanceof Generator) {
+        //    TexturedCoalGenerator.sound.stop(getLocation());
+        //}
     }
 
     @Override
     public void destroy(Player p) {
         Main.debug("Destorying unit at location " + loc.toString());
         setDestroyed(true);
-        new Tracer(this.getLocation()).splitNetworks();
-        if (this instanceof Generator) {
-            TexturedCoalGenerator.sound.stop(getLocation());
-            if (inv.getSourceInventory().getItem(14) != null)
-                loc.getWorld().dropItemNaturally(loc, inv.getSourceInventory().getItem(14).clone());
-            inv.removeItem(14);
-        }
-        closeInventory();
+        Tracer.trace(this);
     }
 
     /**
@@ -152,7 +138,7 @@ public abstract class EnergyUnit implements Unit {
      */
     private void init() {
         Main.debug("Initializing Unit at location " + loc.toString());
-        Tracer.addUnit(this);
+        Tracer.trace(this);
         neighbours = getNeighbours(getLocation());
 
         neighbours.forEach(u -> {
@@ -163,24 +149,9 @@ public abstract class EnergyUnit implements Unit {
          * Merging
          */
         if (traceractivated)
-            new Tracer(this.getLocation()).mergeIntoOneNetwork();
+            Tracer.trace(this);
     }
 
-    /**
-     * This is used for the units GUI
-     *
-     * @param inv is the {@link InventoryFactory}
-     */
-    public void setInventoryFactory(InventoryFactory inv) {
-        this.inv = inv;
-    }
-
-    /**
-     * @return the Units {@link InventoryFactory}, aka. the GUI of it
-     */
-    public InventoryFactory getInventoryFactory() {
-        return this.inv;
-    }
 
     /**
      * This is used by our algorithms to set the Energy Network

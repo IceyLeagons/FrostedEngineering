@@ -1,12 +1,13 @@
 package net.iceyleagons.frostedengineering.network;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-public interface Unit {
+public interface Unit extends Serializable {
 
     /**
      * @return the {@link Location} of this Unit
@@ -61,5 +62,9 @@ public interface Unit {
      * @return the list of {@link Unit}s around this Unit
      */
     public List<Unit> getNeighbours();
+
+    public boolean isVisited();
+    public void visit();
+    public void unvisit();
 
 }

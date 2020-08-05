@@ -21,8 +21,7 @@ import dev.arantes.inventorymenulib.listeners.InventoryListener;
 import net.iceyleagons.frostedengineering.addons.AddonLoader;
 import net.iceyleagons.frostedengineering.addons.AddonManager;
 import net.iceyleagons.frostedengineering.addons.IAddon;
-import net.iceyleagons.frostedengineering.api.EngineersAPI;
-import net.iceyleagons.frostedengineering.api.EngineersAPIProvider;
+import net.iceyleagons.frostedengineering.addons.exception.AddonFolderCreationException;
 import net.iceyleagons.frostedengineering.commands.CommandManager;
 import net.iceyleagons.frostedengineering.generator.frosted.FrostedDimension;
 import net.iceyleagons.frostedengineering.generator.nether.NetherGenerator;
@@ -33,18 +32,16 @@ import net.iceyleagons.frostedengineering.items.FrostedItems;
 import net.iceyleagons.frostedengineering.items.GUIItem;
 import net.iceyleagons.frostedengineering.modules.ModuleManager;
 import net.iceyleagons.frostedengineering.modules.builtin.ExampleModule;
-import net.iceyleagons.frostedengineering.network.energy.EnergyAPI;
-import net.iceyleagons.frostedengineering.network.energy.components.sub.consumers.furnace.TexturedFurnace;
-import net.iceyleagons.frostedengineering.network.energy.components.sub.generators.coal.TexturedCoalGenerator;
-import net.iceyleagons.frostedengineering.network.energy.components.sub.generators.nonthermal.TexturedNonthermalGenerator;
-import net.iceyleagons.frostedengineering.network.energy.components.sub.storages.battery.TexturedBatteryStorage;
-import net.iceyleagons.frostedengineering.network.energy.components.sub.transformers.lowvoltage.TexturedLowVoltageTransformer;
-import net.iceyleagons.frostedengineering.particles.ParticleManager;
-import net.iceyleagons.frostedengineering.particles.effects.Effect1;
-import net.iceyleagons.frostedengineering.particles.effects.Effect2;
-import net.iceyleagons.frostedengineering.particles.effects.Effect3;
-import net.iceyleagons.frostedengineering.particles.effects.Effect4;
-import net.iceyleagons.frostedengineering.quests.QuestNPC;
+import net.iceyleagons.frostedengineering.network.energyold.EnergyAPI;
+import net.iceyleagons.frostedengineering.network.energyold.components.sub.consumers.furnace.TexturedFurnace;
+import net.iceyleagons.frostedengineering.network.energyold.components.sub.generators.coal.TexturedCoalGenerator;
+import net.iceyleagons.frostedengineering.network.energyold.components.sub.generators.nonthermal.TexturedNonthermalGenerator;
+import net.iceyleagons.frostedengineering.network.energyold.components.sub.storages.battery.TexturedBatteryStorage;
+import old.particles.ParticleManager;
+import old.particles.effects.Effect1;
+import old.particles.effects.Effect2;
+import old.particles.effects.Effect3;
+import old.particles.effects.Effect4;
 import net.iceyleagons.frostedengineering.storage.StorageHandler;
 import net.iceyleagons.frostedengineering.storage.StorageType;
 import net.iceyleagons.frostedengineering.textures.Textures;
@@ -61,7 +58,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.reflections.Reflections;
@@ -119,7 +115,11 @@ public class Main extends JavaPlugin implements CommandExecutor {
         LOGGER = this.getLogger();
         ADDON_MANAGER = new AddonManager();
         printLogo();
-        AddonLoader.loadAddons();
+        try {
+            AddonLoader.loadAddons();
+        } catch (AddonFolderCreationException e) {
+            e.printStackTrace();
+        }
 
         //=-=-=Init stuff=-=-=//
         new EnergyAPI();
@@ -137,10 +137,6 @@ public class Main extends JavaPlugin implements CommandExecutor {
         //=-=-=Web stuff=-=-=//
         //WebAPI.getAvailableLanguages();
         new Metrics(this, PLUGIN_ID);
-
-        //=-=-=API stuff=-=-=//
-        Bukkit.getServicesManager().register(EngineersAPI.class, new EngineersAPIProvider(), MAIN,
-                ServicePriority.High);
 
         //EnergySaver.createFolders();
         ParticleManager.register(new Effect1(1, "Test"));
@@ -161,7 +157,6 @@ public class Main extends JavaPlugin implements CommandExecutor {
         }
         //EnergySaver.saveEnergyNetworks();
         texturesMain.onDisable();
-        QuestNPC.despawn();
     }
 
     /*
@@ -219,9 +214,7 @@ public class Main extends JavaPlugin implements CommandExecutor {
     private static BukkitTask onTick = null;
 
     private static void startOnTick() {
-        onTick = Bukkit.getScheduler().runTaskTimer(Main.MAIN, () -> {
-            tickListeners.forEach(ITick::onTick);
-        }, 0L, 1L);
+        onTick = Bukkit.getScheduler().runTaskTimer(Main.MAIN, () -> tickListeners.forEach(ITick::onTick), 0L, 1L);
     }
 
     private void startSchedulers() {
@@ -240,7 +233,6 @@ public class Main extends JavaPlugin implements CommandExecutor {
         customBases.add(new TexturedCoalGenerator());
         customBases.add(new TexturedNonthermalGenerator());
         customBases.add(new TexturedFurnace());
-        customBases.add(new TexturedLowVoltageTransformer());
         customBases.add(CUSTOM_CRAFTING_TABLE = new CustomCraftingTable(this));
         customBases.add(GUI_ITEM = new GUIItem(this));
         customBases.forEach(Textures::register);
@@ -250,23 +242,18 @@ public class Main extends JavaPlugin implements CommandExecutor {
         Bukkit.getConsoleSender().sendMessage("§e§lWarming up generator for usage.");
 
         Bukkit.getConsoleSender().sendMessage("§e§lGenerating Frosted Dimension, this may take a while");
-        Bukkit.getScheduler().scheduleSyncDelayedTask(this, new Runnable() {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this, () -> {
+            try {
+                WorldCreator wC = new WorldCreator("frosted");
+                wC.seed(new Random().nextLong());
+                wC.generator(new FrostedDimension());
+                wC.type(WorldType.NORMAL);
+                wC.environment(Environment.NORMAL);
 
-            @Override
-            public void run() {
-                try {
-                    WorldCreator wC = new WorldCreator("frosted");
-                    wC.seed(new Random().nextLong());
-                    wC.generator(new FrostedDimension());
-                    wC.type(WorldType.NORMAL);
-                    wC.environment(Environment.NORMAL);
-
-                    wC.createWorld();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                wC.createWorld();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
         });
     }
 
@@ -284,9 +271,7 @@ public class Main extends JavaPlugin implements CommandExecutor {
                         .filterInputsBy(new FilterBuilder()
                                 .include(FilterBuilder.prefix("net.iceyleagons.frostedengineering.commands.cmds"))));
         Set<Class<?>> classes = r.getSubTypesOf(Object.class);
-        classes.forEach(clazz -> {
-            COMMAND_MANAGER.loadCommandClass(clazz);
-        });
+        classes.forEach(clazz -> COMMAND_MANAGER.loadCommandClass(clazz));
 
         Objects.requireNonNull(getCommand("tpxd")).setExecutor(this);
 

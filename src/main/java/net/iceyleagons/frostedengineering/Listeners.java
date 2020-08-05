@@ -39,10 +39,10 @@ import net.iceyleagons.frostedengineering.commands.cmds.SaplingCommand;
 import net.iceyleagons.frostedengineering.commands.cmds.StickCommand;
 import net.iceyleagons.frostedengineering.gui.CustomCraftingTable;
 import net.iceyleagons.frostedengineering.network.energy.EnergyUnit;
-import net.iceyleagons.frostedengineering.network.energy.components.Cable;
-import net.iceyleagons.frostedengineering.network.energy.components.Consumer;
-import net.iceyleagons.frostedengineering.network.energy.components.Generator;
-import net.iceyleagons.frostedengineering.network.energy.components.Storage;
+import net.iceyleagons.frostedengineering.network.energyold.components.Cable;
+import net.iceyleagons.frostedengineering.network.energyold.components.Consumer;
+import net.iceyleagons.frostedengineering.network.energyold.components.Generator;
+import net.iceyleagons.frostedengineering.network.energyold.components.Storage;
 import net.iceyleagons.frostedengineering.quests.QuestNPC;
 import net.md_5.bungee.api.ChatColor;
 

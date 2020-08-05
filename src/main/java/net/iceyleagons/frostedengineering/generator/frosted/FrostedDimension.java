@@ -36,14 +36,17 @@ public class FrostedDimension extends ChunkGenerator {
     }
 
     @Override
-    public ChunkData generateChunkData(World world, Random random, int chunkx, int chunkz,
+    public ChunkData generateChunkData(World world, Random random, int chunkX, int chunkZ,
                                        ChunkGenerator.BiomeGrid biomes) {
         @SuppressWarnings("unused")
         long timeNow = System.currentTimeMillis();
         ChunkData chunk = this.createChunkData(world);
 
-        net.iceyleagons.frostedengineering.generator.frosted.ChunkData chunkBase = new net.iceyleagons.frostedengineering.generator.frosted.ChunkData(
-                chunkx * 16, chunkz * 16, world.getSeed());
+        int rx = chunkX * 16;
+        int rz = chunkZ * 16;
+
+        net.iceyleagons.frostedengineering.generator.frosted.ChunkData chunkBase = new net.iceyleagons.frostedengineering.generator.frosted.ChunkData(true,
+                rx, rz, world.getSeed());
         for (int i = 0; i < net.iceyleagons.frostedengineering.generator.frosted.ChunkData.typeSize; i++) {
             PointData noiseData = chunkBase.pointMap[i];
 
@@ -103,6 +106,19 @@ public class FrostedDimension extends ChunkGenerator {
                             if (biome != null)
                                 for (int j = 0; j < 256; j++)
                                     biomes.setBiome(x, j, z, biome.biome);
+
+                            for (int j = 0; j < 255; j++)
+                                if (chunk.getType(rx + x, y, rz + z) != Material.AIR)
+                                    if (j % 3 == 0)
+                                        if (chunkBase.empty(rx + x, j, rz + z)) {
+                                            chunk.setBlock(rx + x, j, rz + z, Material.AIR);
+                                            if (chunkBase.empty(rx + x, j - 1, rz + z)) {
+                                                chunk.setBlock(rx + x, j - 1, rz + z, Material.AIR);
+                                                if (chunkBase.empty(rx + x, j - 2, rz + z))
+                                                    chunk.setBlock(rx + x, j - 2, rz + z, Material.AIR);
+                                            }
+                                        }
+
 
                             continue z;
                         }

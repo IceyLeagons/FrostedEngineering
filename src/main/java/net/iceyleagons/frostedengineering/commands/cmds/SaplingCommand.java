@@ -38,8 +38,8 @@ import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.commands.CommandManager.Arg.ArgString;
 import net.iceyleagons.frostedengineering.commands.CommandManager.Cmd;
 import net.iceyleagons.frostedengineering.commands.CommandManager.CommandFinished;
-import net.iceyleagons.frostedengineering.vegetation.Genes;
-import net.iceyleagons.frostedengineering.vegetation.Genes.GeneType;
+import old.vegetationold.Genes;
+import old.vegetationold.Genes.GeneType;
 
 public class SaplingCommand {
     @Cmd(cmd = "sapling", args = "[sapling_type]", argTypes = {

@@ -41,7 +41,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.network.energy.EnergyUnit;
-import net.iceyleagons.frostedengineering.network.energy.components.Storage;
+import net.iceyleagons.frostedengineering.network.energyold.components.Storage;
 import net.iceyleagons.frostedengineering.textures.base.TexturedBlock;
 import net.iceyleagons.frostedengineering.textures.base.TexturedItem;
 

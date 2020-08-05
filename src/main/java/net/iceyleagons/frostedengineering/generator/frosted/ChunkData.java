@@ -28,6 +28,7 @@ import fastnoise.MathUtils.FastNoise.Interp;
 import fastnoise.MathUtils.FastNoise.NoiseType;
 import net.iceyleagons.frostedengineering.generator.frosted.ChunkData.PointData.PointType;
 
+// 7/30/2020 Added masks.
 // 2/26/2020 General optimizations
 // 2/26/2020 Replaced reflections with direct calling (ModificationType)
 public class ChunkData {
@@ -40,11 +41,14 @@ public class ChunkData {
     static double vegetationChance = .2D;
     int iceHeight = 16;
     int waterHeight = 6;
-    int amplitudePower = 5;
-    float multiplier = 22.5f;
+    static int amplitudePower = 5;
+    static int maskLength = 287;
+    float caveThreshold = .5f;
 
+    final boolean caves;
     private MathUtils utils;
     private static FastNoise noiser;
+    private static FastNoise caveNoiser;
     private static Erosion erosion;
 
     static int typeSize = PointData.PointType.values().length;
@@ -55,11 +59,26 @@ public class ChunkData {
     public long timeTookNoising = 0L;
 
     public ChunkData(PointData[] map, long seed) {
+        this.caves = false;
+        setup(seed);
+        this.pointMap = map;
+    }
+
+    public ChunkData(boolean caves, PointData[] map, long seed) {
+        this.caves = caves;
         setup(seed);
         this.pointMap = map;
     }
 
     public ChunkData(int baseX, int baseZ, long seed) {
+        this.caves = false;
+        setup(seed);
+        this.pointMap = createNoiseMap(baseX, baseZ);
+        this.pointMap = modify(this.pointMap).join();
+    }
+
+    public ChunkData(boolean caves, int baseX, int baseZ, long seed) {
+        this.caves = caves;
         setup(seed);
         this.pointMap = createNoiseMap(baseX, baseZ);
         this.pointMap = modify(this.pointMap).join();
@@ -67,12 +86,25 @@ public class ChunkData {
 
     private void setup(long seed) {
         this.utils = MathUtils.getInstance(seed);
-        ChunkData.noiser = utils.getNoiser();
+        if (ChunkData.noiser != null && ChunkData.caveNoiser != null) {
+            // Terrain noiser
+            ChunkData.noiser = utils.getNoiser();
+            ChunkData.noiser.setNoiseType(NoiseType.PERLIN);
+            ChunkData.noiser.setInterp(Interp.QUINTIC);
+
+            // Cave noiser
+            ChunkData.caveNoiser = noiser.clone();
+            ChunkData.caveNoiser.setNoiseType(NoiseType.FRACTAL_PERLIN);
+            ChunkData.caveNoiser.setFractalOctaves(5);
+            ChunkData.caveNoiser.setFractalType(FastNoise.FractalType.FBM);
+            ChunkData.caveNoiser.setSeed(this.utils.randomLong());
+        }
         ChunkData.erosion = utils.getErosion() != null ? utils.getErosion()
                 : utils.getErosion(mapSize, 1f, 1f, 128, 10f, .01f, .8f, .8f, 01f, 4f, .3f, 4, erosionIterations);
+    }
 
-        ChunkData.noiser.setNoiseType(NoiseType.PERLIN);
-        ChunkData.noiser.setInterp(Interp.QUINTIC);
+    public boolean empty(float x, int y, float z) {
+        return (caves && this.utils.fastPow(ChunkData.caveNoiser.getPerlinFractal(x, y, z), amplitudePower) > caveThreshold) ? true : false;
     }
 
     public PointData[] createNoiseMap(int rx, int rz) {
@@ -99,60 +131,52 @@ public class ChunkData {
     public CompletableFuture<PointData[]> modify(PointData[] inputData) {
         long timeNow = System.currentTimeMillis();
 
-        return CompletableFuture.supplyAsync(new Supplier<PointData[]>() {
+        return CompletableFuture.supplyAsync(() -> {
+            for (int i = 0; i < inputData.length; i++) {
+                float[][] input = inputData[i].height;
 
-            @Override
-            public PointData[] get() {
-                for (int i = 0; i < inputData.length; i++) {
-                    float[][] input = inputData[i].height;
-
-                    for (ModificationType mod : inputData[i].pointType.modificationTypes) {
-                        input = mod.method.run(input);
-                    }
-
-                    inputData[i].height = input;
-                }
-
-                timeTookModifying += System.currentTimeMillis() - timeNow;
-
-                return inputData;
+                for (ModificationType mod : inputData[i].pointType.modificationTypes)
+                    input = mod.method.run(input);
+                inputData[i].height = input;
             }
 
+            timeTookModifying += System.currentTimeMillis() - timeNow;
+
+            return inputData;
         });
     }
 
     public float noise(float x, float y, Technique mode, float amplitude) {
         float noiseValue;
 
-        if (mode == Technique.REGULAR) {
-            noiseValue = (1.f * noiseValue(1 * x, 1 * y, Technique.REGULAR)
-                    + .5f * noiseValue(2 * x, 2 * y, Technique.REGULAR)
-                    + .25f * noiseValue(4 * x, 4 * y, Technique.REGULAR)
-                    + .13f * noiseValue(8 * x, 8 * y, Technique.REGULAR)
-                    + .06f * noiseValue(16 * x, 16 * y, Technique.REGULAR)
-                    + .03f * noiseValue(32 * x, 32 * y, Technique.REGULAR));
-            noiseValue /= (1.f + .50f + .25f + .13f + .06f + .03f);
-        } else {
-            float e1 = 1f * noise(1 * x, 1 * y, Technique.RIDGED, amplitude);
-            float e2 = 0.5f * noise(2 * x, 2 * y, Technique.RIDGED, amplitude) * e1;
-            float e3 = 0.25f * noise(4 * x, 4 * y, Technique.RIDGED, amplitude) * (e1 + e2);
-
-            noiseValue = e1 + e2 + e3;
+        switch (mode) {
+            default:
+            case REGULAR:
+                noiseValue = (1.f * noiseValue(1 * x, 1 * y, Technique.REGULAR)
+                        + .5f * noiseValue(2 * x, 2 * y, Technique.REGULAR)
+                        + .25f * noiseValue(4 * x, 4 * y, Technique.REGULAR)
+                        + .13f * noiseValue(8 * x, 8 * y, Technique.REGULAR)
+                        + .06f * noiseValue(16 * x, 16 * y, Technique.REGULAR)
+                        + .03f * noiseValue(32 * x, 32 * y, Technique.REGULAR));
+                noiseValue /= (1.f + .50f + .25f + .13f + .06f + .03f);
+            case RIDGED:
+                float e1 = 1f * noise(1 * x, 1 * y, Technique.RIDGED, amplitude);
+                float e2 = 0.5f * noise(2 * x, 2 * y, Technique.RIDGED, amplitude) * e1;
+                float e3 = 0.25f * noise(4 * x, 4 * y, Technique.RIDGED, amplitude) * (e1 + e2);
+                noiseValue = e1 + e2 + e3;
         }
-        noiseValue = MathUtils.fastPow(noiseValue, amplitudePower);
+        noiseValue = (float) Math.pow(noiseValue, amplitudePower);
 
         return noiseValue * amplitude;
     }
 
     private float noiseValue(float x, float y, Technique mode) {
         switch (mode) {
-            case RIDGED: {
+            case RIDGED:
                 return (float) (2 * (0.5 - Math.abs(0.5 - noiseValue(x, y, Technique.REGULAR))));
-            }
+            default:
             case REGULAR:
-            default: {
                 return noiser.getNoise(x, y) / 2f + 0.5f;
-            }
         }
     }
 
@@ -166,8 +190,10 @@ public class ChunkData {
         }
 
         public enum PointType {
-            ISLAND(165, 7.5f, 9.f, .4f, BlockChoice.ISLAND, false),
-            TERRAIN(50, 15.f, 22.5f, 0.f, BlockChoice.TERRAIN, true, ModificationType.EROSION),
+            ISLAND(165, 7.5f, 9.f, .4f, BlockChoice.ISLAND, false,
+                    ModificationType.ISLAND_MASK),
+            TERRAIN(50, 15.f, 22.5f, 0.f, BlockChoice.TERRAIN, true,
+                    ModificationType.EROSION, ModificationType.TERRAIN_MASK),
             CLOUD(150, 6.f, 17.5f, .25f, BlockChoice.CLOUD, false);
 
             public final int offset;
@@ -178,8 +204,8 @@ public class ChunkData {
             public final boolean doWater;
             public final ModificationType[] modificationTypes;
 
-            private PointType(int offset, float amplitude, float multiplier, float threshold, BlockChoice blocks,
-                              boolean doWater, ModificationType... mods) {
+            PointType(int offset, float amplitude, float multiplier, float threshold, BlockChoice blocks,
+                      boolean doWater, ModificationType... mods) {
                 this.offset = offset;
                 this.amplitude = amplitude;
                 this.multiplier = multiplier;
@@ -200,7 +226,7 @@ public class ChunkData {
             public final Material heightDependentBlock;
             public final Material[] stoneBlock;
 
-            private BlockChoice(Material surfaceBlock, Material iceBlock, Material... stoneBlocks) {
+            BlockChoice(Material surfaceBlock, Material iceBlock, Material... stoneBlocks) {
                 this.surfaceBlock = surfaceBlock;
                 this.stoneBlock = stoneBlocks;
                 this.heightDependentBlock = iceBlock;
@@ -209,35 +235,31 @@ public class ChunkData {
     }
 
     public enum ModificationType {
-        EROSION("Eroding", new ModificationRunnable() {
-
-            @Override
-            public float[][] run(float[][] input) {
-                return erosion.erode(input);
-            }
-
-        }), TERRACE("Terracing", new ModificationRunnable() {
-
-            @Override
-            public float[][] run(float[][] input) {
-                for (int i = 0; i < typeSize; i++) {
-
-                    for (int x = 0; x < mapSize; x++) {
-                        for (int z = 0; z < mapSize; z++) {
-                            input[x][z] = MathUtils.fastRound(input[x][z] * terraceNumber) / terraceNumber;
-                        }
-                    }
-                }
-
-                return input;
-            }
-
+        EROSION("Eroding", input -> erosion.erode(input)),
+        TERRACE("Terracing", input -> {
+            for (int i = 0; i < typeSize; i++)
+                for (int x = 0; x < mapSize; x++)
+                    for (int z = 0; z < mapSize; z++)
+                        input[x][z] = MathUtils.fastRound(input[x][z] * terraceNumber) / terraceNumber;
+            return input;
+        }),
+        ISLAND_MASK("Masking", input -> {
+            for (int x = 0; x < mapSize; x++)
+                for (int z = 0; z < mapSize; z++)
+                    input[x][z] = (float) -Math.sin(input[x][z] / maskLength) * amplitudePower;
+            return input;
+        }),
+        TERRAIN_MASK("Masking", input -> {
+            for (int x = 0; x < mapSize; x++)
+                for (int z = 0; z < mapSize; z++)
+                    input[x][z] = (float) Math.sin(input[x][z] / maskLength) * amplitudePower;
+            return input;
         });
 
         public final ModificationRunnable method;
         public final String name;
 
-        private ModificationType(String name, ModificationRunnable runnable) {
+        ModificationType(String name, ModificationRunnable runnable) {
             this.name = name;
             this.method = runnable;
         }

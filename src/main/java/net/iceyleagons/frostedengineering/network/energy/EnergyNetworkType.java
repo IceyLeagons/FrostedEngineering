@@ -16,7 +16,6 @@
  ******************************************************************************/
 package net.iceyleagons.frostedengineering.network.energy;
 
-import net.iceyleagons.frostedengineering.network.energy.interfaces.ExplodableComponent;
 
 public enum EnergyNetworkType {
 
@@ -26,7 +25,7 @@ public enum EnergyNetworkType {
     private int id;
 
     /**
-     * @param bound1 is the bound where the {@link EnergyNetwork} is considered as a
+     * @param bound1 is the bound where the {@link net.iceyleagons.frostedengineering.network.energy.EnergyNetwork} is considered as a
      *               {@link #values()}
      * @param bound2 is the end of that bound, above that it is considered as an
      *               other {@link EnergyNetworkType}
@@ -61,7 +60,7 @@ public enum EnergyNetworkType {
     }
 
     /**
-     * @param val is the current FrostedPower value of an {@link EnergyNetwork}
+     * @param val is the current FrostedPower value of an {@link net.iceyleagons.frostedengineering.network.energy.EnergyNetwork}
      * @return the {@link EnergyNetworkType} which is in range.
      */
     public static EnergyNetworkType getClassification(float val) {
@@ -71,20 +70,6 @@ public enum EnergyNetworkType {
             }
         }
         return null;
-    }
-
-    /**
-     * @param capable is the {@link ExplodableComponent}'s {@link EnergyNetworkType} it can capable of
-     * @param parent  is the {@link EnergyNetworkType} of an {@link EnergyNetwork}
-     * @return true if {@link ExplodableComponent} should explode
-     */
-    public static boolean doExplode(EnergyNetworkType capable, EnergyNetworkType parent) {
-        if (capable == parent) {
-            return false;
-        } else {
-            if (parent.getID() > capable.getID()) return true;
-        }
-        return false;
     }
 
 }

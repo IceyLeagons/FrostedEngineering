@@ -25,7 +25,7 @@ import org.bukkit.entity.Player;
 import net.iceyleagons.frostedengineering.commands.CommandManager.Arg.ArgInteger;
 import net.iceyleagons.frostedengineering.commands.CommandManager.Cmd;
 import net.iceyleagons.frostedengineering.commands.CommandManager.CommandFinished;
-import net.iceyleagons.frostedengineering.particles.ParticleManager;
+import old.particles.ParticleManager;
 import net.iceyleagons.frostedengineering.utils.festruct.FEStruct;
 
 public class TestCommand {

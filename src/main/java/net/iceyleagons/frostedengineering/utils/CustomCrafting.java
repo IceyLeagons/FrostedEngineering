@@ -23,6 +23,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
+import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -34,7 +35,7 @@ public class CustomCrafting {
     private Map<String, ItemStack> recipeItems = new HashMap<String, ItemStack>();
     private String[] recipe;
 
-    public CustomCrafting(@Nullable ItemStack inputItem, @Nullable ItemStack outputItem, @Nullable ItemStack powerItem,
+    public CustomCrafting(@NonNull ItemStack inputItem, @NonNull ItemStack outputItem, @Nullable ItemStack powerItem,
                           String[] recipe) {
         this.outputItem = outputItem;
         this.inputItem = inputItem;

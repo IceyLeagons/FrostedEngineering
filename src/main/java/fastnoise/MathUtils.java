@@ -16,6 +16,7 @@
  ******************************************************************************/
 package fastnoise;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 import org.bukkit.util.Vector;
@@ -114,7 +115,7 @@ public class MathUtils {
     // The developer's email is jorzixdan.me2@gzixmail.com (for great email, take
     // off every 'zix'.)
     //
-    public static class FastNoise {
+    public static class FastNoise implements Cloneable {
         public enum NoiseType {
             PERLIN, FRACTAL_PERLIN, SIMPLEX, FRACTAL_SIMPLEX, CELLULAR
         }
@@ -150,6 +151,13 @@ public class MathUtils {
         private CellularDistanceFunction m_cellularDistanceFunction = CellularDistanceFunction.EUCLIDEAN;
         private CellularReturnType m_cellularReturnType = CellularReturnType.CELL_VALUE;
         private FastNoise m_cellularNoiseLookup = null;
+
+        @Override
+        public FastNoise clone() {
+            FastNoise cloned = new FastNoise();
+            cloned.setSeed(m_seed);
+            return cloned;
+        }
 
         public FastNoise() {
             this.m_seed = MathUtils.seed;
@@ -1902,86 +1910,81 @@ public class MathUtils {
             final float xMax = mapSize - 1.f;
             final float yMax = mapSize - 1.f;
 
-            Thread threadA = new Thread(new Runnable() {
+            Thread threadA = new Thread(() -> {
+                final Random r = new Random(seed);
 
-                @Override
-                public void run() {
-                    final Random r = new Random(seed);
+                for (int iteration = 0; iteration < numIterations; iteration++) {
+                    Droplet droplet;
+                    try {
+                        droplet = new Droplet(r.nextInt((int) (radius - (xMax - radius))) + (xMax - radius),
+                                r.nextInt((int) (radius - (yMax - radius))) + (yMax - radius), 0f, 0f, 0, 0, 0f, 0f,
+                                initialVelocity, initialWaterVolume, 0f);
+                        // Make new droplet, with random position
+                    } catch (IllegalArgumentException ignore) {
+                        // Ignore. This should actually happen.
 
-                    for (int iteration = 0; iteration < numIterations; iteration++) {
-                        Droplet droplet = null;
-                        try {
-                            droplet = new Droplet(r.nextInt((int) (radius - (xMax - radius))) + (xMax - radius),
-                                    r.nextInt((int) (radius - (yMax - radius))) + (yMax - radius), 0f, 0f, 0, 0, 0f, 0f,
-                                    initialVelocity, initialWaterVolume, 0f);
-                            // Make new droplet, with random position
-                        } catch (IllegalArgumentException ignore) {
-                            // Ignore. This should actually happen.
+                        droplet = new Droplet(0, 0, 0f, 0f, 0, 0, 0f, 0f, initialVelocity, initialWaterVolume, 0f);
+                        // Make new droplet, at 0, 0
+                    }
 
-                            droplet = new Droplet(0, 0, 0f, 0f, 0, 0, 0f, 0f, initialVelocity, initialWaterVolume, 0f);
-                            // Make new droplet, at 0, 0
+                    for (int lifetime = 0; lifetime < maxDropletLifetime; lifetime++) {
+                        // Cast position floats to ints
+                        droplet.node = new Node((int) droplet.position.x, (int) droplet.position.y);
+
+                        // Calculate droplet's offset inside the cell (0,0) = at NW node, (1,1) = at SE node
+                        droplet.cellOffset.x = droplet.position.x - droplet.node.x;
+                        droplet.cellOffset.y = droplet.position.y - droplet.node.y;
+
+                        // Calculate droplet's height and direction of flow with bilinear interpolation of surrounding heights
+                        HeightAndGradient heightAndGradient = calculateHeightAndGradient(map, droplet);
+
+                        // Update the droplet's direction and position (move position 1 unit regardless of speed)
+                        droplet.direction.x = (droplet.direction.x * inertia
+                                - heightAndGradient.gradient.x * (1 - inertia));
+                        droplet.direction.y = (droplet.direction.y * inertia
+                                - heightAndGradient.gradient.y * (1 - inertia));
+
+                        // Normalize direction
+                        float len = (float) Math.sqrt(droplet.direction.x * droplet.direction.x
+                                + droplet.direction.y * droplet.direction.y);
+                        if (len != 0) {
+                            droplet.direction.x /= len;
+                            droplet.direction.y /= len;
+                        }
+                        droplet.position.x += droplet.direction.x;
+                        droplet.position.y += droplet.direction.y;
+
+                        // Stop simulating droplet if it's not moving or has flowed over edge of map
+                        if ((droplet.direction.x == 0 && droplet.direction.y == 0) || droplet.position.x < 0
+                                || droplet.position.x >= xMax || droplet.position.y < 0
+                                || droplet.position.y >= yMax || droplet.node.x < 0 || droplet.node.y < 0) {
+                            break;
                         }
 
-                        for (int lifetime = 0; lifetime < maxDropletLifetime; lifetime++) {
-                            // Cast position floats to ints
-                            droplet.node = new Node((int) droplet.position.x, (int) droplet.position.y);
+                        // Find the droplet's new height and calculate the deltaHeight
+                        float newHeight = calculateHeightAndGradient(map, droplet).height;
+                        float oldHeight = heightAndGradient.height;
+                        float deltaHeight = newHeight - oldHeight;
 
-                            // Calculate droplet's offset inside the cell (0,0) = at NW node, (1,1) = at SE node
-                            droplet.cellOffset.x = droplet.position.x - droplet.node.x;
-                            droplet.cellOffset.y = droplet.position.y - droplet.node.y;
+                        // Calculate the droplet's sediment capacity (higher when moving fast down a slope and contains lots of water)
+                        final float sedimentCapacity = Math.max(
+                                -deltaHeight * droplet.velocity * droplet.water * sedimentCapacityFactor,
+                                minSedimentCapacity);
 
-                            // Calculate droplet's height and direction of flow with bilinear interpolation of surrounding heights
-                            HeightAndGradient heightAndGradient = calculateHeightAndGradient(map, droplet);
-
-                            // Update the droplet's direction and position (move position 1 unit regardless of speed)
-                            droplet.direction.x = (droplet.direction.x * inertia
-                                    - heightAndGradient.gradient.x * (1 - inertia));
-                            droplet.direction.y = (droplet.direction.y * inertia
-                                    - heightAndGradient.gradient.y * (1 - inertia));
-
-                            // Normalize direction
-                            float len = (float) Math.sqrt(droplet.direction.x * droplet.direction.x
-                                    + droplet.direction.y * droplet.direction.y);
-                            if (len != 0) {
-                                droplet.direction.x /= len;
-                                droplet.direction.y /= len;
-                            }
-                            droplet.position.x += droplet.direction.x;
-                            droplet.position.y += droplet.direction.y;
-
-                            // Stop simulating droplet if it's not moving or has flowed over edge of map
-                            if ((droplet.direction.x == 0 && droplet.direction.y == 0) || droplet.position.x < 0
-                                    || droplet.position.x >= xMax || droplet.position.y < 0
-                                    || droplet.position.y >= yMax || droplet.node.x < 0 || droplet.node.y < 0) {
-                                break;
-                            }
-
-                            // Find the droplet's new height and calculate the deltaHeight
-                            float newHeight = calculateHeightAndGradient(map, droplet).height;
-                            float oldHeight = heightAndGradient.height;
-                            float deltaHeight = newHeight - oldHeight;
-
-                            // Calculate the droplet's sediment capacity (higher when moving fast down a slope and contains lots of water)
-                            final float sedimentCapacity = Math.max(
-                                    -deltaHeight * droplet.velocity * droplet.water * sedimentCapacityFactor,
-                                    minSedimentCapacity);
-
-                            // If carrying more sediment than capacity, or if flowing uphill:
-                            if (droplet.sediment > sedimentCapacity || deltaHeight > 0) {
-                                deposit(map, droplet, deltaHeight, sedimentCapacity);
-                            } else {
-                                erode(map, droplet, deltaHeight, sedimentCapacity);
-                            }
-
-                            // Update droplet's speed and water content
-                            droplet.velocity = (float) Math
-                                    .sqrt(Math.abs(droplet.velocity * droplet.velocity + deltaHeight * gravity));
-                            droplet.water *= (1 - evaporateSpeed);
-
+                        // If carrying more sediment than capacity, or if flowing uphill:
+                        if (droplet.sediment > sedimentCapacity || deltaHeight > 0) {
+                            deposit(map, droplet, deltaHeight, sedimentCapacity);
+                        } else {
+                            erode(map, droplet, deltaHeight, sedimentCapacity);
                         }
+
+                        // Update droplet's speed and water content
+                        droplet.velocity = (float) Math
+                                .sqrt(Math.abs(droplet.velocity * droplet.velocity + deltaHeight * gravity));
+                        droplet.water *= (1 - evaporateSpeed);
+
                     }
                 }
-
             });
             threadA.start();
 
@@ -2066,7 +2069,7 @@ public class MathUtils {
                 for (int y = brush.start.y; y <= brush.end.y; y++) {
                     brush.weights[x - brush.start.x][y - brush.start.y] /= brush.weightSum;
                     float weighedErodeAmount = amountToErode * brush.weights[x - brush.start.x][y - brush.start.y];
-                    float deltaSediment = (map[x][y] < weighedErodeAmount) ? map[x][y] : weighedErodeAmount;
+                    float deltaSediment = Math.min(map[x][y], weighedErodeAmount);
                     map[x][y] -= deltaSediment;
                     droplet.sediment += deltaSediment;
                 }
@@ -2083,10 +2086,8 @@ public class MathUtils {
             }
         }
 
-        ;
-
         private class HeightAndGradient {
-            public float height = 0f;
+            public float height;
             public final Vector2 gradient;
 
             private HeightAndGradient(float height, Vector2 gradient) {
@@ -2098,8 +2099,6 @@ public class MathUtils {
                 this(height, new Vector2(x, y));
             }
         }
-
-        ;
 
         private class Droplet {
             public final Vector2 position;
@@ -2128,8 +2127,6 @@ public class MathUtils {
             }
         }
 
-        ;
-
         private class Brush {
             public final Node start;
             public final Node end;
@@ -2146,8 +2143,78 @@ public class MathUtils {
                 this(new Node(x1, y1), new Node(x2, y2), weightSum);
             }
         }
+    }
 
-        ;
+    public static ArrayList<Vector3> brasenhamLine(final Vector3 pos1, final Vector3 pos2) {
+        final ArrayList<Vector3> output = new ArrayList<>();
+        int x1 = (int) pos1.x;
+        int y1 = (int) pos1.y;
+        int z1 = (int) pos1.z;
+        int x2 = (int) pos2.x;
+        int y2 = (int) pos2.y;
+        int z2 = (int) pos2.z;
+        output.add(new Vector3(x1, y1, z1));
+        int dx = Math.abs(x2 - x1);
+        int dy = Math.abs(y2 - y1);
+        int dz = Math.abs(z2 - z1);
+
+        int xs = x2 > x1 ? 1 : -1;
+        int ys = y2 > y1 ? 1 : -1;
+        int zs = z2 > z1 ? 1 : -1;
+
+        if (dx >= dy && dx >= dz) {
+            int p1 = 2 * dy - dx;
+            int p2 = 2 * dz - dx;
+            while (x1 != x2) {
+                x1 += xs;
+                if (p1 >= 0) {
+                    y1 += ys;
+                    p1 -= 2 * dx;
+                }
+                if (p2 >= 0) {
+                    z1 += zs;
+                    p2 -= 2 * dx;
+                }
+                p1 += 2 * dy;
+                p2 += 2 * dz;
+                output.add(new Vector3(x1, y1, z1));
+            }
+        } else if (dy >= dx && dy >= dz) {
+            int p1 = 2 * dx - dy;
+            int p2 = 2 * dz - dy;
+            while (y1 != y2) {
+                y1 += ys;
+                if (p1 >= 0) {
+                    x1 += xs;
+                    p1 -= 2 * dy;
+                }
+                if (p2 >= 0) {
+                    z1 += zs;
+                    p2 -= 2 * dy;
+                }
+                p1 += 2 * dx;
+                p2 += 2 * dz;
+                output.add(new Vector3(x1, y1, z1));
+            }
+        } else {
+            int p1 = 2 * dy - dz;
+            int p2 = 2 * dx - dz;
+            while (z1 != z2) {
+                z1 += zs;
+                if (p1 >= 0) {
+                    y1 += ys;
+                    p1 -= 2 * dz;
+                }
+                if (p2 >= 0) {
+                    x1 += xs;
+                    p2 -= 2 * dz;
+                }
+                p1 += 2 * dy;
+                p2 += 2 * dx;
+                output.add(new Vector3(x1, y1, z1));
+            }
+        }
+        return output;
     }
 
     public static class Vector2 {
@@ -2179,6 +2246,35 @@ public class MathUtils {
             double d2 = this.y - otherPoint.y;
             double d3 = this.y - otherPoint.y;
             return Math.sqrt(d1 * d1 + d2 * d2 + d3 * d3);
+        }
+
+        public static Vector3 add(final Vector3 vec1, final Vector3 vec2) {
+            return new Vector3(vec1.x + vec2.x, vec1.y + vec2.y, vec1.z + vec2.z);
+        }
+
+        public static Vector3 sub(final Vector3 vec1, final Vector3 vec2) {
+            return new Vector3(vec1.x - vec2.x, vec1.y - vec2.y, vec1.z - vec2.z);
+        }
+
+        public static Vector3 div(final Vector3 vec1, final int n) {
+            return new Vector3(vec1.x / n, vec1.y / n, vec1.z / n);
+        }
+
+        public static Vector3 mul(final Vector3 vec1, final int n) {
+            return new Vector3(vec1.x * n, vec1.y * n, vec1.z * n);
+        }
+
+        public static Vector3 normalize(Vector3 vec1) {
+            final double length = length(vec1);
+            return new Vector3((float) (vec1.x / length), (float) (vec1.y / length), (float) (vec1.z / length));
+        }
+
+        public static double length(final Vector3 vec1) {
+            return Math.sqrt(Math.pow(vec1.x, 2.0) + Math.pow(vec1.y, 2.0) + Math.pow(vec1.z, 2.0));
+        }
+
+        public static double distance(Vector3 vec1, Vector3 vec2) {
+            return Math.sqrt(Math.pow(vec2.x - vec1.x, 2.0) + Math.pow(vec2.y - vec1.y, 2.0) + Math.pow(vec2.z - vec1.z, 2.0));
         }
     }
 
@@ -2232,6 +2328,10 @@ public class MathUtils {
 
     public static int randomInt(int min, int max) {
         return random.nextInt(max - min + 1) + min;
+    }
+
+    public static long randomLong() {
+        return random.nextLong();
     }
 
     public static double map(double paramDouble, Range range1, Range range2) {

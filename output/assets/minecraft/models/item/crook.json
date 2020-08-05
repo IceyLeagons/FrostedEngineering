@@ -1,14 +1,26 @@
 {
-    "parent": "item/generated",
-	"textures":{
-		"layer0":"custom_gui/test"
-	},
-	"elements":[],
-	"display":{
-		"layer0":{
-			"rotation":[-45,0,-22.5],
-			"scale":[4,4,4],
-			"translation":[0,0,-80]
-		}
-	}
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "custom_gui/test"
+  },
+  "elements": [],
+  "display": {
+    "layer0": {
+      "rotation": [
+        -45,
+        0,
+        -22.5
+      ],
+      "scale": [
+        4,
+        4,
+        4
+      ],
+      "translation": [
+        0,
+        0,
+        -80
+      ]
+    }
+  }
 }

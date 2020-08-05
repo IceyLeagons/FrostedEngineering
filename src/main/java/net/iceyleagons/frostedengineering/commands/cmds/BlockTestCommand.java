@@ -16,13 +16,16 @@
  ******************************************************************************/
 package net.iceyleagons.frostedengineering.commands.cmds;
 
+import net.iceyleagons.frostedengineering.vegetation.Tree;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import net.iceyleagons.frostedengineering.commands.CommandManager.Cmd;
 import net.iceyleagons.frostedengineering.commands.CommandManager.CommandFinished;
-import net.iceyleagons.frostedengineering.network.energy.components.sub.ComponentManager;
-import net.iceyleagons.frostedengineering.network.energy.components.sub.generators.coal.TexturedCoalGenerator;
+import net.iceyleagons.frostedengineering.network.energy.ComponentManager;
+import net.iceyleagons.frostedengineering.network.energyold.components.sub.generators.coal.TexturedCoalGenerator;
 
 public class BlockTestCommand {
     @Cmd(cmd = "blocktest", args = "", argTypes = {}, help = "Gives you a test block.", longhelp = "Gives you a test block.", permission = net.iceyleagons.frostedengineering.other.permission.Permissions.COMMAND_DEBUG)
@@ -30,6 +33,11 @@ public class BlockTestCommand {
         if (sender instanceof Player) {
             Player player = (Player) sender;
 
+            Block b = player.getTargetBlock(10);
+            if (b != null)
+                new Tree(2, 2, 3, 3, 8, 10)
+                        .place(b, new Tree.TreeParameters(Material.OAK_LOG, Material.OAK_LEAVES, Material.OAK_LOG,
+                                3, 3, 100, 5, 3, true));
             player.getInventory().addItem(((TexturedCoalGenerator) ComponentManager.getComponent("fe:coalgenerator")).getItem());
             return CommandFinished.DONE;
         }
