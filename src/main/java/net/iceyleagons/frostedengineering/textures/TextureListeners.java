@@ -104,7 +104,7 @@ public class TextureListeners implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
-        e.getPlayer().setResourcePack(Textures.getData("resourcepack-link"), Textures.getData("resourcepack-sha1"));
+        e.getPlayer().setResourcePack(Textures.getData("resourcepack-link"), Textures.getData("resourcepack-hash"));
     }
 
     @EventHandler
