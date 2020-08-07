@@ -54,13 +54,17 @@ public interface IUploadable {
                         .put(RequestBody.create(MediaType.parse("application/zip"), file))
                         .build()).execute().header("com.station307.located-at");
 
-                Main.executor.execute(() -> {
-                    while (Main.MAIN.isEnabled()) {
-                        assert url != null;
-                        new OkHttpClient().newCall(new Request.Builder()
-                                .url(url)
-                                .put(RequestBody.create(MediaType.parse("application/zip"), file))
-                                .build()).execute();
+                Main.executor.execute(new Runnable() {
+                    @SneakyThrows
+                    @Override
+                    public void run() {
+                        while (Main.MAIN.isEnabled()) {
+                            assert url != null;
+                            new OkHttpClient().newCall(new Request.Builder()
+                                    .url(url)
+                                    .put(RequestBody.create(MediaType.parse("application/zip"), file))
+                                    .build()).execute();
+                        }
                     }
                 });
 
