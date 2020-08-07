@@ -12,6 +12,7 @@
 
  ![version][]  ![license-shield][] ![forks][] ![stars][]
  ![issues][] [ ![faq-shield] ][faq][ ![troubleshooting-shield] ][troubleshooting]
+ 
 [ ![discord-shield][] ][discord-invite]
 
 # FrostedEngineering (Spigot mod framework)
