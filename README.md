@@ -1,6 +1,6 @@
 [version]: http://img.shields.io/github/downloads/IceyLeagons/FrostedEngineering/total.svg?style=for-the-badge
 [discord-invite]: https://discord.gg/uej8rGb
-[faq]: https://github.com/IceyLeagons/FrostedEngineering/wiki\)-FAQ
+[faq]: https://github.com/IceyLeagons/FrostedEngineering/wiki
 [troubleshooting]: https://google.com/\)-Troubleshooting
 [discord-shield]: https://discord.com/api/guilds/489789322300620801/widget.png?style=banner2
 [faq-shield]: https://img.shields.io/badge/Wiki-FAQ-blue.svg?style=for-the-badge
