@@ -15,7 +15,7 @@
  
 [ ![discord-shield][] ][discord-invite]
 
-# FrostedEngineering <img align="right" src="https://i.imgur.com/sxB9BHG.png" width="240" height="50"> 
+# FrostedEngineering
 FrostedEngineering tries its best to create a unique mod-like experience in Bukkit/Spigot; you name it. We've achieved exciting things with it that you'll like; you don't need any client-side modifications to see custom models and receive custom sounds. And what's the best? It's open-source and free for everyone. As is FrostedEngineering provides some features like simple machines etc. Explore the possibilities yourself with our API and custom addon system.
 For more information visit our [wiki](https://github.com/IceyLeagons/FrostedEngineering/wiki).
 
