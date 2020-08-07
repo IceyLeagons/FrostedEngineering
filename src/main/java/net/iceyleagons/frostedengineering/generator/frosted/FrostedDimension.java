@@ -43,10 +43,12 @@ public class FrostedDimension extends ChunkGenerator {
         int rx = chunkX * 16;
         int rz = chunkZ * 16;
 
-        net.iceyleagons.frostedengineering.generator.frosted.ChunkData chunkBase = new net.iceyleagons.frostedengineering.generator.frosted.ChunkData(true,
+        net.iceyleagons.frostedengineering.generator.frosted.ChunkData chunkBase = new net.iceyleagons.frostedengineering.generator.frosted.ChunkData(
                 rx, rz, world.getSeed());
+        PointData[] pointMap = chunkBase.generate();
+
         for (int i = 0; i < net.iceyleagons.frostedengineering.generator.frosted.ChunkData.typeSize; i++) {
-            PointData noiseData = chunkBase.pointMap[i];
+            PointData noiseData = pointMap[i];
 
             x:
             for (int x = 0; x < net.iceyleagons.frostedengineering.generator.frosted.ChunkData.mapSize; x++) {

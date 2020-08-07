@@ -37,8 +37,8 @@ public class Tree {
      * <b>L-SYSTEM IS EXPERIMENTAL!</b>
      */
     int type;
-    ArrayList<Block> branchBlocks = new ArrayList<>();
-    HashMap<Block, Material> replaceMap = new HashMap<>();
+    ArrayList<Vector3> branchBlocks = new ArrayList<>();
+    HashMap<Vector3, Material> replaceMap = new HashMap<>();
 
     // L-System specific stuff
     String result, axiom;
@@ -98,31 +98,71 @@ public class Tree {
         switch (type) {
             case 1:
                 final long start = System.currentTimeMillis();
-                createTree().thenAccept(ignored -> new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        render(block, parameters);
-                        leaves(block, parameters);
-                        roots(block, parameters);
+                createTree().thenAccept(ignored -> {
+                    render(block, parameters);
+                    leaves(block, parameters);
+                    roots(block, parameters);
 
-                        replaceMap.forEach(Block::setType);
-                        System.out.println("Took " + (System.currentTimeMillis() - start) + " ms' to finish.");
-                    }
-                }.runTask(Main.MAIN));
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+
+                            replaceMap.forEach((vector3, material) -> {
+                                Block blokk = block.getWorld().getBlockAt((int) vector3.x, (int) vector3.y, (int) vector3.z);
+                                if (blokk.getType() != parameters.branchMaterial && blokk.getType() != parameters.rootMaterial)
+                                    blokk.setType(material);
+
+                                if (blokk.getState().getBlockData() instanceof Leaves) {
+                                    Leaves leaves = (Leaves) blokk.getState().getBlockData();
+                                    leaves.setPersistent(true);
+                                    blokk.setBlockData(leaves);
+                                }
+                            });
+                            System.out.println("Took " + (System.currentTimeMillis() - start) + " ms' to finish.");
+                        }
+                    }.runTask(Main.MAIN);
+                });
                 break;
             default:
             case 0:
                 final long start2 = System.currentTimeMillis();
                 createTree().thenAccept(ignore -> grow(parameters).thenAccept(ignored -> {
                     leaves.clear();
+                    render(block, parameters);
+                    leaves(block, parameters);
+                    roots(block, parameters);
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            render(block, parameters);
-                            leaves(block, parameters);
-                            roots(block, parameters);
 
-                            replaceMap.forEach(Block::setType);
+                            replaceMap.forEach((vector3, material) -> {
+                                Block blokk = block.getWorld().getBlockAt((int) vector3.x, (int) vector3.y, (int) vector3.z);
+                                if (blokk.getType() != parameters.branchMaterial && blokk.getType() != parameters.rootMaterial)
+                                    blokk.setType(material);
+
+                                if (blokk.getState().getBlockData() instanceof Leaves) {
+                                    Leaves leaves = (Leaves) blokk.getState().getBlockData();
+                                    leaves.setPersistent(true);
+                                    blokk.setBlockData(leaves);
+                                } else if (parameters.logRotate && blokk.getBlockData() instanceof Orientable) {
+                                    Orientable orientable = (Orientable) blokk.getBlockData();
+
+                                    switch (ThreadLocalRandom.current().nextInt(3) + 1) {
+                                        default:
+                                        case 1:
+                                            orientable.setAxis(Axis.X);
+                                            break;
+                                        case 2:
+                                            orientable.setAxis(Axis.Y);
+                                            break;
+                                        case 3:
+                                            orientable.setAxis(Axis.Z);
+                                            break;
+                                    }
+
+                                    blokk.setBlockData(orientable);
+                                }
+                            });
                             System.out.println("Took " + (System.currentTimeMillis() - start2) + " ms' to finish.");
                         }
                     }.runTask(Main.MAIN);
@@ -143,31 +183,12 @@ public class Tree {
                 ArrayList<Vector3> lineSegments = MathUtils.brasenhamLine(branch.getPosition(), branch.getParent().getPosition());
 
                 for (Vector3 lineSegment : lineSegments) {
-                    Block lineBlock = block.getWorld().getBlockAt((int) lineSegment.x + block.getX(),
+                    Vector3 linePos = new Vector3((int) lineSegment.x + block.getX(),
                             (int) lineSegment.y + block.getY() + 1, // idk why add one, but let's just do it.
                             (int) lineSegment.z + block.getZ());
 
-                    replaceMap.put(lineBlock, parameters.branchMaterial);
-                    branchBlocks.add(lineBlock);
-
-                    if (parameters.logRotate && lineBlock.getBlockData() instanceof Orientable) {
-                        Orientable orientable = (Orientable) lineBlock.getBlockData();
-
-                        switch (ThreadLocalRandom.current().nextInt(3) + 1) {
-                            default:
-                            case 1:
-                                orientable.setAxis(Axis.X);
-                                break;
-                            case 2:
-                                orientable.setAxis(Axis.Y);
-                                break;
-                            case 3:
-                                orientable.setAxis(Axis.Z);
-                                break;
-                        }
-
-                        lineBlock.setBlockData(orientable);
-                    }
+                    replaceMap.put(linePos, parameters.branchMaterial);
+                    branchBlocks.add(linePos);
                 }
             }
         });
@@ -183,20 +204,11 @@ public class Tree {
         branchBlocks.forEach(branchBlock -> {
             if (branchBlock.getY() > block.getY() + this.stemLength / 5 * 3) {
                 for (int i = 0; i < parameters.leafPerBranch; i++) {
-                    int x = branchBlock.getX() + (int) (Math.random() * 3) - 1,
-                            y = branchBlock.getY() + (int) (Math.random() * 3) - 1,
-                            z = branchBlock.getZ() + (int) (Math.random() * 3) - 1;
+                    int x = (int) (branchBlock.getX() + (int) (Math.random() * 3) - 1),
+                            y = (int) (branchBlock.getY() + (int) (Math.random() * 3) - 1),
+                            z = (int) (branchBlock.getZ() + (int) (Math.random() * 3) - 1);
 
-                    Block leafBlock = block.getWorld().getBlockAt(x, y, z);
-                    if (leafBlock.getType() != parameters.branchMaterial && leafBlock.getType() != parameters.rootMaterial) {
-                        replaceMap.put(leafBlock, parameters.leafMaterial);
-
-                        if (leafBlock.getState().getBlockData() instanceof Leaves) {
-                            Leaves leaves = (Leaves) leafBlock.getState().getBlockData();
-                            leaves.setPersistent(true);
-                            leafBlock.setBlockData(leaves);
-                        }
-                    }
+                    replaceMap.put(new Vector3(x, y, z), parameters.leafMaterial);
                 }
             }
         });
@@ -216,11 +228,11 @@ public class Tree {
 
             ArrayList<Vector3> lineSegments = MathUtils.brasenhamLine(new Vector3((float) x, (float) y, (float) z), new Vector3(0.f, 0.f, 0.f));
             lineSegments.forEach(lineSegment -> {
-                Block lineBlock = block.getWorld().getBlockAt((int) lineSegment.x + block.getX(),
-                        (int) lineSegment.y + block.getY() + 1, // idk why add one, but let's just do it.
+                Vector3 linePos = new Vector3((int) lineSegment.x + block.getX(),
+                        (int) lineSegment.y + block.getY() + 1,
                         (int) lineSegment.z + block.getZ());
 
-                replaceMap.put(lineBlock, parameters.rootMaterial);
+                replaceMap.put(linePos, parameters.rootMaterial);
             });
         }
     }

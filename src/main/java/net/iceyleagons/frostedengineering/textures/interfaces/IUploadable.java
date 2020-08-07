@@ -16,43 +16,21 @@
  ******************************************************************************/
 package net.iceyleagons.frostedengineering.textures.interfaces;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.MalformedURLException;
+import java.io.*;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import lombok.SneakyThrows;
+import okhttp3.*;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.plugin.Plugin;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.IncorrectnessListener;
-import com.gargoylesoftware.htmlunit.ScriptException;
-import com.gargoylesoftware.htmlunit.ThreadedRefreshHandler;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import com.gargoylesoftware.htmlunit.html.parser.HTMLParserListener;
-import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
 
 import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.textures.Textures;
@@ -64,106 +42,75 @@ import net.iceyleagons.frostedengineering.textures.initialization.Sounds.SoundDa
 
 public interface IUploadable {
 
-    public void init();
+    void init();
 
-    public default void upload(File file) {
-        // Create a new htmlunit driver in selenium.
-        WebDriver driver = new HtmlUnitDriver(BrowserVersion.CHROME, true) {
-            @Override
-            public WebClient modifyWebClient(final WebClient modify) {
-                return modify(modify);
-            }
-        };
-
-        // Get the minepack.net page
-        driver.get("https://minepack.net/");
-
+    default void upload(File file) {
         new Timer().schedule(new TimerTask() {
+            @SneakyThrows
             @Override
             public void run() {
-                driver.findElement(By.name("resourcepack")).sendKeys(file.getAbsolutePath());
-                driver.findElement(By.name("submit")).submit();
+                String url = new OkHttpClient().newCall(new Request.Builder()
+                        .url("https://www.station307.com/")
+                        .put(RequestBody.create(MediaType.parse("application/zip"), file))
+                        .build()).execute().header("com.station307.located-at");
 
-                List<WebElement> webElements = driver.findElements(By.name("select"));
+                Main.executor.execute(() -> {
+                    while (Main.MAIN.isEnabled()) {
+                        assert url != null;
+                        new OkHttpClient().newCall(new Request.Builder()
+                                .url(url)
+                                .put(RequestBody.create(MediaType.parse("application/zip"), file))
+                                .build()).execute();
+                    }
+                });
 
                 Main.info(Optional.of("Textures"), "Resource pack uploaded.");
                 Main.info(Optional.of("Textures"),
-                        "Resource pack link is: " + webElements.get(0).getAttribute("value"));
-                Main.info(Optional.of("Textures"),
-                        "Resource pack hash is: " + webElements.get(1).getAttribute("value"));
+                        "Resource pack link is: " + url);
+                Main.info(Optional.of("Textures"), "Calculating SHA-1 hash...");
+                String hash = sha1Code(file);
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        Main.info(Optional.of("Textures"),
+                                "Resource pack hash is: " + hash);
 
-                Textures.setData("resourcepack-link", webElements.get(0).getAttribute("value"));
-                Textures.setData("resourcepack-sha1", webElements.get(1).getAttribute("value"));
+                        Textures.setData("resourcepack-link", url);
+                        Textures.setData("resourcepack-hash", hash);
 
-                Bukkit.getOnlinePlayers().forEach(player -> player
-                        .setResourcePack(Textures.getData("resourcepack-link"), Textures.getData("resourcepack-sha1")));
-
-                driver.close();
+                        Bukkit.getOnlinePlayers().forEach(player -> player
+                                .setResourcePack(Textures.getData("resourcepack-link"), Textures.getData("resourcepack-hash")));
+                    }
+                }, 1000L);
             }
         }, 10000L);
     }
 
-    public default WebClient modify(final WebClient client) {
-        client.getOptions().setThrowExceptionOnScriptError(false);
-        client.getCookieManager().setCookiesEnabled(true);
-        client.setRefreshHandler(new ThreadedRefreshHandler());
-        client.getOptions().setDownloadImages(false);
-        client.getOptions().setCssEnabled(false);
-        client.getOptions().setUseInsecureSSL(true);
-        client.getOptions().setRedirectEnabled(true);
-        client.getOptions().setThrowExceptionOnFailingStatusCode(false);
+    @SneakyThrows
+    default String sha1Code(File file) {
+        FileInputStream fileInputStream = new FileInputStream(file);
+        MessageDigest digest = MessageDigest.getInstance("SHA-1");
+        DigestInputStream digestInputStream = new DigestInputStream(fileInputStream, digest);
+        byte[] bytes = new byte[1024];
 
-        client.setIncorrectnessListener(new IncorrectnessListener() {
+        while (digestInputStream.read(bytes) > 0) ;
 
-            @Override
-            public void notify(String arg0, Object arg1) {
-                // Ignored.
-            }
-        });
-        client.setJavaScriptErrorListener(new JavaScriptErrorListener() {
-
-            @Override
-            public void timeoutError(HtmlPage arg0, long arg1, long arg2) {
-                // Ignored.
-            }
-
-            @Override
-            public void scriptException(HtmlPage arg0, ScriptException arg1) {
-                // Ignored.
-            }
-
-            @Override
-            public void malformedScriptURL(HtmlPage arg0, String arg1, MalformedURLException arg2) {
-                // Ignored.
-            }
-
-            @Override
-            public void loadScriptError(HtmlPage arg0, URL arg1, Exception arg2) {
-                // Ignored.
-            }
-
-            @Override
-            public void warn(String arg0, String arg1, int arg2, String arg3, int arg4) {
-                // Ignored.
-            }
-        });
-        client.setHTMLParserListener(new HTMLParserListener() {
-
-            @Override
-            public void error(String arg0, URL arg1, String arg2, int arg3, int arg4, String arg5) {
-                // Ignored.
-            }
-
-            @Override
-            public void warning(String arg0, URL arg1, String arg2, int arg3, int arg4, String arg5) {
-                // Ignored.
-            }
-        });
-
-        return client;
+        byte[] resultByteArry = digest.digest();
+        return bytesToHexString(resultByteArry);
     }
 
-    public default void unzipFile(File assets, File where) {
+    default String bytesToHexString(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            int value = b & 0xFF;
+            if (value < 16)
+                sb.append("0");
+            sb.append(Integer.toHexString(value).toUpperCase());
+        }
+        return sb.toString();
+    }
+
+    default void unzipFile(File assets, File where) {
         try {
             ZipInputStream zipIn = new ZipInputStream(new FileInputStream(assets));
             ZipEntry entry = zipIn.getNextEntry();
@@ -182,17 +129,17 @@ public interface IUploadable {
         }
     }
 
-    public default void extractEntry(ZipInputStream zipIn, File file) throws IOException {
+    default void extractEntry(ZipInputStream zipIn, File file) throws IOException {
         FileOutputStream fOS = new FileOutputStream(file);
         byte[] bytesIn = new byte[8192];
-        int read = 0;
+        int read;
         while ((read = zipIn.read(bytesIn)) != -1)
             fOS.write(bytesIn, 0, read);
 
         fOS.close();
     }
 
-    public default void printData() {
+    default void printData() {
         if (Textures.items.size() != 0)
             Main.info(Optional.of("Textures"), "Registered " + Textures.items.size() + " textured item(s).");
         if (Textures.blocks.size() != 0)
@@ -207,12 +154,12 @@ public interface IUploadable {
                 "Registered " + (Textures.blocks.size() + Textures.items.size()) + " textured instance(s).");
     }
 
-    public default File extractFile(Plugin plugin, String name, File where) {
+    default File extractFile(Plugin plugin, String name, File where) {
         Main.info(Optional.of("Textures"), " Retrieving assets.zip out of the plugin \"" + plugin.getName() + "\".");
 
         try {
             FileOutputStream fOS = new FileOutputStream(where);
-            byte[] resourceData = IOUtils.toByteArray(plugin.getResource(name));
+            byte[] resourceData = IOUtils.toByteArray(Objects.requireNonNull(plugin.getResource(name)));
             fOS.write(resourceData, 0, resourceData.length);
             fOS.close();
         } catch (IOException exception) {
@@ -222,7 +169,7 @@ public interface IUploadable {
         return where;
     }
 
-    public default void deleteFile(File file) {
+    default void deleteFile(File file) {
         if (file.exists())
             try {
                 FileUtils.forceDelete(file);
@@ -231,12 +178,12 @@ public interface IUploadable {
             }
     }
 
-    public default void printModelData(PrintWriter printWriter, Material baseMaterial) {
+    default void printModelData(PrintWriter printWriter, Material baseMaterial) {
         List<TexturedBase> texturedList = new ArrayList<>(Textures.items.size() + Textures.blocks.size());
 
-        Textures.blocks.forEach((block) -> texturedList.add(block));
+        texturedList.addAll(Textures.blocks);
 
-        Textures.items.forEach((item) -> texturedList.add(item));
+        texturedList.addAll(Textures.items);
 
         if (texturedList.size() != 0)
             printWriter.write("{ \"parent\": \"item/handheld\", \"textures\": { \"layer0\": \"items/"
@@ -245,14 +192,13 @@ public interface IUploadable {
                     + baseMaterial.name().toLowerCase() + "\"}\"");
 
         texturedList.forEach((textured) -> {
-            if (textured.getBaseMaterial() == baseMaterial)
-                if (textured != null) {
-                    Main.info(Optional.of("TEXTURES"), "Wrote custom JSON data for TexturedBase #" + textured.getId()
-                            + " (" + textured.getName() + ") with id " + textured.getId());
+            if (textured.getBaseMaterial() == baseMaterial) {
+                Main.info(Optional.of("TEXTURES"), "Wrote custom JSON data for TexturedBase #" + textured.getId()
+                        + " (" + textured.getName() + ") with id " + textured.getId());
 
-                    printWriter.println(",{ \"predicate\": {\"custom_model_data\": " + textured.getId()
-                            + "}, \"model\": \"" + textured.getModel() + "\"}");
-                }
+                printWriter.println(",{ \"predicate\": {\"custom_model_data\": " + textured.getId()
+                        + "}, \"model\": \"" + textured.getModel() + "\"}");
+            }
         });
 
         if (texturedList.size() != 0)
@@ -261,12 +207,10 @@ public interface IUploadable {
         printWriter.close();
     }
 
-    public default void writeSounds(File file) throws IOException {
+    default void writeSounds(File file) throws IOException {
         HashMap<String, SoundData> soundsMap = new HashMap<>();
 
-        Textures.sounds.forEach((sound) -> {
-            soundsMap.put(sound.getName(), new SoundData("master", Arrays.asList(sound.getModel())));
-        });
+        Textures.sounds.forEach((sound) -> soundsMap.put(sound.getName(), new SoundData("master", Collections.singletonList(sound.getModel()))));
 
         Sounds sounds = new Sounds(soundsMap);
 
@@ -275,7 +219,7 @@ public interface IUploadable {
         fw.close();
     }
 
-    public default void writeMcMeta(File file) throws IOException {
+    default void writeMcMeta(File file) throws IOException {
         String finalJson = Textures.GSON.toJson(new McMeta(Textures.pack_format, Textures.pack_description));
 
         FileWriter fW = new FileWriter(file);
@@ -283,22 +227,20 @@ public interface IUploadable {
         fW.close();
     }
 
-    public default void throwEvent() {
+    default void throwEvent() {
         Bukkit.getPluginManager().callEvent(new TextureSetupEvent());
     }
 
-    public default void download(String link, File file) {
+    default void download(String link, File file) {
         try {
             BufferedInputStream bIS = new BufferedInputStream(new URL(link).openStream());
 
             FileOutputStream fOS = new FileOutputStream(file);
 
-            byte[] buff = new byte[32*1024];
-            int len=0;
-            while((len = bIS.read(buff)) > 0)
-                fOS.write(buff,0,len);
-
-            // fOS.write(bIS.readAllBytes());
+            byte[] buff = new byte[32 * 1024];
+            int len;
+            while ((len = bIS.read(buff)) > 0)
+                fOS.write(buff, 0, len);
 
             fOS.close();
             bIS.close();
@@ -307,7 +249,7 @@ public interface IUploadable {
         }
     }
 
-    public default File createFolder(File file) {
+    default File createFolder(File file) {
         if (!file.exists())
             file.mkdirs();
 

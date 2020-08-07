@@ -36,60 +36,28 @@ import net.iceyleagons.frostedengineering.generator.frosted.ChunkData.PointData.
 // 2/26/2020 General optimizations
 // 2/26/2020 Replaced reflections with direct calling (ModificationType)
 public class ChunkData {
-    int erosionIterations = 2048;
+    // Options
+    static int erosionIterations = 2048;
     static int mapSize = 16;
     static int vegetationNumber = 1; // add + 1 for max possible trees.
     static int vegetationOverflow = 2; // this is in blocks.
+    static int amplitudePower = 1;
+    static int maskLength = 287;
+    // static double vegetationChance = .2D;
+    final boolean caves;
     final float cloudNoiseLimit = 0.75f;
     int iceHeight = 16;
     int waterHeight = 6;
-    // static double vegetationChance = .2D;
-    static int amplitudePower = 5;
-    static int maskLength = 287;
+
     static float caveDecidingFactor = .5f;
+    float secondaryNoiseMultiplier = .25f;
 
-    float secondaryNoiseMultiplier = .5f;
+    static Map.Entry<FastNoise, Optional<FastNoise>> noise;
+    static Map.Entry<FastNoise, Optional<FastNoise>> caveNoise;
+    static Erosion erosion;
+    static MathUtils utils = MathUtils.getInstance(1337);
 
-    final boolean caves;
-    private static Map.Entry<FastNoise, Optional<FastNoise>> noise;
-    private static Map.Entry<FastNoise, Optional<FastNoise>> caveNoise;
-    private static Erosion erosion;
-
-    static int typeSize = PointData.PointType.values().length;
-
-    public PointData[] pointMap;
-
-    public long timeTookModifying = 0L;
-    public long timeTookNoising = 0L;
-
-    public ChunkData(PointData[] map, long seed) {
-        this.caves = false;
-        setup(seed);
-        this.pointMap = map;
-    }
-
-    public ChunkData(boolean caves, PointData[] map, long seed) {
-        this.caves = caves;
-        setup(seed);
-        this.pointMap = map;
-    }
-
-    public ChunkData(int baseX, int baseZ, long seed) {
-        this.caves = false;
-        setup(seed);
-        this.pointMap = createNoiseMap(baseX, baseZ);
-        this.pointMap = modify(this.pointMap).join();
-    }
-
-    public ChunkData(boolean caves, int baseX, int baseZ, long seed) {
-        this.caves = caves;
-        setup(seed);
-        this.pointMap = createNoiseMap(baseX, baseZ);
-        this.pointMap = modify(this.pointMap).join();
-    }
-
-    private void setup(long seed) {
-        MathUtils utils = MathUtils.getInstance(seed);
+    static {
         // Terrain noise
         ChunkData.noise = utils.getNoise(MathUtils.NoiseClass.TERRAIN);
 
@@ -98,6 +66,46 @@ public class ChunkData {
 
         ChunkData.erosion = utils.getErosion() != null ? utils.getErosion()
                 : utils.getErosion(mapSize, 1f, 1f, 128, 10f, .01f, .8f, .8f, 01f, 4f, .3f, 4, erosionIterations);
+    }
+
+    static int typeSize = PointData.PointType.values().length;
+
+    PointData[] pointMap;
+
+    public long timeTookModifying = 0L;
+    public long timeTookNoising = 0L;
+
+    int x, z;
+
+    public ChunkData(PointData[] map, long seed) {
+        this.caves = false;
+        utils.updateSeed(seed);
+        this.pointMap = map;
+    }
+
+    public ChunkData(boolean caves, PointData[] map, long seed) {
+        this.caves = caves;
+        utils.updateSeed(seed);
+        this.pointMap = map;
+    }
+
+    public ChunkData(int baseX, int baseZ, long seed) {
+        this.caves = false;
+        utils.updateSeed(seed);
+        this.x = baseX;
+        this.z = baseZ;
+    }
+
+    public ChunkData(boolean caves, int baseX, int baseZ, long seed) {
+        this.caves = caves;
+        utils.updateSeed(seed);
+        this.x = baseX;
+        this.z = baseZ;
+    }
+
+    public PointData[] generate() {
+        pointMap = createNoiseMap(x, z);
+        return modify(pointMap).join();
     }
 
     public PointData[] createNoiseMap(int rx, int rz) {
@@ -111,7 +119,7 @@ public class ChunkData {
 
             for (int x = 0; x < mapSize; x++)
                 for (int z = 0; z < mapSize; z++)
-                    heightMap[x][z] = noise(noise, rx + x, rz + z, type.amplitude);
+                    heightMap[x][z] = noise(rx + x, rz + z, type.amplitude);
 
             pointMap[i] = new PointData(heightMap, type);
         }
@@ -142,6 +150,20 @@ public class ChunkData {
         }
 
         return instructions;
+    }
+
+    @Deprecated
+    public float noise(float x, float y, float amplitude) {
+        float noiseValue = (1.f * noise(noise, 1 * x, 1 * y)
+                + .5f * noise(noise, 2 * x, 2 * y)
+                + .25f * noise(noise, 4 * x, 4 * y)
+                + .13f * noise(noise, 8 * x, 8 * y)
+                + .06f * noise(noise, 16 * x, 16 * y)
+                + .03f * noise(noise, 32 * x, 32 * y));
+        noiseValue /= (1.f + .50f + .25f + .13f + .06f + .03f);
+        noiseValue = (float) Math.pow(noiseValue, amplitudePower);
+
+        return noiseValue * amplitude;
     }
 
     public CompletableFuture<PointData[]> modify(PointData[] inputData) {
@@ -201,10 +223,9 @@ public class ChunkData {
         }
 
         public enum PointType {
-            ISLAND(165, 7.5f, 9.f, .4f, BlockChoice.ISLAND, false,
-                    ModificationType.ISLAND_MASK),
+            ISLAND(165, 7.5f, 9.f, .4f, BlockChoice.ISLAND, false),
             TERRAIN(50, 15.f, 22.5f, 0.f, BlockChoice.TERRAIN, true,
-                    ModificationType.EROSION, ModificationType.TERRAIN_MASK),
+                    ModificationType.EROSION),
             CLOUD(150, 6.f, 17.5f, .25f, BlockChoice.CLOUD, false);
 
             public final int offset;

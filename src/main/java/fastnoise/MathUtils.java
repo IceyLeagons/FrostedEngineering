@@ -21,6 +21,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import lombok.Data;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.util.Vector;
 
 import net.iceyleagons.frostedengineering.utils.math.Range;
@@ -48,6 +49,14 @@ public class MathUtils {
         }
 
         return MathUtils.instance;
+    }
+
+    public void updateSeed(long seed) {
+        noiseMap.forEach((ignore, entry) -> {
+            entry.getKey().setSeed(seed);
+            if (entry.getValue().isPresent())
+                entry.getValue().get().setSeed(seed);
+        });
     }
 
     public static MathUtils getInstance() {
@@ -99,10 +108,8 @@ public class MathUtils {
         switch (noiseClass) {
             default:
             case TERRAIN:
-                MapEntry<FastNoise, Optional<FastNoise>> mapEntry = MapEntry.of(new FastNoise().setNoiseType(FastNoise.NoiseType.FRACTAL_SIMPLEX)
-                                .setFractalOctaves(8).setFractalLacunarity(2.f).setFractalGain(.5f).setFractalType(FastNoise.FractalType.FBM),
-                        Optional.of(new FastNoise().setNoiseType(FastNoise.NoiseType.CELLULAR)));
-                noiseMap.put(noiseClass, mapEntry);
+                noiseMap.put(noiseClass, MapEntry.of(new FastNoise().setNoiseType(FastNoise.NoiseType.SIMPLEX),
+                        Optional.empty()));
                 break;
             case CAVE:
                 FastNoise firstNoise = new FastNoise().setNoiseType(FastNoise.NoiseType.FRACTAL_SIMPLEX).setFractalGain(.5f).setFractalLacunarity(2.f)
@@ -2342,14 +2349,11 @@ public class MathUtils {
         return (value + 180.f) * 2.f / (180.f + 180.f);
     }
 
+    @Data
+    @RequiredArgsConstructor
     public static class Vector3 {
+        @NonNull
         public float x, y, z;
-
-        public Vector3(float x, float y, float z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
 
         public double distance(Vector3 otherPoint) {
             double d1 = this.x - otherPoint.x;
