@@ -1,6 +1,7 @@
 package net.iceyleagons.frostedengineering.network.energy.components.impl.storages.battery;
 
 import lombok.NonNull;
+import lombok.SneakyThrows;
 import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.network.energy.EnergyNetwork;
 import net.iceyleagons.frostedengineering.network.energy.EnergyUnit;
@@ -53,13 +54,10 @@ public class TexturedBattery extends TexturedBlock {
         updateMap();
     }
 
+    @SneakyThrows
     @Override
     public void onPlacement(Block block, Player player) {
-        try {
-            generateNewInstanceAtLocation(block.getLocation(), new EnergyNetwork(), 500f);
-        } catch (UnsupportedUnitType unsupportedUnitType) {
-            unsupportedUnitType.printStackTrace();
-        }
+        generateNewInstanceAtLocation(block.getLocation(), new EnergyNetwork(), 500f);
     }
 
     @Override

@@ -138,7 +138,6 @@ public abstract class EnergyUnit implements Unit, Serializable {
      */
     private void init() {
         Main.debug("Initializing Unit at location " + loc.toString());
-        Tracer.trace(this);
         neighbours = getNeighbours(getLocation());
 
         neighbours.forEach(u -> {

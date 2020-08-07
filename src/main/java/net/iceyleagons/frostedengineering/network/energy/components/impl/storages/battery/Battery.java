@@ -1,5 +1,6 @@
 package net.iceyleagons.frostedengineering.network.energy.components.impl.storages.battery;
 
+import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.gui.InventoryFactory;
 import net.iceyleagons.frostedengineering.interfaces.ITick;
 import net.iceyleagons.frostedengineering.items.FrostedItems;
@@ -53,11 +54,13 @@ public class Battery extends EnergyUnit implements ChargableComponent, Interacti
         super(loc, network);
         calculatePercentages();
         this.maxStores = maxStores;
+        Main.registerITick(this);
     }
 
     public Battery(Location loc, EnergyNetwork network, UUID uuid, float maxStores, List<ItemStack> itemsInside) throws UnsupportedUnitType {
         super(loc, network, uuid, itemsInside);
         calculatePercentages();
+        Main.registerITick(this);
     }
 
     private void calculatePercentages() {

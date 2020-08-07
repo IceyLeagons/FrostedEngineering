@@ -32,6 +32,7 @@ import net.iceyleagons.frostedengineering.items.FrostedItems;
 import net.iceyleagons.frostedengineering.items.GUIItem;
 import net.iceyleagons.frostedengineering.modules.ModuleManager;
 import net.iceyleagons.frostedengineering.modules.builtin.ExampleModule;
+import net.iceyleagons.frostedengineering.network.energy.components.impl.generators.coal.TexturedCoalGenerator;
 import net.iceyleagons.frostedengineering.network.energy.components.impl.storages.battery.TexturedBattery;
 import old.particles.ParticleManager;
 import old.particles.effects.Effect1;
@@ -230,6 +231,7 @@ public class Main extends JavaPlugin implements CommandExecutor {
         //customBases.add(new TexturedCoalGenerator());
         //customBases.add(new TexturedNonthermalGenerator());
         //customBases.add(new TexturedFurnace());
+        customBases.add(new TexturedCoalGenerator());
         customBases.add(new TexturedBattery());
         customBases.add(CUSTOM_CRAFTING_TABLE = new CustomCraftingTable(this));
         customBases.add(GUI_ITEM = new GUIItem(this));
