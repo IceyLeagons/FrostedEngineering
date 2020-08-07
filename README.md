@@ -11,7 +11,7 @@
 [issues]: https://img.shields.io/github/issues/IceyLeagons/FrostedEngineering?style=for-the-badge
 
  ![version][]  ![license-shield][] ![forks][] ![stars][]
- ![issues][] [ ![faq-shield] ][faq][ ![troubleshooting-shield] ][troubleshooting]
+ ![issues][] [ ![faq-shield] ][faq]
  
 [ ![discord-shield][] ][discord-invite]
 
