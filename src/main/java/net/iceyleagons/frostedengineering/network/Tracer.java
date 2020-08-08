@@ -26,8 +26,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+/**
+ * Used for merging, splitting {@link Network}s using the Depth First Search algorithm.
+ * Due to the probability of heavy calculations it's run asynchronously with {@link java.util.concurrent.ExecutorService}
+ *
+ * @author TOTHTOMI
+ */
 public class Tracer {
 
+    /**
+     * This will start the tracing, and decide between merging and splitting.
+     * It is decided with the {@link Unit#isDestroyed()} boolean, therefore if the Unit got broken
+     * set {@link Unit#setDestroyed(boolean)} to true before running this method.
+     *
+     * @param unit {@link Unit} to start from, basically which got broken/placed
+     */
     public static void trace(@NonNull Unit unit) {
         Main.executor.execute(() -> {
             if (unit.isDestroyed())
@@ -37,6 +50,11 @@ public class Tracer {
         });
     }
 
+    /**
+     * This will start the merging process.
+     *
+     * @param unit {@link Unit} to start from, basically which got placed
+     */
     private static void traceMerge(@NonNull Unit unit) {
         System.out.println("tracing");
         unit.getNeighbours().forEach(System.out::println);
@@ -54,6 +72,11 @@ public class Tracer {
         });
     }
 
+    /**
+     * This will start the splitting process.
+     *
+     * @param unit {@link Unit} to start from, basically which got broken
+     */
     private static void traceSplit(@NonNull Unit unit) {
         List<Unit> neighbours = unit.getNeighbours();
         for (Unit neighbour : neighbours) {
@@ -70,11 +93,26 @@ public class Tracer {
         }
     }
 
+    /**
+     * This is a helper function to add Units to networks with one simple method rather than multiple.
+     *
+     * @param unit {@link Unit} to add
+     * @param network {@link Network} to add to
+     * @throws UnsupportedUnitType if the provided {@link Network} doesn't support that {@link Unit} ex. you can only add an {@link net.iceyleagons.frostedengineering.network.energy.EnergyUnit} to an {@link net.iceyleagons.frostedengineering.network.energy.EnergyNetwork}
+     */
     public static void addToNetwork(@NonNull Unit unit, @NonNull Network network) throws UnsupportedUnitType {
         unit.setNetwork(network);
         network.addUnit(unit);
     }
 
+
+    /**
+     * Depth First Search algorithm implementation using {@link Stack}
+     * This will return all the connections that we can use later on.
+     *
+     * @param unit {@link Unit} to start from
+     * @return a List of {@link Unit}s that are connected together in some way.
+     */
     private static List<Unit> dfs(@NonNull Unit unit) {
         Stack<Unit> stack = new Stack<>();
         List<Unit> graph = new ArrayList<>();

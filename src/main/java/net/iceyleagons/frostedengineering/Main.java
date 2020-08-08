@@ -169,9 +169,9 @@ public class Main extends JavaPlugin implements CommandExecutor {
         onTick.cancel();
         LOW_COMPUTE = true;
 
-        Objects.requireNonNull(Bukkit.getWorld("frosted")).getPlayers().forEach(p -> {
-            p.teleport(new Location(Bukkit.getWorld("island"), 0, 0, 0)); //Teleport all players in the frosted dimension to the Engineers Island to stop generation
-        });
+        ////Objects.requireNonNull(Bukkit.getWorld("frosted")).getPlayers().forEach(p -> {
+          //  p.teleport(new Location(Bukkit.getWorld("island"), 0, 0, 0)); //Teleport all players in the frosted dimension to the Engineers Island to stop generation
+        //});
     }
 
     public static void restoreNormalComputing() {

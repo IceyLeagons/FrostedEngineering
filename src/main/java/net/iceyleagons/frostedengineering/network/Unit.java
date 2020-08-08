@@ -30,17 +30,17 @@ public interface Unit extends Serializable {
     /**
      * @return the {@link Location} of this Unit
      */
-    public Location getLocation();
+    Location getLocation();
 
     /**
      * @return the {@link UUID} of the unit
      */
-    public UUID getUUID();
+    UUID getUUID();
 
     /**
      * This will be used by our algorithms
      */
-    public void destroy();
+    void destroy();
 
     /**
      * This is the same as above, but here we have a player, so we can give items,
@@ -48,7 +48,7 @@ public interface Unit extends Serializable {
      *
      * @param p is the {@link Player} of the destruction
      */
-    public void destroy(Player p);
+    void destroy(Player p);
 
 
     /**
@@ -56,33 +56,45 @@ public interface Unit extends Serializable {
      *
      * @param bool if true the unit won't work anymore
      */
-    public void setDestroyed(boolean bool);
+    void setDestroyed(boolean bool);
 
 
     /**
      * @return true if the Unit is destroyed.
      */
-    public boolean isDestroyed();
+    boolean isDestroyed();
 
     /**
      * @return the {@link Network} of this Unit
      */
-    public Network getNetwork();
+    Network getNetwork();
 
     /**
      * This is used by our algorithms to set the Energy Network
      *
      * @param net is the {@link Network} to set to, make sure that the Network is appropriate for the Unit's type!
      */
-    public void setNetwork(Network net);
+    void setNetwork(Network net);
 
     /**
      * @return the list of {@link Unit}s around this Unit
      */
-    public List<Unit> getNeighbours();
+    List<Unit> getNeighbours();
 
-    public boolean isVisited();
-    public void visit();
-    public void unvisit();
+    /**
+     *
+     * @return true if the unit has been visited by the {@link Tracer}
+     */
+    boolean isVisited();
+
+    /**
+     * sets the visited value for the unit to true
+     */
+    void visit();
+
+    /**
+     * sets the visited value for the unit to false
+     */
+    void unvisit();
 
 }

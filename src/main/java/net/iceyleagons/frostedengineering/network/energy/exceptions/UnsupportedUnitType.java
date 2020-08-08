@@ -18,6 +18,10 @@
 
 package net.iceyleagons.frostedengineering.network.energy.exceptions;
 
+
+/**
+ * Thrown when a {@link net.iceyleagons.frostedengineering.network.Network} does not support a provided {@link net.iceyleagons.frostedengineering.network.Unit}
+ */
 public class UnsupportedUnitType extends Exception {
 
     public UnsupportedUnitType() {

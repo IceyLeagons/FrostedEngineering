@@ -24,13 +24,47 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
+/**
+ * Used for {@link net.iceyleagons.frostedengineering.network.Unit}s that needs some sort of GUI.
+ *
+ * @author TOTHTOMI
+ */
 public interface InteractiveComponent {
 
+    /**
+     * @return a {@link List} of {@link ItemStack}s in that Inventory, the items here are added by the developer
+     */
     List<ItemStack> getItemsInside();
+
+    /**
+     * Updates the inventory, mainly used with {@link net.iceyleagons.frostedengineering.interfaces.ITick}
+     */
     void updateInventory();
+
+    /**
+     * Used for initializing the {@link InventoryFactory}, and for initializing any other objects related to the GUI part of the {@link net.iceyleagons.frostedengineering.network.Unit}
+     */
     void initInventory();
+
+    /**
+     * @return the {@link InventoryFactory} of the {@link net.iceyleagons.frostedengineering.network.Unit}
+     */
     InventoryFactory getInventoryFactory();
+
+    /**
+     *
+     * Opens the {@link InventoryFactory} for the player, please use {@link InventoryFactory#openInventory(Player)}
+     *
+     * @param player the {@link Player} to open the Inventory for.
+     */
     void open(Player player);
+
+    /**
+     * CURRENTLY NOT IMPLEMENTED
+     *
+     * @return the list of {@link GUIElement}s
+     * @deprecated currently not implemented in any way.
+     */
     List<GUIElement> getGUIElements();
 
 }

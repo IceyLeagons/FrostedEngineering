@@ -18,12 +18,44 @@
 
 package net.iceyleagons.frostedengineering.network.energy.components;
 
+
+/**
+ * Strictly used for {@link net.iceyleagons.frostedengineering.network.energy.EnergyUnit}s or for {@link net.iceyleagons.frostedengineering.network.Unit}s
+ * that have some sort of interest in power, but extending {@link net.iceyleagons.frostedengineering.network.energy.EnergyUnit} is required!
+ *
+ * @author TOTHTOMI
+ */
 public interface ChargableComponent {
 
+    /**
+     * @return the maximum amount of energy, that this {@link net.iceyleagons.frostedengineering.network.energy.EnergyUnit} can store
+     */
     float getMaxStorage();
+
+    /**
+     * @return the currently stored amount of energy of the {@link net.iceyleagons.frostedengineering.network.energy.EnergyUnit}
+     */
     float getStored();
+
+    /**
+     * Adds energy to the {@link net.iceyleagons.frostedengineering.network.energy.EnergyUnit}
+     *
+     * @param fp amount of power to add
+     * @return the amount of power that cannot be stored, because of overcharge.
+     */
     float addEnergy(float fp);
+
+    /**
+     * Removes energy from the {@link net.iceyleagons.frostedengineering.network.energy.EnergyUnit}
+     *
+     * @param fp amount of power needed
+     * @return the amount of power that the {@link net.iceyleagons.frostedengineering.network.energy.EnergyUnit} can provide, can be less then the required one!
+     */
     float consumeEnergy(float fp);
+
+    /**
+     * @return true if the {@link #getStored()} equals to the {@link #getMaxStorage()}
+     */
     boolean isFull();
 
 }

@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author TOTHT
+ * @author TOTHTOMI
  * <p>
  * This class is used for saving/loading.
  */
