@@ -1,20 +1,19 @@
-/*
- *  Copyright (C) IceyLeagons(https://iceyleagons.net/)
+/*******************************************************************************
+ * Copyright (C) IceyLeagons(https://iceyleagons.net/) 
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package net.iceyleagons.frostedengineering.utils;
 
 import java.lang.reflect.Method;
@@ -28,33 +27,32 @@ public class Reflections {
     public static String craftBukkitPrefix = "org.bukkit.craftbukkit";
     public static String nmsPrefix = "net.minecraft.server";
 
-    private static HashMap<String, Class<?>> cache = new HashMap<>();
+    private static final HashMap<String, Class<?>> cache = new HashMap<>();
 
     public static String versionString;
     public static Version version;
 
     static {
-        if (Bukkit.getServer() != null) {
-            Server server = Bukkit.getServer();
-            Class<?> bukkitServerClass = server.getClass();
-            String[] pas = bukkitServerClass.getName().split("\\.");
-            if (pas.length == 5) {
-                String verB = pas[3];
-                versionString = verB;
-                craftBukkitPrefix += "." + verB;
-            }
-            try {
-                Method getHandle = bukkitServerClass.getDeclaredMethod("getHandle");
-                Object handle = getHandle.invoke(server);
-                Class<?> handleServerClass = handle.getClass();
-                pas = handleServerClass.getName().split("\\.");
-                if (pas.length == 5) {
-                    String verM = pas[3];
-                    nmsPrefix += "." + verM;
-                }
-            } catch (Exception ignored) {
-            }
+        Server server = Bukkit.getServer();
+        Class<?> bukkitServerClass = server.getClass();
+        String[] pas = bukkitServerClass.getName().split("\\.");
+        if (pas.length == 5) {
+            String verB = pas[3];
+            versionString = verB;
+            craftBukkitPrefix += "." + verB;
         }
+        try {
+            Method getHandle = bukkitServerClass.getDeclaredMethod("getHandle");
+            Object handle = getHandle.invoke(server);
+            Class<?> handleServerClass = handle.getClass();
+            pas = handleServerClass.getName().split("\\.");
+            if (pas.length == 5) {
+                String verM = pas[3];
+                nmsPrefix += "." + verM;
+            }
+        } catch (Exception ignored) {
+        }
+
         Arrays.asList(Version.values()).forEach((version2) -> {
             if (versionString.contains(version2.name().toLowerCase())) {
                 version = version2;
@@ -94,11 +92,11 @@ public class Reflections {
     }
 
     public enum Version {
-        V1_15(5), V1_14(4);
+        V1_16(6), V1_15(5), V1_14(4);
 
         public int packFormat;
 
-        private Version(int packFormat) {
+        Version(int packFormat) {
             this.packFormat = packFormat;
         }
     }
