@@ -26,6 +26,7 @@ import java.util.UUID;
 import net.iceyleagons.frostedengineering.network.Tracer;
 import net.iceyleagons.frostedengineering.network.energy.EnergyNetwork;
 import net.iceyleagons.frostedengineering.network.energy.exceptions.UnsupportedUnitType;
+import net.iceyleagons.frostedengineering.network.interfaces.InteractiveComponent;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -330,6 +331,12 @@ public abstract class EnergyUnit implements Unit, Serializable {
             }
         }
         return null;
+    }
+
+    public static void render(InteractiveComponent interactiveComponent) {
+        interactiveComponent.getGUIElements().forEach(guiElement -> {
+            guiElement.render(interactiveComponent.getInventoryFactory());
+        });
     }
 
 }

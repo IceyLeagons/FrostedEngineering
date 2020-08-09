@@ -21,6 +21,7 @@ package net.iceyleagons.frostedengineering.network.energy;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.network.Network;
 import net.iceyleagons.frostedengineering.network.Unit;
 import net.iceyleagons.frostedengineering.network.energy.components.ChargableComponent;
@@ -39,6 +40,8 @@ public class EnergyNetwork implements Network, java.io.Serializable {
     private EnergyNetworkType type;
     @Setter
     private UUID uuid;
+
+    private boolean updated = false;
 
     public EnergyNetwork() {
         this.units = new ArrayList<>();
@@ -69,20 +72,28 @@ public class EnergyNetwork implements Network, java.io.Serializable {
     }
 
     public void depositEnergy(float energy) {
-        Map<Float, ChargableComponent> chargableComponents = getChargableComponents();
-        distributeEnergy(chargableComponents, energy);
-        
+        Main.executor.execute(()-> {
+            Map<Float, ChargableComponent> chargableComponents = getChargableComponents();
+            distributeEnergy(chargableComponents, energy);
+        });
     }
 
     private void distributeEnergy(@NonNull Map<Float, ChargableComponent> ChargableComponents,float energy) {
         float toAdd = energy;
 
         int i = 0;
+        int j = 0;
         List<Float> keys = new ArrayList<>(ChargableComponents.keySet());
         Collections.sort(keys);
-        while (toAdd >= 0) {
+        while (toAdd > 0) {
+            if (updated) {
+                distributeEnergy(getChargableComponents(),toAdd);
+                updated = false;
+                break;
+            }
+            System.out.println("ADDING1");
             ChargableComponent chargableComponent = ChargableComponents.get(keys.get(i));
-            if ((chargableComponent.getMaxStorage() - chargableComponent.getStored()) >= toAdd) chargableComponent.addEnergy(toAdd);
+            if ((chargableComponent.getMaxStorage() - chargableComponent.getStored()) >= toAdd) {chargableComponent.addEnergy(toAdd); toAdd = 0;}
             else {
                 float max = (chargableComponent.getMaxStorage() - chargableComponent.getStored());
                 chargableComponent.addEnergy(max);
@@ -125,6 +136,7 @@ public class EnergyNetwork implements Network, java.io.Serializable {
 
         if (!units.contains(unit)) {
             units.add((EnergyUnit) unit);
+            updated = true;
         }
     }
 
@@ -133,6 +145,7 @@ public class EnergyNetwork implements Network, java.io.Serializable {
         if (!(unit instanceof EnergyUnit)) throw new UnsupportedUnitType();
 
         units.remove(unit);
+        updated = true;
     }
 
     @Override

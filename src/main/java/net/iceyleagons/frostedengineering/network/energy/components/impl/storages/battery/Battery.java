@@ -24,6 +24,7 @@ import net.iceyleagons.frostedengineering.interfaces.ITick;
 import net.iceyleagons.frostedengineering.items.FrostedItems;
 import net.iceyleagons.frostedengineering.network.energy.UnitInformation;
 import net.iceyleagons.frostedengineering.network.energy.components.ChargableComponent;
+import net.iceyleagons.frostedengineering.network.energy.gui.PowerBar;
 import net.iceyleagons.frostedengineering.network.interfaces.GUIElement;
 import net.iceyleagons.frostedengineering.network.interfaces.InteractiveComponent;
 import net.iceyleagons.frostedengineering.network.energy.EnergyNetwork;
@@ -96,7 +97,7 @@ public class Battery extends EnergyUnit implements ChargableComponent, Interacti
     @Override
     public void updateInventory() {
         if (inventoryFactory == null) initInventory();
-
+/*
         DecimalFormat df = new DecimalFormat("###,###.##");
 
 
@@ -126,14 +127,16 @@ public class Battery extends EnergyUnit implements ChargableComponent, Interacti
             inventoryFactory.setItem(new ItemFactory(Material.WHITE_STAINED_GLASS_PANE).hideAttributes().setDisplayName(text).build(), 13);
         if (stores < maxStores)
             inventoryFactory.setItem(new ItemFactory(Material.WHITE_STAINED_GLASS_PANE).hideAttributes().setDisplayName(text).build(), 14);
-
+*/
+        EnergyUnit.render(this);
     }
 
     @Override
     public void initInventory() {
         inventoryFactory = new InventoryFactory("Storage", 27, FrostedItems.INVENTORY_FILLER, true);
-        for (int i = 10; i < 15; i++)
-            inventoryFactory.setItem(new ItemFactory(Material.WHITE_STAINED_GLASS_PANE).hideAttributes().setDisplayName("§f" + stores + "/" + maxStores + " FP").build(), i);
+        //for (int i = 10; i < 15; i++)
+        //    inventoryFactory.setItem(new ItemFactory(Material.WHITE_STAINED_GLASS_PANE).hideAttributes().setDisplayName("§f" + stores + "/" + maxStores + " FP").build(), i);
+        EnergyUnit.render(this);
         updateInventory();
     }
 
@@ -151,7 +154,9 @@ public class Battery extends EnergyUnit implements ChargableComponent, Interacti
 
     @Override
     public List<GUIElement> getGUIElements() {
-        return Collections.emptyList();
+        return Collections.singletonList(
+                new PowerBar(10,5,this)
+        );
     }
 
     @Override

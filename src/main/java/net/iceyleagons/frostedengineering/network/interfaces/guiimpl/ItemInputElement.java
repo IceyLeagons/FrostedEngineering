@@ -26,7 +26,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 public class ItemInputElement implements GUIElement {
 
     @Override
-    public void render(InventoryFactory inventoryFactory, int startingSlot) {
+    public void render(InventoryFactory inventoryFactory) {
     }
 
     @Override

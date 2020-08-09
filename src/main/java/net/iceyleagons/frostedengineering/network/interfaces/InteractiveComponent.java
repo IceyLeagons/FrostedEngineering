@@ -60,10 +60,8 @@ public interface InteractiveComponent {
     void open(Player player);
 
     /**
-     * CURRENTLY NOT IMPLEMENTED
      *
      * @return the list of {@link GUIElement}s
-     * @deprecated currently not implemented in any way.
      */
     List<GUIElement> getGUIElements();
 
