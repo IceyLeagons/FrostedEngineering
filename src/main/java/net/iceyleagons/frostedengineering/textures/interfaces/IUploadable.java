@@ -1,94 +1,296 @@
-/*
- *  Copyright (C) IceyLeagons(https://iceyleagons.net/)
+/*******************************************************************************
+ * Copyright (C) IceyLeagons(https://iceyleagons.net/) 
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ ******************************************************************************/
 package net.iceyleagons.frostedengineering.textures.interfaces;
 
-import java.io.*;
-import java.net.URL;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
-import java.util.*;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
+import com.gargoylesoftware.htmlunit.ScriptException;
+import com.gargoylesoftware.htmlunit.ThreadedRefreshHandler;
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.parser.HTMLParserListener;
+import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
 import lombok.SneakyThrows;
-import okhttp3.*;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.plugin.Plugin;
-
 import net.iceyleagons.frostedengineering.Main;
+import net.iceyleagons.frostedengineering.textures.BlockStorage;
 import net.iceyleagons.frostedengineering.textures.Textures;
 import net.iceyleagons.frostedengineering.textures.base.TexturedBase;
 import net.iceyleagons.frostedengineering.textures.events.TextureSetupEvent;
 import net.iceyleagons.frostedengineering.textures.initialization.McMeta;
 import net.iceyleagons.frostedengineering.textures.initialization.Sounds;
 import net.iceyleagons.frostedengineering.textures.initialization.Sounds.SoundData;
+import net.lingala.zip4j.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.model.ZipParameters;
+import net.lingala.zip4j.model.enums.CompressionLevel;
+import net.lingala.zip4j.model.enums.CompressionMethod;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.plugin.Plugin;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
+
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.time.Duration;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public interface IUploadable {
 
     void init();
 
-    default void upload(File file) {
+    String[] keywords();
+
+    default boolean needReupload() {
+        return false;
+    }
+
+    default Duration reuploadIntervals() {
+        return Duration.ZERO;
+    }
+
+    default void common(net.iceyleagons.frostedengineering.textures.initialization.Function<File> fileFunction) {
+        try {
+            printData();
+
+            File resourcepacksFolder = createFolder(new File(Textures.homeFolder, "resourcepacks"));
+            File finalResourcesFolder = createFolder(new File(resourcepacksFolder, "final_resources"));
+
+            File assetsFolder = new File(finalResourcesFolder, "assets");
+
+            // We get the assets.zip files and extract them into the final_resources folder.
+            Textures.plugins.forEach((plugin) -> {
+                File pluginFolder = new File(resourcepacksFolder, plugin.getName());
+                deleteFile(pluginFolder);
+                createFolder(pluginFolder);
+
+                File assets = extractFile(plugin, "assets.zip", new File(pluginFolder, "assets.zip"));
+
+                unzipFile(assets, pluginFolder);
+                deleteFile(assets);
+
+                try {
+                    FileUtils.copyDirectory(pluginFolder, assetsFolder);
+                } catch (IOException exception) {
+                    Main.error(Optional.of("Textures"), exception);
+                }
+            });
+
+            // We write our custom x.json file.
+            File itemModelsFolder = createFolder(new File(finalResourcesFolder, "assets/minecraft/models/item"));
+            File blockModelsFolder = createFolder(new File(finalResourcesFolder, "assets/minecraft/models/block"));
+            Textures.usedMaterials.forEach(material -> {
+                try {
+                    FileOutputStream fOS = new FileOutputStream(
+                            new File(material.isBlock() ? blockModelsFolder : itemModelsFolder,
+                                    material.name().toLowerCase() + ".json"));
+                    PrintWriter printWriter = new PrintWriter(fOS);
+                    printModelData(printWriter, material);
+
+                    fOS.close();
+                } catch (IOException exception) {
+                    Main.error(Optional.of("Textures"), exception);
+                }
+            });
+
+            Plugin plugin = Main.MAIN;
+            if (Textures.USE_PACK_IMAGE)
+                plugin.saveResource("pack.png", true);
+
+            plugin.saveResource("mob_spawner.png", true);
+
+            deleteFile(new File(finalResourcesFolder, "pack.mcmeta"));
+            if (Textures.USE_PACK_IMAGE)
+                deleteFile(new File(finalResourcesFolder, "pack.png"));
+
+            File blocksFolder = createFolder(new File(finalResourcesFolder, "assets/minecraft/textures/block"));
+            File minecraftFolder = createFolder(new File(finalResourcesFolder, "assets/minecraft"));
+            File soundsFile = new File(minecraftFolder, "sounds.json");
+            File mobSpawnerFile = new File(blocksFolder, "spawner.png");
+            deleteFile(mobSpawnerFile);
+            deleteFile(soundsFile);
+
+            File oldResourcePack = new File(Textures.homeFolder, "old-resourcepack.zip");
+            File finalResourcePack = new File(Textures.homeFolder, "final-resourcepack.zip");
+
+            try {
+                writeMcMeta(new File(finalResourcesFolder, "pack.mcmeta"));
+                writeSounds(soundsFile);
+                if (Textures.USE_PACK_IMAGE)
+                    FileUtils.moveFile(new File(Textures.mainFolder, "pack.png"),
+                            new File(finalResourcesFolder, "pack.png"));
+
+                FileUtils.moveFile(new File(Textures.mainFolder, "mob_spawner.png"), mobSpawnerFile);
+                FileUtils.copyFile(mobSpawnerFile, new File(blocksFolder, "mob_spawner.png"));
+
+                deleteFile(oldResourcePack);
+
+                if (finalResourcePack.exists())
+                    FileUtils.copyFile(finalResourcePack, oldResourcePack);
+            } catch (IOException exception) {
+                Main.error(Optional.of("Textures"), exception);
+            }
+
+            if (!Textures.USE_PACK_IMAGE)
+                download(Textures.PACK_IMAGE_LINK, new File(finalResourcesFolder, "pack.png"));
+
+            deleteFile(finalResourcePack);
+
+            try {
+                ZipFile zip = new ZipFile(finalResourcePack);
+                ZipParameters params = new ZipParameters();
+                params.setOverrideExistingFilesInZip(true);
+                params.setCompressionLevel(CompressionLevel.MAXIMUM);
+                params.setCompressionMethod(CompressionMethod.STORE);
+
+                zip.addFolder(new File(finalResourcesFolder, "assets"), params);
+                zip.addFile(new File(finalResourcesFolder, "pack.mcmeta"), params);
+                zip.addFile(new File(finalResourcesFolder, "pack.png"), params);
+
+                zip.getFile();
+            } catch (ZipException exception) {
+                exception.printStackTrace();
+            }
+
+            // Compare the old and the new resourcepack to check if there's any changes.
+            fileFunction.run(finalResourcePack);
+
+            Textures.plugins.forEach((pl) -> {
+                File pluginFolder = new File(resourcepacksFolder, pl.getName());
+                deleteFile(pluginFolder);
+            });
+
+            deleteFile(oldResourcePack);
+
+        } catch (Exception uncatchedException) {
+            // This is bad. We have an uncatched exception.
+            Main.error(Optional.of("Textures"), uncatchedException);
+        } finally {
+            // Create block storages for all the registered worlds.
+            Bukkit.getWorlds().forEach((world) -> {
+                File blocksList = new File(world.getWorldFolder(), "block.map");
+
+                if (blocksList.exists()) {
+                    try {
+                        FileInputStream fIS = new FileInputStream(blocksList);
+                        ObjectInputStream oIS = new ObjectInputStream(fIS);
+
+                        Textures.storageMap.put(world, new BlockStorage(world,
+                                (Map<Map<String, Object>, Map<String, Object>>) oIS.readObject()));
+
+                        oIS.close();
+                        fIS.close();
+                    } catch (IOException | ClassNotFoundException exception) {
+                        Main.error(Optional.of("Textures"), exception);
+                    }
+                } else {
+                    Textures.storageMap.put(world, new BlockStorage(world));
+                }
+            });
+
+            throwEvent();
+
+            if (needReupload())
+                newTask(fileFunction);
+        }
+    }
+
+    default void newTask(net.iceyleagons.frostedengineering.textures.initialization.Function<File> fileFunction) {
         new Timer().schedule(new TimerTask() {
-            @SneakyThrows
             @Override
             public void run() {
-                String url = new OkHttpClient().newCall(new Request.Builder()
-                        .url("https://www.station307.com/")
-                        .put(RequestBody.create(MediaType.parse("application/zip"), file))
-                        .build()).execute().header("com.station307.located-at");
-
-                Main.executor.execute(new Runnable() {
-                    @SneakyThrows
-                    @Override
-                    public void run() {
-                        while (Main.MAIN.isEnabled()) {
-                            assert url != null;
-                            new OkHttpClient().newCall(new Request.Builder()
-                                    .url(url)
-                                    .put(RequestBody.create(MediaType.parse("application/zip"), file))
-                                    .build()).execute();
-                        }
-                    }
-                });
-
-                Main.info(Optional.of("Textures"), "Resource pack uploaded.");
-                Main.info(Optional.of("Textures"),
-                        "Resource pack link is: " + url);
-                Main.info(Optional.of("Textures"), "Calculating SHA-1 hash...");
-                String hash = sha1Code(file);
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        Main.info(Optional.of("Textures"),
-                                "Resource pack hash is: " + hash);
-
-                        Textures.setData("resourcepack-link", url);
-                        Textures.setData("resourcepack-hash", hash);
-
-                        Bukkit.getOnlinePlayers().forEach(player -> player
-                                .setResourcePack(Textures.getData("resourcepack-link"), Textures.getData("resourcepack-hash")));
-                    }
-                }, 1000L);
+                fileFunction.run(new File(Textures.homeFolder, "final-resourcepack.zip"));
+                newTask(fileFunction);
             }
-        }, 10000L);
+        }, reuploadIntervals().toMillis());
+    }
+
+    default WebElement fluentWait(final By locator, final WebDriver driver) {
+        Wait<WebDriver> wait = new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(30))
+                .pollingEvery(Duration.ofSeconds(5))
+                .ignoring(NoSuchElementException.class);
+
+        return wait.until(driver1 -> driver1.findElement(locator));
+    }
+
+    default WebClient modify(final WebClient client) {
+        client.getOptions().setThrowExceptionOnScriptError(false);
+        client.getCookieManager().setCookiesEnabled(true);
+        client.setRefreshHandler(new ThreadedRefreshHandler());
+        client.getOptions().setDownloadImages(false);
+        client.getOptions().setCssEnabled(false);
+        client.getOptions().setUseInsecureSSL(true);
+        client.getOptions().setRedirectEnabled(true);
+        client.getOptions().setThrowExceptionOnFailingStatusCode(false);
+
+        client.setIncorrectnessListener((arg0, arg1) -> {
+            // Ignored.
+        });
+        client.setJavaScriptErrorListener(new JavaScriptErrorListener() {
+
+            @Override
+            public void timeoutError(HtmlPage arg0, long arg1, long arg2) {
+                // Ignored.
+            }
+
+            @Override
+            public void scriptException(HtmlPage arg0, ScriptException arg1) {
+                // Ignored.
+            }
+
+            @Override
+            public void malformedScriptURL(HtmlPage arg0, String arg1, MalformedURLException arg2) {
+                // Ignored.
+            }
+
+            @Override
+            public void loadScriptError(HtmlPage arg0, URL arg1, Exception arg2) {
+                // Ignored.
+            }
+
+            @Override
+            public void warn(String arg0, String arg1, int arg2, String arg3, int arg4) {
+                // Ignored.
+            }
+        });
+        client.setHTMLParserListener(new HTMLParserListener() {
+
+            @Override
+            public void error(String arg0, URL arg1, String arg2, int arg3, int arg4, String arg5) {
+                // Ignored.
+            }
+
+            @Override
+            public void warning(String arg0, URL arg1, String arg2, int arg3, int arg4, String arg5) {
+                // Ignored.
+            }
+        });
+
+        return client;
     }
 
     @SneakyThrows
