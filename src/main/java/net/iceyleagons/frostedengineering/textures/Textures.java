@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import net.iceyleagons.frostedengineering.textures.initialization.Station307;
 import net.iceyleagons.frostedengineering.textures.initialization.TransferSH;
+import net.iceyleagons.frostedengineering.textures.initialization.ZeroxZero;
 import net.iceyleagons.frostedengineering.textures.interfaces.IUploadable;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -86,6 +87,7 @@ public class Textures {
         init();
 
         // First mode registered is considered as default.
+        registerInitMethod(new ZeroxZero());
         registerInitMethod(new TransferSH());
         // TODO: this.
         // registerInitMethod(new Dropbox());
@@ -102,7 +104,7 @@ public class Textures {
                             if (keyword.equalsIgnoreCase(getData("method")))
                                 uploadable.init();
                 } else
-                    new TransferSH().init();
+                    new ZeroxZero().init();
             }
         }.runTask(Main.MAIN);
     }
