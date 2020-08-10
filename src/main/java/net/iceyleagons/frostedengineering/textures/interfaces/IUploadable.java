@@ -294,7 +294,7 @@ public interface IUploadable {
     }
 
     @SneakyThrows
-    default String sha1Code(File file) {
+    default byte[] sha1Code(File file) {
         FileInputStream fileInputStream = new FileInputStream(file);
         MessageDigest digest = MessageDigest.getInstance("SHA-1");
         DigestInputStream digestInputStream = new DigestInputStream(fileInputStream, digest);
@@ -302,8 +302,7 @@ public interface IUploadable {
 
         while (digestInputStream.read(bytes) > 0) ;
 
-        byte[] resultByteArry = digest.digest();
-        return bytesToHexString(resultByteArry);
+        return digest.digest();
     }
 
     default String bytesToHexString(byte[] bytes) {
@@ -393,23 +392,23 @@ public interface IUploadable {
         texturedList.addAll(Textures.items);
 
         if (texturedList.size() != 0)
-            printWriter.write("{ \"parent\": \"item/handheld\", \"textures\": { \"layer0\": \"items/"
+            printWriter.write("{\n\t\"parent\": \"item/handheld\",\n\t\"textures\":\n\t{\n\t\t\"layer0\": \"items/"
                     + baseMaterial.name().toLowerCase()
-                    + "\" }, \"overrides\": [ { \"predicate\": {\"custom_model_data\": 0}, \"model\": \""
-                    + baseMaterial.name().toLowerCase() + "\"}\"");
+                    + "\"\n\t},\n\t\"overrides\": [\n\t\t{\n\t\t\t\"predicate\":\n\t\t\t{\n\t\t\t\t\"custom_model_data\": 0\n\t\t\t},\n\t\t\t\"model\": \""
+                    + baseMaterial.name().toLowerCase() + "\"\n\t\t}");
 
         texturedList.forEach((textured) -> {
             if (textured.getBaseMaterial() == baseMaterial) {
+                printWriter.println(",\n\t\t{\n\t\t\t\"predicate\":\n\t\t\t{\n\t\t\t\t\"custom_model_data\": " + textured.getId()
+                        + "\n\t\t\t},\n\t\t\t\"model\": \"" + textured.getModel() + "\"\n\t\t}");
+
                 Main.info(Optional.of("TEXTURES"), "Wrote custom JSON data for TexturedBase #" + textured.getId()
                         + " (" + textured.getName() + ") with id " + textured.getId());
-
-                printWriter.println(",{ \"predicate\": {\"custom_model_data\": " + textured.getId()
-                        + "}, \"model\": \"" + textured.getModel() + "\"}");
             }
         });
 
         if (texturedList.size() != 0)
-            printWriter.println(" ]}");
+            printWriter.println("\n\t]\n}");
 
         printWriter.close();
     }

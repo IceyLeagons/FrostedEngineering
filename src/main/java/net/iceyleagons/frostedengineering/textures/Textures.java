@@ -69,6 +69,7 @@ public class Textures {
     public static Gson GSON = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
 
     public static Textures instance;
+    public static byte[] hash;
 
     private static YamlConfiguration resourceConfig;
     public static File mainFolder = Main.MAIN.getDataFolder();

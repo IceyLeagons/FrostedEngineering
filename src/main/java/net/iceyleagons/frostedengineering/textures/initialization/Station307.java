@@ -68,18 +68,18 @@ public class Station307 implements IUploadable {
                     Main.info(Optional.of("Textures"),
                             "Resource pack link is: " + url);
                     Main.info(Optional.of("Textures"), "Calculating SHA-1 hash...");
-                    String hash = sha1Code(file);
+                    byte[] hash = sha1Code(file);
                     new Timer().schedule(new TimerTask() {
                         @Override
                         public void run() {
                             Main.info(Optional.of("Textures"),
-                                    "Resource pack hash is: " + hash);
+                                    "Resource pack hash is: " + bytesToHexString(hash));
 
                             Textures.setData("resourcepack-link", url);
-                            Textures.setData("resourcepack-hash", hash);
+                            Textures.hash = hash;
 
                             Bukkit.getOnlinePlayers().forEach(player -> player
-                                    .setResourcePack(Textures.getData("resourcepack-link"), Textures.getData("resourcepack-hash")));
+                                    .setResourcePack(Textures.getData("resourcepack-link"), Textures.hash));
                         }
                     }, 1000L);
                 }

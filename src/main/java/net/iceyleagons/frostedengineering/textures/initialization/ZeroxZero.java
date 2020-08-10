@@ -41,31 +41,33 @@ public class ZeroxZero implements IUploadable {
             @SneakyThrows
             @Override
             public void run() {
-                String url = new OkHttpClient().newCall(new Request.Builder().url("https://0x0.st/")
+                try (Response response = new OkHttpClient().newCall(new Request.Builder().url("https://0x0.st/")
                         .post(new MultipartBody.Builder()
                                 .setType(MultipartBody.FORM)
                                 .addFormDataPart("file", file.getName(),
                                         RequestBody.create(MediaType.parse("application/zip"), file))
-                                .build()).build()).execute().message();
+                                .build()).build()).execute()) {
+                    String url = response.body().string();
 
-                Main.info(Optional.of("Textures"), "Resource pack uploaded.");
-                Main.info(Optional.of("Textures"),
-                        "Resource pack link is: " + url);
-                Main.info(Optional.of("Textures"), "Calculating SHA-1 hash...");
-                String hash = sha1Code(file);
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        Main.info(Optional.of("Textures"),
-                                "Resource pack hash is: " + hash);
+                    Main.info(Optional.of("Textures"), "Resource pack uploaded.");
+                    Main.info(Optional.of("Textures"),
+                            "Resource pack link is: " + url);
+                    Main.info(Optional.of("Textures"), "Calculating SHA-1 hash...");
+                    byte[] hash = sha1Code(file);
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            Main.info(Optional.of("Textures"),
+                                    "Resource pack hash is: " + bytesToHexString(hash));
 
-                        Textures.setData("resourcepack-link", url);
-                        Textures.setData("resourcepack-hash", hash);
+                            Textures.setData("resourcepack-link", url);
+                            Textures.hash = hash;
 
-                        Bukkit.getOnlinePlayers().forEach(player -> player
-                                .setResourcePack(Textures.getData("resourcepack-link"), Textures.getData("resourcepack-hash")));
-                    }
-                }, 1000L);
+                            Bukkit.getOnlinePlayers().forEach(player -> player
+                                    .setResourcePack(Textures.getData("resourcepack-link"), Textures.hash));
+                        }
+                    }, 1000L);
+                }
             }
         }, 10000L));
     }
