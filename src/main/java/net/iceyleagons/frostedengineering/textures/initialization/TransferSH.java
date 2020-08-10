@@ -18,9 +18,14 @@ package net.iceyleagons.frostedengineering.textures.initialization;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
+import lombok.SneakyThrows;
 import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.textures.Textures;
 import net.iceyleagons.frostedengineering.textures.interfaces.IUploadable;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import org.bukkit.Bukkit;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -32,37 +37,28 @@ import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class uguu implements IUploadable {
+public class TransferSH implements IUploadable {
 
     @Override
     public String[] keywords() {
-        return new String[]{"uguu.se", "uguu", "u.se", ".se", "se", "ugs", "primary"};
+        return new String[]{"transfer", "sh", "transfer.sh", "t.sh", "shell", "primary"};
     }
 
     @Override
     public void init() {
         common(file -> {
-            // Create a new htmlunit driver in selenium.
-            WebDriver driver = new HtmlUnitDriver(BrowserVersion.CHROME, true) {
-                @Override
-                public WebClient modifyWebClient(final WebClient modify) {
-                    return modify(modify);
-                }
-            };
-
-            // Get the uguu.se page
-            driver.get("https://uguu.se/");
-
             new Timer().schedule(new TimerTask() {
+                @SneakyThrows
                 @Override
                 public void run() {
-                    driver.findElement(By.id("upload-input")).sendKeys(file.getAbsolutePath());
-
-                    WebElement element = fluentWait(By.xpath("/html/body/div/div/ul/li/span[2]/a"), driver);
+                    String url = new OkHttpClient().newCall(new Request.Builder()
+                            .url("https://transfer.sh/" + file.getName())
+                            .put(RequestBody.create(MediaType.parse("application/zip"), file))
+                            .build()).execute().message();
 
                     Main.info(Optional.of("Textures"), "Resource pack uploaded.");
                     Main.info(Optional.of("Textures"),
-                            "Resource pack link is: " + element.getText());
+                            "Resource pack link is: " + url);
                     Main.info(Optional.of("Textures"), "Calculating SHA-1 hash...");
                     String hash = sha1Code(file);
                     new Timer().schedule(new TimerTask() {
@@ -71,7 +67,7 @@ public class uguu implements IUploadable {
                             Main.info(Optional.of("Textures"),
                                     "Resource pack hash is: " + hash);
 
-                            Textures.setData("resourcepack-link", element.getText());
+                            Textures.setData("resourcepack-link", url);
                             Textures.setData("resourcepack-hash", hash);
 
                             Bukkit.getOnlinePlayers().forEach(player -> player
@@ -90,6 +86,6 @@ public class uguu implements IUploadable {
 
     @Override
     public Duration reuploadIntervals() {
-        return Duration.ofDays(2);
+        return Duration.ofDays(14);
     }
 }
