@@ -32,11 +32,11 @@ import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class tmpNinja implements IUploadable {
+public class uguu implements IUploadable {
 
     @Override
     public String[] keywords() {
-        return new String[]{"tmpninja", "tmp", "ninja", "tninja", "tmpn", "temporary", "primary"};
+        return new String[]{"uguu.se", "uguu", "u.se", ".se", "se", "ugs", "primary"};
     }
 
     @Override
@@ -50,16 +50,15 @@ public class tmpNinja implements IUploadable {
                 }
             };
 
-            // Get the tmp.ninja page
-            driver.get("https://tmp.ninja/");
+            // Get the uguu.se page
+            driver.get("https://uguu.se/");
 
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    driver.findElement(By.name("file")).sendKeys(file.getAbsolutePath());
-                    driver.findElement(By.xpath("/html/body/div[1]/form/button")).click();
+                    driver.findElement(By.id("upload-input")).sendKeys(file.getAbsolutePath());
 
-                    WebElement element = fluentWait(By.xpath("/html/body/div[1]/div/div/div/div/p/a"), driver);
+                    WebElement element = fluentWait(By.xpath("/html/body/div/div/ul/li/span[2]/a"), driver);
 
                     Main.info(Optional.of("Textures"), "Resource pack uploaded.");
                     Main.info(Optional.of("Textures"),
