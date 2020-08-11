@@ -6,7 +6,7 @@
 [faq-shield]: https://img.shields.io/badge/Wiki-FAQ-blue.svg
 [troubleshooting-shield]: https://img.shields.io/badge/Wiki-Troubleshooting-red.svg
 [license-shield]: https://img.shields.io/github/license/IceyLeagons/FrostedEngineering
-[forks]: https://img.shields.io/github/forks/IceyLeagons/FrostedEngineeringd
+[forks]: https://img.shields.io/github/forks/IceyLeagons/FrostedEngineering
 [stars]: https://img.shields.io/github/stars/IceyLeagons/FrostedEngineering
 [issues]: https://img.shields.io/github/issues/IceyLeagons/FrostedEngineering
 [central]: https://github.com/IceyLeagons/FrostedEngineering/workflows/Maven%20Central/badge.svg?event=deployment_status
