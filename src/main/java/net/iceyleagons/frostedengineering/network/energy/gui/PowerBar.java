@@ -49,29 +49,41 @@ public class PowerBar implements GUIElement {
     @Override
     public void render(InventoryFactory inventoryFactory) {
         int powered = map(chargableComponent.getStored(),
-                chargableComponent.getMaxStorage(), chargableComponent.getMaxStorage());
+                chargableComponent.getMaxStorage());
 
         DecimalFormat df = new DecimalFormat("###,###.##");
 
 
         String text = "§f" + df.format(chargableComponent.getStored()) + "/" + df.format(chargableComponent.getMaxStorage()) + " FP";
 
-        for (int i = startingSlot; i < startingSlot+numOfSlots; i++) {
-            if (i <= powered)
+        if (chargableComponent.isFull()) {
+            for (int i = startingSlot; i < startingSlot + this.numOfSlots; i++) {
                 inventoryFactory.setItem(
                         ItemFactory.newFactory(Material.RED_STAINED_GLASS_PANE)
                                 .hideAttributes().setDisplayName(text).build(),
                         i);
-            else
+            }
+        } else {
+
+            for (int i = startingSlot; i < startingSlot + this.numOfSlots; i++) {
                 inventoryFactory.setItem(
-                        ItemFactory.newFactory(Material.WHITE_STAINED_GLASS_PANE)
+                        ItemFactory.newFactory(Material.BLACK_STAINED_GLASS_PANE)
                                 .hideAttributes().setDisplayName(text).build(),
                         i);
+            }
+            for (int i = startingSlot; i < startingSlot + powered; i++) {
+                inventoryFactory.setItem(
+                        ItemFactory.newFactory(Material.RED_STAINED_GLASS_PANE)
+                                .hideAttributes().setDisplayName(text).build(),
+                        i);
+            }
         }
+
+
     }
 
-    private int map(float input, float in_max, float out_max) {
-        return Math.round((input * out_max / in_max));
+    private int map(float input, float max) {
+        return (int) Math.floor(input / max * this.numOfSlots);
     }
 
     @Override

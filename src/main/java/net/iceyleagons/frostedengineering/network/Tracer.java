@@ -56,11 +56,7 @@ public class Tracer {
      * @param unit {@link Unit} to start from, basically which got placed
      */
     private static void traceMerge(@NonNull Unit unit) {
-        System.out.println("tracing");
-        unit.getNeighbours().forEach(System.out::println);
-
         List<Unit> connections = dfs(unit);
-        connections.forEach(System.out::println);
         Network network = unit.getNetwork().generateSameType();
         connections.forEach(u -> {
             try {

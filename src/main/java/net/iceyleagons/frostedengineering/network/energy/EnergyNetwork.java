@@ -41,6 +41,9 @@ public class EnergyNetwork implements Network, java.io.Serializable {
     @Setter
     private UUID uuid;
 
+    Map<Float, ChargableComponent> chargableComponents;
+    List<Float> chargablekeys;
+
     private boolean updated = false;
 
     public EnergyNetwork() {
@@ -73,26 +76,18 @@ public class EnergyNetwork implements Network, java.io.Serializable {
 
     public void depositEnergy(float energy) {
         Main.executor.execute(()-> {
-            Map<Float, ChargableComponent> chargableComponents = getChargableComponents();
-            distributeEnergy(chargableComponents, energy);
+            distributeEnergy(energy);
         });
     }
 
-    private void distributeEnergy(@NonNull Map<Float, ChargableComponent> ChargableComponents,float energy) {
+    private void distributeEnergy(float energy) {
         float toAdd = energy;
 
         int i = 0;
         int j = 0;
-        List<Float> keys = new ArrayList<>(ChargableComponents.keySet());
-        Collections.sort(keys);
         while (toAdd > 0) {
-            if (updated) {
-                distributeEnergy(getChargableComponents(),toAdd);
-                updated = false;
-                break;
-            }
-            System.out.println("ADDING1");
-            ChargableComponent chargableComponent = ChargableComponents.get(keys.get(i));
+            if (chargableComponents.isEmpty()) break; //Double check cause java sucks
+            ChargableComponent chargableComponent = chargableComponents.get(chargablekeys.get(i));
             if ((chargableComponent.getMaxStorage() - chargableComponent.getStored()) >= toAdd) {chargableComponent.addEnergy(toAdd); toAdd = 0;}
             else {
                 float max = (chargableComponent.getMaxStorage() - chargableComponent.getStored());
@@ -104,7 +99,6 @@ public class EnergyNetwork implements Network, java.io.Serializable {
     }
 
     public float withdrawEnergy(float needed) {
-        Map<Float, ChargableComponent> chargableComponents = getChargableComponents();
         float storedEnergy = getEnergy(chargableComponents);
         if (storedEnergy > needed) {
             removeEnergy(chargableComponents, needed);
@@ -116,14 +110,11 @@ public class EnergyNetwork implements Network, java.io.Serializable {
         return 0f;
     }
 
-    private static void removeEnergy(@NonNull Map<Float, ChargableComponent> ChargableComponents,float removal) {
+    private void removeEnergy(Map<Float, ChargableComponent> chargableComponents, float removal) {
         float toRemove = removal;
-        List<Float> keys = new ArrayList<>(ChargableComponents.keySet());
-        Collections.sort(keys);
-        Collections.reverse(keys);
         int i = 0;
         while (toRemove >= 0)
-            toRemove = ChargableComponents.get(keys.get(i)).addEnergy(toRemove);
+            toRemove = chargableComponents.get(chargablekeys.get(i)).addEnergy(toRemove);
     }
 
     public static void clearEnergy(@NonNull Map<Float, ChargableComponent> chargableComponentMap) {
@@ -138,6 +129,9 @@ public class EnergyNetwork implements Network, java.io.Serializable {
             units.add((EnergyUnit) unit);
             updated = true;
         }
+        chargableComponents = getChargableComponents();
+        chargablekeys = new ArrayList<>(chargableComponents.keySet());
+        Collections.sort(chargablekeys);
     }
 
     @Override
@@ -146,6 +140,7 @@ public class EnergyNetwork implements Network, java.io.Serializable {
 
         units.remove(unit);
         updated = true;
+        chargableComponents = getChargableComponents();
     }
 
     @Override
