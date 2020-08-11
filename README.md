@@ -14,7 +14,7 @@
 
  ![build][] ![version][]  ![license-shield][] ![forks][] ![stars][]
  ![issues][] [ ![faq-shield]][faq] ![central][]
-  ![discord-shield][] [discord-invite]
+ [![discord-shield]][discord-invite]
  
 
 # FrostedEngineering
