@@ -15,7 +15,6 @@
  ![build][] ![version][] ![central][] ![license-shield][]
  
  ![forks][] ![stars][] ![issues][]
- 
  [![faq-shield]][faq] [![discord-shield]][discord-invite]
  
 
