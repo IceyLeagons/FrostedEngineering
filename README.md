@@ -10,9 +10,11 @@
 [stars]: https://img.shields.io/github/stars/IceyLeagons/FrostedEngineering
 [issues]: https://img.shields.io/github/issues/IceyLeagons/FrostedEngineering
 [central]: https://github.com/IceyLeagons/FrostedEngineering/workflows/Maven%20Central/badge.svg?event=deployment_status
+[build]: https://github.com/IceyLeagons/FrostedEngineering/workflows/Java%20CI%20with%20Maven/badge.svg
 
- ![version][]  ![license-shield][] ![forks][] ![stars][]
- ![issues][] [ ![faq-shield] ][faq] ![central][][ ![discord-shield][] ][discord-invite]
+ ![build][] ![version][]  ![license-shield][] ![forks][] ![stars][]
+ ![issues][] [ ![faq-shield]][faq] ![central][]
+ [ ![discord-shield][] [discord-invite]
  
 
 # FrostedEngineering
