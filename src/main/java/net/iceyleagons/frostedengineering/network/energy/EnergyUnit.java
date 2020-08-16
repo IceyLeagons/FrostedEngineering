@@ -217,10 +217,7 @@ public abstract class EnergyUnit implements Unit, Serializable {
 
     @Override
     public List<Unit> getNeighbours() {
-        List<Unit> units = new ArrayList<Unit>();
-        for (EnergyUnit eu : getNeighbours(getLocation())) {
-            units.add(eu);
-        }
+        List<Unit> units = new ArrayList<Unit>(getNeighbours(getLocation()));
         return units;
     }
 
@@ -312,9 +309,7 @@ public abstract class EnergyUnit implements Unit, Serializable {
         Location target = start.clone().add(x, y, z);
         Main.debug("Getting unit at location " + start.toString());
         if (!target.equals(start)) {
-            EnergyUnit targetUnit = getEnergyUnitAtLocation(target);
-            if (targetUnit != null)
-                return targetUnit;
+            return getEnergyUnitAtLocation(target);
         }
         return null;
     }
