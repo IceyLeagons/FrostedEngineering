@@ -25,6 +25,7 @@ import java.io.ObjectOutputStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import net.iceyleagons.frostedengineering.textures.base.*;
 import net.iceyleagons.frostedengineering.textures.initialization.Station307;
 import net.iceyleagons.frostedengineering.textures.initialization.TransferSH;
 import net.iceyleagons.frostedengineering.textures.initialization.ZeroxZero;
@@ -43,10 +44,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import net.iceyleagons.frostedengineering.Main;
-import net.iceyleagons.frostedengineering.textures.base.TexturedBase;
-import net.iceyleagons.frostedengineering.textures.base.TexturedBlock;
-import net.iceyleagons.frostedengineering.textures.base.TexturedItem;
-import net.iceyleagons.frostedengineering.textures.base.TexturedSound;
 import net.iceyleagons.frostedengineering.textures.events.TextureInitializationEvent;
 import net.iceyleagons.frostedengineering.utils.Reflections;
 
@@ -285,8 +282,13 @@ public class Textures {
         if (!(base instanceof TexturedSound))
             create(base);
 
-        if (base instanceof TexturedBlock)
-            blocks.add((TexturedBlock) base);
+        if (base instanceof TexturedBlock) {
+            if (base instanceof TexturedInterconnectible) {
+                Collection<TexturedBlock> a;
+                Collections.addAll(blocks, (a = ((TexturedInterconnectible) base).getRegisterMap().values()).toArray(new TexturedBlock[a.size()]));
+            } else
+                blocks.add((TexturedBlock) base);
+        }
 
         if (base instanceof TexturedItem)
             items.add((TexturedItem) base);

@@ -27,6 +27,7 @@ import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.textures.BlockStorage;
 import net.iceyleagons.frostedengineering.textures.Textures;
 import net.iceyleagons.frostedengineering.textures.base.TexturedBase;
+import net.iceyleagons.frostedengineering.textures.base.TexturedInterconnectible;
 import net.iceyleagons.frostedengineering.textures.events.TextureSetupEvent;
 import net.iceyleagons.frostedengineering.textures.initialization.McMeta;
 import net.iceyleagons.frostedengineering.textures.initialization.Sounds;
@@ -397,8 +398,18 @@ public interface IUploadable {
                     + "\"\n\t},\n\t\"overrides\": [\n\t\t{\n\t\t\t\"predicate\":\n\t\t\t{\n\t\t\t\t\"custom_model_data\": 0\n\t\t\t},\n\t\t\t\"model\": \""
                     + baseMaterial.name().toLowerCase() + "\"\n\t\t}");
 
-        texturedList.forEach((textured) -> {
-            if (textured.getBaseMaterial() == baseMaterial) {
+        texturedList.forEach(textured -> {
+            if (textured instanceof TexturedInterconnectible) {
+                ((TexturedInterconnectible) textured).getRegisterMap().forEach((directions, texturedBlock) -> {
+                    if (texturedBlock.getBaseMaterial() == baseMaterial) {
+                        printWriter.println(",\n\t\t{\n\t\t\t\"predicate\":\n\t\t\t{\n\t\t\t\t\"custom_model_data\": " + texturedBlock.getId()
+                                + "\n\t\t\t},\n\t\t\t\"model\": \"" + texturedBlock.getModel() + "\"\n\t\t}");
+
+                        Main.info(Optional.of("TEXTURES"), "Wrote custom JSON data for TexturedBase #" + texturedBlock.getId()
+                                + " (" + texturedBlock.getName() + ") with id " + texturedBlock.getId());
+                    }
+                });
+            } else if (textured.getBaseMaterial() == baseMaterial) {
                 printWriter.println(",\n\t\t{\n\t\t\t\"predicate\":\n\t\t\t{\n\t\t\t\t\"custom_model_data\": " + textured.getId()
                         + "\n\t\t\t},\n\t\t\t\"model\": \"" + textured.getModel() + "\"\n\t\t}");
 

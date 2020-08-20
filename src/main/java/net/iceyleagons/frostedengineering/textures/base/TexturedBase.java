@@ -28,7 +28,7 @@ public class TexturedBase {
     private Material baseMaterial;
     private String name;
     private String modelPath;
-    private Plugin plugin;
+    private JavaPlugin plugin;
     private int id;
 
     /**
@@ -98,7 +98,7 @@ public class TexturedBase {
      *
      * @return the plugin with which this TexturedBase was registered
      */
-    public Plugin getPlugin() {
+    public JavaPlugin getPlugin() {
         return plugin;
     }
 

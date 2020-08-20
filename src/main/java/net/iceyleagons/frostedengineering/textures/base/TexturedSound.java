@@ -18,7 +18,7 @@
 
 package net.iceyleagons.frostedengineering.textures.base;
 
-import java.util.HashMap;
+import java.util.*;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -34,9 +34,10 @@ import net.iceyleagons.frostedengineering.textures.events.SoundEvent.EventType;
 
 public class TexturedSound extends TexturedBase implements ITick {
 
-    private short length = 0;
-    private static HashMap<Location, SoundData> playing = new HashMap<>();
-    private float volume, pitch;
+    private final short length;
+    private static final HashMap<Location, List<SoundData>> playing = new HashMap<>();
+    private final float volume;
+    private final float pitch;
 
     /**
      * @param plugin    the plugin to register this sound at
@@ -54,7 +55,7 @@ public class TexturedSound extends TexturedBase implements ITick {
         Main.registerITick(this);
     }
 
-    public static SoundData getPlayingAtLocation(Location l) {
+    public static List<SoundData> getPlayingAtLocation(Location l) {
         return playing.get(l);
     }
 
@@ -71,16 +72,22 @@ public class TexturedSound extends TexturedBase implements ITick {
         Bukkit.getPluginManager().callEvent(event);
 
         if (!event.isCancelled()) {
-            SoundData sd = getPlayingAtLocation(loc);
-            if (sd == null) {
-                sd = new SoundData(this, loc, loop);
-                sd.setCurrentTime((short) 0);
+            List<SoundData> soundDataList = getPlayingAtLocation(loc);
+            if (soundDataList == null)
+                soundDataList = new ArrayList<>(1);
+
+            if (soundDataList.isEmpty()) {
+                SoundData sd = new SoundData(this, loc, loop);
+                sd.setCurrentTime(0);
                 sd.getLoc().getWorld().playSound(sd.getLoc(), super.getName(), volume, pitch);
-                playing.put(loc, sd);
-            } else if (sd.isLooped()) {
-                sd.getLoc().getWorld().playSound(sd.getLoc(), super.getName(), volume, pitch);
-                sd.setCurrentTime((short) 0);
-            }
+                soundDataList.add(sd);
+                playing.put(loc, soundDataList);
+            } else
+                for (SoundData sd : soundDataList)
+                    if (sd.isLooped()) {
+                        sd.getLoc().getWorld().playSound(sd.getLoc(), super.getName(), volume, pitch);
+                        sd.setCurrentTime(0);
+                    }
         }
     }
 
@@ -96,13 +103,19 @@ public class TexturedSound extends TexturedBase implements ITick {
         Bukkit.getPluginManager().callEvent(event);
 
         if (!event.isCancelled()) {
-            SoundData sd = getPlayingAtLocation(loc);
-            if (sd != null) {
-                sd.setCurrentTime((short) 0);
-                sd.setLooping(false);
-                loc.getNearbyPlayers(32).forEach(player -> player.stopSound(super.getName()));
+            List<SoundData> soundDataList = getPlayingAtLocation(loc);
+            for (SoundData sd : Collections.unmodifiableList(soundDataList))
+                if (sd.parent.getName().equalsIgnoreCase(super.getName())) {
+                    sd.setCurrentTime(0);
+                    sd.setLooped(false);
+                    loc.getNearbyPlayers(32).forEach(player -> player.stopSound(super.getName()));
+                    soundDataList.remove(sd);
+                }
+
+            if (soundDataList.isEmpty())
                 playing.remove(loc);
-            }
+            else
+                playing.put(loc, soundDataList);
         }
     }
 
@@ -165,11 +178,15 @@ public class TexturedSound extends TexturedBase implements ITick {
      */
     @Override
     public void onTick() {
-        playing.forEach((loc, sd) -> {
-            if (sd.getCurrentTime() >= sd.getParent().getLength())
-                sd.getParent().play(loc, sd.isLooped());
+        for (Map.Entry<Location, List<SoundData>> entry : playing.entrySet()) {
+            Location loc = entry.getKey();
+            List<SoundData> soundDataList = entry.getValue();
+            for (SoundData sd : soundDataList) {
+                if (sd.getCurrentTime() >= sd.getParent().getLength())
+                    sd.getParent().play(loc, sd.isLooped());
 
-            sd.setCurrentTime((short) (sd.getCurrentTime() + 1));
-        });
+                sd.setCurrentTime(sd.getCurrentTime() + 1);
+            }
+        }
     }
 }

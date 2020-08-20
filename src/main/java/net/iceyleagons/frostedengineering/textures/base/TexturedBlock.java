@@ -34,7 +34,7 @@ import net.iceyleagons.frostedengineering.textures.WrappedMobSpawner;
 public class TexturedBlock extends TexturedBase {
 
     protected String title;
-    private static WrappedMobSpawner wms;
+    static WrappedMobSpawner wms;
     private Sound placeSound = Sound.BLOCK_STONE_HIT;
 
     static {
@@ -129,27 +129,26 @@ public class TexturedBlock extends TexturedBase {
     }
 
     /**
-     * @see TexturedBlock#setBlock(Location)
+     * @return the place sound of the block.
      */
-    public void setBlock(World world, int x, int y, int z, Player player) {
-        setBlock(new Location(world, x, y, z), player);
+    public Sound getPlaceSound() {
+        return placeSound;
     }
 
     /**
-     * @see TexturedBlock#setBlock(Location)
+     * @see #setBlock(Block, Player)
      */
-    public void setBlock(Block block, Player player) {
-        setBlock(block.getLocation(), player);
+    public void setBlock(World world, int x, int y, int z, Player player) {
+        setBlock(new Location(world, x, y, z).getBlock(), player);
     }
 
     /**
      * Sets the block at specified location to this type of block.
      *
-     * @param location the location to place the block
-     * @param player   the player who placed it
+     * @param block  the location to place the block
+     * @param player the player who placed it
      */
-    public void setBlock(Location location, Player player) {
-        Block block = location.getWorld().getBlockAt(location);
+    public void setBlock(Block block, Player player) {
         block.setType(Material.SPAWNER);
 
         wms.execute(block,
@@ -158,7 +157,21 @@ public class TexturedBlock extends TexturedBase {
                         + ",tag:{Unbreakable:1,CustomModelData:" + super.getId() + "}}]}}");
         onPlacement(block, player);
 
-        block.getWorld().playSound(location, placeSound, 1.f, 1.f);
+        block.getWorld().playSound(block.getLocation(), placeSound, 1.f, 1.f);
+    }
+
+    /**
+     * @see #setBlock(Block, Player)
+     */
+    public void setBlock(Location location, Player player) {
+        setBlock(location.getBlock(), player);
+    }
+
+    /**
+     * @return the title of this block.
+     */
+    public String getTitle() {
+        return title;
     }
 
     /**
