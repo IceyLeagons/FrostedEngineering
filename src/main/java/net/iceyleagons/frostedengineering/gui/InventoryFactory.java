@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -47,6 +49,11 @@ public class InventoryFactory {
     private boolean registered = false;
     private Listener listener;
     private List<Player> opened = new ArrayList<Player>();
+    @Getter
+    @Setter
+    private List<Integer> denyList = new ArrayList<>();
+
+
 
     public InventoryFactory(String name, int size) {
         new InventoryFactory(name, size, null, true);
@@ -67,6 +74,7 @@ public class InventoryFactory {
                     }
                     if (inventories.containsKey(e.getInventory())) {
                         InventoryFactory current = inventories.get(e.getInventory());
+                        if (denyList.contains(e.getSlot())) e.setCancelled(true);
                         if (deny)
                             e.setCancelled(true);
                         if (e.getCurrentItem().equals(placeholder)) {
@@ -81,7 +89,7 @@ public class InventoryFactory {
                             }
                         } else {
                             p.playSound(p.getLocation(), Sound.BLOCK_WOODEN_BUTTON_CLICK_ON, 1, 1);
-                            if (current.runs.get(e.getSlot()) != null && debounce == false) {
+                            if (current.runs.get(e.getSlot()) != null && !debounce) {
                                 debounce = true;
                                 current.runs.get(e.getSlot()).run(e);
                                 try {
@@ -151,8 +159,7 @@ public class InventoryFactory {
     }
 
     public void setItem(ItemStack itemstack, String displayname, Integer slot, ClickRunnable executeOnClick, String... description) {
-        ItemStack is = itemstack;
-        ItemMeta im = is.getItemMeta();
+        ItemMeta im = itemstack.getItemMeta();
         im.addItemFlags(ItemFlag.HIDE_ATTRIBUTES,
                 ItemFlag.HIDE_DESTROYS,
                 ItemFlag.HIDE_ENCHANTS,
@@ -169,8 +176,8 @@ public class InventoryFactory {
             }
             im.setLore(lore);
         }
-        is.setItemMeta(im);
-        inv.setItem(slot, is);
+        itemstack.setItemMeta(im);
+        inv.setItem(slot, itemstack);
         runs.put(slot, executeOnClick);
     }
 
