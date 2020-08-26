@@ -27,6 +27,8 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ZeroxZero implements IUploadable {
 
@@ -47,20 +49,21 @@ public class ZeroxZero implements IUploadable {
                                 .addFormDataPart("file", file.getName(),
                                         RequestBody.create(MediaType.parse("application/zip"), file))
                                 .build()).build()).execute()) {
-                    String url = response.body().string();
+                    String url = response.body().string().replace("|", "").replace("\r", "").replace("\n", "").replace(" ", "");
 
                     Main.info(Optional.of("Textures"), "Resource pack uploaded.");
                     Main.info(Optional.of("Textures"),
                             "Resource pack link is: " + url);
                     Main.info(Optional.of("Textures"), "Calculating SHA-1 hash...");
                     byte[] hash = sha1Code(file);
+                    String finalUrl = url;
                     new Timer().schedule(new TimerTask() {
                         @Override
                         public void run() {
                             Main.info(Optional.of("Textures"),
                                     "Resource pack hash is: " + bytesToHexString(hash));
 
-                            Textures.setData("resourcepack-link", url);
+                            Textures.setData("resourcepack-link", finalUrl);
                             Textures.hash = hash;
 
                             Bukkit.getOnlinePlayers().forEach(player -> player
