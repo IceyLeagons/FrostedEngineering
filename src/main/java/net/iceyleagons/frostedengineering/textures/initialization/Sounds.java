@@ -29,10 +29,10 @@ import net.iceyleagons.frostedengineering.textures.Textures;
 
 public class Sounds {
 
-    @Expose(serialize = true, deserialize = false)
-    public HashMap<String, SoundData> sounds = new HashMap<>();
+    @Expose(deserialize = false)
+    public HashMap<String, SoundData> sounds;
 
-    private String json;
+    private final String json;
 
     public String getJson() {
         return json;
@@ -44,9 +44,9 @@ public class Sounds {
     }
 
     public static class SoundData {
-        @Expose(serialize = true, deserialize = false)
-        public String category = "master";
-        @Expose(serialize = true, deserialize = false)
+        @Expose(deserialize = false)
+        public String category;
+        @Expose(deserialize = false)
         public List<String> sounds;
 
         public SoundData(String category, List<String> sounds) {

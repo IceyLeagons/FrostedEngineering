@@ -16,19 +16,16 @@
  ******************************************************************************/
 package net.iceyleagons.frostedengineering.textures.initialization;
 
-import lombok.SneakyThrows;
 import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.textures.Textures;
 import net.iceyleagons.frostedengineering.textures.interfaces.IUploadable;
 import okhttp3.*;
 import org.bukkit.Bukkit;
 
-import java.time.Duration;
+import java.io.File;
+import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class ZeroxZero implements IUploadable {
 
@@ -39,49 +36,41 @@ public class ZeroxZero implements IUploadable {
 
     @Override
     public void init() {
-        common(file -> new Timer().schedule(new TimerTask() {
-            @SneakyThrows
-            @Override
-            public void run() {
-                try (Response response = new OkHttpClient().newCall(new Request.Builder().url("https://0x0.st/")
-                        .post(new MultipartBody.Builder()
-                                .setType(MultipartBody.FORM)
-                                .addFormDataPart("file", file.getName(),
-                                        RequestBody.create(MediaType.parse("application/zip"), file))
-                                .build()).build()).execute()) {
-                    String url = response.body().string().replace("|", "").replace("\r", "").replace("\n", "").replace(" ", "");
-
-                    Main.info(Optional.of("Textures"), "Resource pack uploaded.");
-                    Main.info(Optional.of("Textures"),
-                            "Resource pack link is: " + url);
-                    Main.info(Optional.of("Textures"), "Calculating SHA-1 hash...");
-                    byte[] hash = sha1Code(file);
-                    String finalUrl = url;
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            Main.info(Optional.of("Textures"),
-                                    "Resource pack hash is: " + bytesToHexString(hash));
-
-                            Textures.setData("resourcepack-link", finalUrl);
-                            Textures.hash = hash;
-
-                            Bukkit.getOnlinePlayers().forEach(player -> player
-                                    .setResourcePack(Textures.getData("resourcepack-link"), Textures.hash));
-                        }
-                    }, 1000L);
-                }
-            }
-        }, 10000L));
+        common(file -> {
+            String stringHash = Textures.getData("resourcepack-hash");
+            byte[] currentHash = sha1Code(file);
+            String stringCurrentHash = bytesToHexString(currentHash);
+            if (stringHash != null) {
+                if (!stringHash.equalsIgnoreCase(stringCurrentHash))
+                    a(file, currentHash, stringCurrentHash);
+            } else
+                a(file, currentHash, stringCurrentHash);
+        });
     }
 
-    @Override
-    public boolean needReupload() {
-        return true;
-    }
+    private void a(File file, byte[] hash, String stringHash) {
+        try (Response response = new OkHttpClient().newCall(new Request.Builder().url("https://0x0.st/")
+                .post(new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("file", file.getName(),
+                                RequestBody.create(MediaType.parse("application/zip"), file))
+                        .build()).build()).execute()) {
+            final String url = Objects.requireNonNull(response.body()).string().replace("|", "")
+                    .replace("\r", "").replace("\n", "").replace(" ", "");
+            Main.info(Optional.of("Textures"), "Resource pack uploaded.");
+            Main.info(Optional.of("Textures"),
+                    "Resource pack link is: " + url);
+            Main.info(Optional.of("Textures"),
+                    "Resource pack hash is: " + stringHash);
 
-    @Override
-    public Duration reuploadIntervals() {
-        return Duration.ofDays(14);
+            Textures.setData("resourcepack-link", url);
+            Textures.setData("resourcepack-hash", stringHash);
+            Textures.hash = hash;
+
+            Bukkit.getOnlinePlayers().forEach(player -> player
+                    .setResourcePack(Textures.getData("resourcepack-link"), Textures.hash));
+        } catch (IOException ignored) {
+
+        }
     }
 }

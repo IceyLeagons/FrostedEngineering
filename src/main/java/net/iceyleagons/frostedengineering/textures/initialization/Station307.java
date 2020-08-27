@@ -16,16 +16,14 @@
  ******************************************************************************/
 package net.iceyleagons.frostedengineering.textures.initialization;
 
-import lombok.SneakyThrows;
 import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.textures.Textures;
 import net.iceyleagons.frostedengineering.textures.interfaces.IUploadable;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
+import okhttp3.*;
 import org.bukkit.Bukkit;
 
+import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -37,53 +35,51 @@ public class Station307 implements IUploadable {
         return new String[]{"experimental", "station", "station307", "307", "s307"};
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void init() {
         common(file -> {
-            new Timer().schedule(new TimerTask() {
-                @SneakyThrows
-                @Override
-                public void run() {
-                    String url = new OkHttpClient().newCall(new Request.Builder()
-                            .url("https://www.station307.com/")
-                            .put(RequestBody.create(MediaType.parse("application/zip"), file))
-                            .build()).execute().header("com.station307.located-at");
+            try (Response response = new OkHttpClient().newCall(new Request.Builder()
+                    .url("https://www.station307.com/")
+                    .put(RequestBody.create(MediaType.parse("application/zip"), file))
+                    .build()).execute()) {
 
-                    Main.executor.execute(new Runnable() {
-                        @SneakyThrows
-                        @Override
-                        public void run() {
-                            while (Main.MAIN.isEnabled()) {
-                                assert url != null;
-                                new OkHttpClient().newCall(new Request.Builder()
-                                        .url(url)
-                                        .put(RequestBody.create(MediaType.parse("application/zip"), file))
-                                        .build()).execute();
-                            }
+                String url = response.header("com.station307.located-at");
+
+                Main.executor.execute(() -> {
+                    final String finalUrl = Objects.requireNonNull(url);
+
+                    while (Main.MAIN.isEnabled())
+                        try (Response ignored = new OkHttpClient().newCall(new Request.Builder()
+                                .url(finalUrl)
+                                .put(RequestBody.create(MediaType.parse("application/zip"), file))
+                                .build()).execute()) {
+                            // Not even needed.
+                        } catch (IOException ignored) {
+
                         }
-                    });
+                });
 
-                    Main.info(Optional.of("Textures"), "Resource pack uploaded.");
-                    Main.info(Optional.of("Textures"),
-                            "Resource pack link is: " + url);
-                    Main.info(Optional.of("Textures"), "Calculating SHA-1 hash...");
-                    byte[] hash = sha1Code(file);
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            Main.info(Optional.of("Textures"),
-                                    "Resource pack hash is: " + bytesToHexString(hash));
+                Main.info(Optional.of("Textures"), "Resource pack uploaded.");
+                Main.info(Optional.of("Textures"),
+                        "Resource pack link is: " + url);
+                Main.info(Optional.of("Textures"), "Calculating SHA-1 hash...");
+                byte[] hash = sha1Code(file);
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        Main.info(Optional.of("Textures"),
+                                "Resource pack hash is: " + bytesToHexString(hash));
 
-                            Textures.setData("resourcepack-link", url);
-                            Textures.hash = hash;
+                        Textures.setData("resourcepack-link", url);
+                        Textures.hash = hash;
 
-                            Bukkit.getOnlinePlayers().forEach(player -> player
-                                    .setResourcePack(Textures.getData("resourcepack-link"), Textures.hash));
-                        }
-                    }, 1000L);
-                }
-            }, 10000L);
+                        Bukkit.getOnlinePlayers().forEach(player -> player
+                                .setResourcePack(Textures.getData("resourcepack-link"), Textures.hash));
+                    }
+                }, 1000L);
+            } catch (IOException ignored) {
+
+            }
         });
     }
 

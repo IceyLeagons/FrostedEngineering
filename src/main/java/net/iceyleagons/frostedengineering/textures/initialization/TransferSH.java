@@ -16,22 +16,13 @@
  ******************************************************************************/
 package net.iceyleagons.frostedengineering.textures.initialization;
 
-import com.gargoylesoftware.htmlunit.BrowserVersion;
-import com.gargoylesoftware.htmlunit.WebClient;
-import lombok.SneakyThrows;
 import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.textures.Textures;
 import net.iceyleagons.frostedengineering.textures.interfaces.IUploadable;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
+import okhttp3.*;
 import org.bukkit.Bukkit;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Optional;
 import java.util.Timer;
@@ -47,35 +38,33 @@ public class TransferSH implements IUploadable {
     @Override
     public void init() {
         common(file -> {
-            new Timer().schedule(new TimerTask() {
-                @SneakyThrows
-                @Override
-                public void run() {
-                    String url = new OkHttpClient().newCall(new Request.Builder()
-                            .url("https://transfer.sh/" + file.getName())
-                            .put(RequestBody.create(MediaType.parse("application/zip"), file))
-                            .build()).execute().message();
+            try (Response response = new OkHttpClient().newCall(new Request.Builder()
+                    .url("https://transfer.sh/" + file.getName())
+                    .put(RequestBody.create(MediaType.parse("application/zip"), file))
+                    .build()).execute()) {
+                String url = response.message();
 
-                    Main.info(Optional.of("Textures"), "Resource pack uploaded.");
-                    Main.info(Optional.of("Textures"),
-                            "Resource pack link is: " + url);
-                    Main.info(Optional.of("Textures"), "Calculating SHA-1 hash...");
-                    byte[] hash = sha1Code(file);
-                    new Timer().schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            Main.info(Optional.of("Textures"),
-                                    "Resource pack hash is: " + bytesToHexString(hash));
+                Main.info(Optional.of("Textures"), "Resource pack uploaded.");
+                Main.info(Optional.of("Textures"),
+                        "Resource pack link is: " + url);
+                Main.info(Optional.of("Textures"), "Calculating SHA-1 hash...");
+                byte[] hash = sha1Code(file);
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        Main.info(Optional.of("Textures"),
+                                "Resource pack hash is: " + bytesToHexString(hash));
 
-                            Textures.setData("resourcepack-link", url);
-                            Textures.hash = hash;
+                        Textures.setData("resourcepack-link", url);
+                        Textures.hash = hash;
 
-                            Bukkit.getOnlinePlayers().forEach(player -> player
-                                    .setResourcePack(Textures.getData("resourcepack-link"), Textures.hash));
-                        }
-                    }, 1000L);
-                }
-            }, 10000L);
+                        Bukkit.getOnlinePlayers().forEach(player -> player
+                                .setResourcePack(Textures.getData("resourcepack-link"), Textures.hash));
+                    }
+                }, 1000L);
+            } catch (IOException ignored) {
+
+            }
         });
     }
 

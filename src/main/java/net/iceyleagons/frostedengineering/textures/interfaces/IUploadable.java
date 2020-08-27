@@ -176,15 +176,21 @@ public interface IUploadable {
                 exception.printStackTrace();
             }
 
-            // Compare the old and the new resourcepack to check if there's any changes.
-            fileFunction.run(finalResourcePack);
+            new Timer().schedule(new TimerTask() {
+                @SneakyThrows
+                @Override
+                public void run() {
+                    // Compare the old and the new resourcepack to check if there's any changes.
+                    fileFunction.run(finalResourcePack);
 
-            Textures.plugins.forEach((pl) -> {
-                File pluginFolder = new File(resourcepacksFolder, pl.getName());
-                deleteFile(pluginFolder);
-            });
+                    Textures.plugins.forEach((pl) -> {
+                        File pluginFolder = new File(resourcepacksFolder, pl.getName());
+                        deleteFile(pluginFolder);
+                    });
 
-            deleteFile(oldResourcePack);
+                    deleteFile(oldResourcePack);
+                }
+            }, 10000L);
 
         } catch (Exception uncatchedException) {
             // This is bad. We have an uncatched exception.
