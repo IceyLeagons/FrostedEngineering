@@ -22,7 +22,6 @@ import net.iceyleagons.frostedengineering.textures.interfaces.IUploadable;
 import okhttp3.*;
 import org.bukkit.Bukkit;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,41 +35,30 @@ public class ZeroxZero implements IUploadable {
 
     @Override
     public void init() {
-        common(file -> {
-            String stringHash = Textures.getData("resourcepack-hash");
-            byte[] currentHash = sha1Code(file);
-            String stringCurrentHash = bytesToHexString(currentHash);
-            if (stringHash != null) {
-                if (!stringHash.equalsIgnoreCase(stringCurrentHash))
-                    a(file, currentHash, stringCurrentHash);
-            } else
-                a(file, currentHash, stringCurrentHash);
+        common((file, hash, stringHash) -> {
+            try (Response response = new OkHttpClient().newCall(new Request.Builder().url("https://0x0.st/")
+                    .post(new MultipartBody.Builder()
+                            .setType(MultipartBody.FORM)
+                            .addFormDataPart("file", file.getName(),
+                                    RequestBody.create(MediaType.parse("application/zip"), file))
+                            .build()).build()).execute()) {
+                final String url = Objects.requireNonNull(response.body()).string().replace("|", "")
+                        .replace("\r", "").replace("\n", "").replace(" ", "");
+                Main.info(Optional.of("Textures"), "Resource pack uploaded.");
+                Main.info(Optional.of("Textures"),
+                        "Resource pack link is: " + url);
+                Main.info(Optional.of("Textures"),
+                        "Resource pack hash is: " + stringHash);
+
+                Textures.setData("resourcepack-link", url);
+                Textures.setData("resourcepack-hash", stringHash);
+                Textures.hash = hash;
+
+                Bukkit.getOnlinePlayers().forEach(player -> player
+                        .setResourcePack(Textures.getData("resourcepack-link"), Textures.hash));
+            } catch (IOException ignored) {
+
+            }
         });
-    }
-
-    private void a(File file, byte[] hash, String stringHash) {
-        try (Response response = new OkHttpClient().newCall(new Request.Builder().url("https://0x0.st/")
-                .post(new MultipartBody.Builder()
-                        .setType(MultipartBody.FORM)
-                        .addFormDataPart("file", file.getName(),
-                                RequestBody.create(MediaType.parse("application/zip"), file))
-                        .build()).build()).execute()) {
-            final String url = Objects.requireNonNull(response.body()).string().replace("|", "")
-                    .replace("\r", "").replace("\n", "").replace(" ", "");
-            Main.info(Optional.of("Textures"), "Resource pack uploaded.");
-            Main.info(Optional.of("Textures"),
-                    "Resource pack link is: " + url);
-            Main.info(Optional.of("Textures"),
-                    "Resource pack hash is: " + stringHash);
-
-            Textures.setData("resourcepack-link", url);
-            Textures.setData("resourcepack-hash", stringHash);
-            Textures.hash = hash;
-
-            Bukkit.getOnlinePlayers().forEach(player -> player
-                    .setResourcePack(Textures.getData("resourcepack-link"), Textures.hash));
-        } catch (IOException ignored) {
-
-        }
     }
 }

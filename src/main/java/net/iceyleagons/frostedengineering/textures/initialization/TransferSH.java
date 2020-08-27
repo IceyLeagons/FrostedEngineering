@@ -25,8 +25,6 @@ import org.bukkit.Bukkit;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Optional;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class TransferSH implements IUploadable {
 
@@ -37,7 +35,7 @@ public class TransferSH implements IUploadable {
 
     @Override
     public void init() {
-        common(file -> {
+        common((file, hash, stringHash) -> {
             try (Response response = new OkHttpClient().newCall(new Request.Builder()
                     .url("https://transfer.sh/" + file.getName())
                     .put(RequestBody.create(MediaType.parse("application/zip"), file))
@@ -47,21 +45,15 @@ public class TransferSH implements IUploadable {
                 Main.info(Optional.of("Textures"), "Resource pack uploaded.");
                 Main.info(Optional.of("Textures"),
                         "Resource pack link is: " + url);
-                Main.info(Optional.of("Textures"), "Calculating SHA-1 hash...");
-                byte[] hash = sha1Code(file);
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        Main.info(Optional.of("Textures"),
-                                "Resource pack hash is: " + bytesToHexString(hash));
+                Main.info(Optional.of("Textures"),
+                        "Resource pack hash is: " + stringHash);
 
-                        Textures.setData("resourcepack-link", url);
-                        Textures.hash = hash;
+                Textures.setData("resourcepack-link", url);
+                Textures.setData("resourcepack-hash", stringHash);
+                Textures.hash = hash;
 
-                        Bukkit.getOnlinePlayers().forEach(player -> player
-                                .setResourcePack(Textures.getData("resourcepack-link"), Textures.hash));
-                    }
-                }, 1000L);
+                Bukkit.getOnlinePlayers().forEach(player -> player
+                        .setResourcePack(Textures.getData("resourcepack-link"), Textures.hash));
             } catch (IOException ignored) {
 
             }
