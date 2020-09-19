@@ -73,7 +73,7 @@ public interface IUploadable {
         return Duration.ZERO;
     }
 
-    default void common(net.iceyleagons.frostedengineering.textures.initialization.Function<File> fileFunction) {
+    default void common(net.iceyleagons.frostedengineering.textures.initialization.Function<File, byte[], String> fileFunction) {
         try {
             printData();
 
@@ -176,15 +176,29 @@ public interface IUploadable {
                 exception.printStackTrace();
             }
 
-            // Compare the old and the new resourcepack to check if there's any changes.
-            fileFunction.run(finalResourcePack);
+            new Timer().schedule(new TimerTask() {
+                @SneakyThrows
+                @Override
+                public void run() {
 
-            Textures.plugins.forEach((pl) -> {
-                File pluginFolder = new File(resourcepacksFolder, pl.getName());
-                deleteFile(pluginFolder);
-            });
+                    String stringHash = Textures.getData("resourcepack-hash");
+                    byte[] currentHash = sha1Code(finalResourcePack);
+                    String stringCurrentHash = bytesToHexString(currentHash);
+                    if (stringHash != null) {
+                        if (!stringHash.equalsIgnoreCase(stringCurrentHash))
+                            fileFunction.run(finalResourcePack, currentHash, stringCurrentHash);
+                    } else
+                        fileFunction.run(finalResourcePack, currentHash, stringCurrentHash);
+                    // Compare the old and the new resourcepack to check if there's any changes.
 
-            deleteFile(oldResourcePack);
+                    Textures.plugins.forEach((pl) -> {
+                        File pluginFolder = new File(resourcepacksFolder, pl.getName());
+                        deleteFile(pluginFolder);
+                    });
+
+                    deleteFile(oldResourcePack);
+                }
+            }, 10000L);
 
         } catch (Exception uncatchedException) {
             // This is bad. We have an uncatched exception.
@@ -219,11 +233,11 @@ public interface IUploadable {
         }
     }
 
-    default void newTask(net.iceyleagons.frostedengineering.textures.initialization.Function<File> fileFunction) {
+    default void newTask(net.iceyleagons.frostedengineering.textures.initialization.Function<File, byte[], String> fileFunction) {
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                fileFunction.run(new File(Textures.homeFolder, "final-resourcepack.zip"));
+                fileFunction.run(new File(Textures.homeFolder, "final-resourcepack.zip"), Textures.hash, Textures.getData("resourcepack-hash"));
                 newTask(fileFunction);
             }
         }, reuploadIntervals().toMillis());
