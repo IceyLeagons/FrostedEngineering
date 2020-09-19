@@ -24,11 +24,11 @@ import org.luaj.vm2.lib.OneArgFunction;
 /**
  * @author TOTHTOMI
  */
-public abstract class UnaryOperation extends OneArgFunction {
+public abstract class IntegerOperation extends OneArgFunction {
 
     public LuaValue call(LuaValue arg) {
         return valueOf(call(arg.checkint()));
     }
-    abstract protected boolean call(int distance);
+    abstract protected boolean call(int value);
 
 }

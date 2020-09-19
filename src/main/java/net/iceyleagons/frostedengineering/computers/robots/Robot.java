@@ -18,15 +18,76 @@
 
 package net.iceyleagons.frostedengineering.computers.robots;
 
+import net.iceyleagons.frostedengineering.computers.lua.LuaRunner;
+import net.iceyleagons.frostedengineering.computers.robots.functions.RobotFunctions;
+import net.iceyleagons.frostedengineering.computers.robots.functions.TurnRight;
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
+
 /**
  * @author TOTHTOMI
  */
-public interface Robot {
+public abstract class Robot extends LuaRunner {
 
-    void turnRight(int times);
-    void turnLeft(int times);
-    void moveForward(int blocks);
-    void moveUp(int blocks);
-    void moveDown(int blocks);
+    public Robot() {
+
+    }
+
+    public LuaValue loadCode(String code) {
+        Globals globals = super.getGlobals();
+        globals.load(new RobotFunctions(this));
+        return super.loadCode(code,globals);
+    }
+
+    /**
+     * Turns the robot to the right times amount of times.
+     *
+     * @param times amount of turns
+     * @return true if the robot successfully moved otherwise false
+     */
+    public boolean turnRight(int times) {
+        return false;
+    }
+
+    /**
+     * Turns the robot to the left times amount of times.
+     *
+     * @param times amount of turns
+     * @return true if the robot successfully moved otherwise false
+     */
+    public boolean turnLeft(int times) {
+        return false;
+    }
+
+    /**
+     * Moves the robot forward x amount of blocks.
+     *
+     * @param blocks amount of blocks to travel
+     * @return true if the robot successfully moved otherwise false
+     */
+    public boolean moveForward(int blocks) {
+        return false;
+    }
+
+    /**
+     * Moves the robot upwards x amount of blocks.
+     *
+     * @param blocks amount of blocks to travel
+     * @return true if the robot successfully moved otherwise false
+     */
+    public boolean moveUp(int blocks) {
+        return false;
+    }
+
+    /**
+     * Moves the robot downwards x amount of blocks.
+     *
+     * @param blocks amount of blocks to travel
+     * @return true if the robot successfully moved otherwise false
+     */
+    public boolean moveDown(int blocks) {
+        return false;
+    }
 
 }
