@@ -18,10 +18,7 @@
 
 package net.iceyleagons.frostedengineering.structures;
 
-import com.sun.istack.internal.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import net.iceyleagons.frostedengineering.gui.InventoryFactory;
 import net.iceyleagons.frostedengineering.hologram.HoloAPI;
 import net.iceyleagons.frostedengineering.textures.base.TexturedBlock;

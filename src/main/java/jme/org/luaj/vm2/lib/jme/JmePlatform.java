@@ -19,7 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  ******************************************************************************/
-package org.luaj.vm2.lib.jme;
+package jme.org.luaj.vm2.lib.jme;
 
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LoadState;
@@ -113,7 +113,7 @@ public class JmePlatform {
 		globals.load(new TableLib());
 		globals.load(new StringLib());
 		globals.load(new CoroutineLib());
-		globals.load(new JmeIoLib());
+		//globals.load(new JmeIoLib());
 		LoadState.install(globals);
 		LuaC.install(globals);
 		return globals;		
