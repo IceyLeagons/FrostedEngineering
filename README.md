@@ -12,7 +12,7 @@
 [central]: https://github.com/IceyLeagons/FrostedEngineering/workflows/Maven%20Central/badge.svg?event=deployment_status
 [build]: https://github.com/IceyLeagons/FrostedEngineering/workflows/Java%20CI%20with%20Maven/badge.svg
 
- ![build][] ![version][] ![central][] ![license-shield][] ![forks][] ![stars][] ![issues][] [![faq-shield]][faq] [![discord-shield]][discord-invite][![CodeFactor](https://www.codefactor.io/repository/github/iceyleagons/frostedengineering/badge)](https://www.codefactor.io/repository/github/iceyleagons/frostedengineering)
+ ![build][] ![version][] ![central][] ![license-shield][] [![CodeFactor](https://www.codefactor.io/repository/github/iceyleagons/frostedengineering/badge)](https://www.codefactor.io/repository/github/iceyleagons/frostedengineering) ![forks][] ![stars][] ![issues][] [![faq-shield]][faq] [![discord-shield]][discord-invite]
  
 
 # FrostedEngineering
