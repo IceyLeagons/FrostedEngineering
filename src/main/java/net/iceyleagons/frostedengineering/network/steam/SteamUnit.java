@@ -22,12 +22,9 @@ import net.iceyleagons.frostedengineering.Main;
 import net.iceyleagons.frostedengineering.network.Network;
 import net.iceyleagons.frostedengineering.network.Tracer;
 import net.iceyleagons.frostedengineering.network.Unit;
-import net.iceyleagons.frostedengineering.network.energy.EnergyUnit;
 import net.iceyleagons.frostedengineering.network.energy.exceptions.UnsupportedUnitType;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import sun.nio.ch.Net;
 
 import java.util.ArrayList;
 import java.util.List;
