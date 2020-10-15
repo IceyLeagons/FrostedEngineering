@@ -94,7 +94,7 @@ net/iceyleagons/frostedengineering/interfaces/ISecond.java
 net/iceyleagons/frostedengineering/commands/cmds/TestCommand.java
  net.iceyleagons.frostedengineering.commands.cmds.TestCommand
 net/iceyleagons/frostedengineering/addons/exception/AddonLoadingException.java
- net.iceyleagons.frostedengineering.addons.exception.AddonLoadingException
+ net.iceyleagons.frostedengineering.common.addons.exception.AddonLoadingException
 net/iceyleagons/frostedengineering/modules/enums/MethodTypes.java
  net.iceyleagons.frostedengineering.modules.enums.MethodTypes
 net/iceyleagons/frostedengineering/modules/ModuleManager.java
@@ -196,7 +196,7 @@ org/luaj/vm2/WeakTable.java
  org.luaj.vm2.WeakTable$WeakValue
  org.luaj.vm2.WeakTable$WeakValueSlot
 net/iceyleagons/frostedengineering/addons/AddonManager.java
- net.iceyleagons.frostedengineering.addons.AddonManager
+ net.iceyleagons.frostedengineering.common.addons.AddonManager
 jse/org/luaj/vm2/ast/Block.java
  org.luaj.vm2.ast.Block
 net/iceyleagons/frostedengineering/textures/initialization/Station307.java
@@ -422,9 +422,9 @@ net/iceyleagons/frostedengineering/generator/frosted/VegetationPopulator.java
  net.iceyleagons.frostedengineering.generator.frosted.VegetationPopulator
  net.iceyleagons.frostedengineering.generator.frosted.VegetationPopulator$1
 net/iceyleagons/frostedengineering/addons/IAddon.java
- net.iceyleagons.frostedengineering.addons.IAddon
+ net.iceyleagons.frostedengineering.common.addons.IAddon
 net/iceyleagons/frostedengineering/addons/AddonDescription.java
- net.iceyleagons.frostedengineering.addons.AddonDescription
+ net.iceyleagons.frostedengineering.common.addons.AddonDescription
 jse/luac.java
  luac
 net/iceyleagons/frostedengineering/modules/annotations/ModuleReturns.java
@@ -434,7 +434,7 @@ net/iceyleagons/frostedengineering/textures/base/TexturedBlock.java
 jse/org/luaj/vm2/luajc/UpvalInfo.java
  org.luaj.vm2.luajc.UpvalInfo
 net/iceyleagons/frostedengineering/addons/AddonLoader.java
- net.iceyleagons.frostedengineering.addons.AddonLoader
+ net.iceyleagons.frostedengineering.common.addons.AddonLoader
 net/iceyleagons/frostedengineering/structures/Blueprint.java
  net.iceyleagons.frostedengineering.structures.Blueprint
 jse/org/luaj/vm2/ast/FuncArgs.java
@@ -528,7 +528,7 @@ org/luaj/vm2/compiler/FuncState.java
  org.luaj.vm2.compiler.FuncState
  org.luaj.vm2.compiler.FuncState$BlockCnt
 net/iceyleagons/frostedengineering/addons/LoadedAddon.java
- net.iceyleagons.frostedengineering.addons.LoadedAddon
+ net.iceyleagons.frostedengineering.common.addons.LoadedAddon
 old/vegetationold/genes/types/genome/LeafGene.java
  old.vegetationold.genes.types.genome.LeafGene
 net/iceyleagons/frostedengineering/computers/lua/IntegerOperation.java
@@ -538,7 +538,7 @@ org/luaj/vm2/Prototype.java
 net/iceyleagons/frostedengineering/textures/events/TextureSetupEvent.java
  net.iceyleagons.frostedengineering.textures.events.TextureSetupEvent
 net/iceyleagons/frostedengineering/addons/exception/InvalidAddonDescriptionException.java
- net.iceyleagons.frostedengineering.addons.exception.InvalidAddonDescriptionException
+ net.iceyleagons.frostedengineering.common.addons.exception.InvalidAddonDescriptionException
 net/iceyleagons/frostedengineering/computers/robots/functions/RobotFunctions.java
  net.iceyleagons.frostedengineering.computers.robots.functions.RobotFunctions
 net/iceyleagons/frostedengineering/textures/interfaces/IWrapped.java
@@ -584,7 +584,7 @@ jse/luajc.java
  luajc$InputFile
  luajc$LocalClassLoader
 net/iceyleagons/frostedengineering/addons/exception/AddonFolderCreationException.java
- net.iceyleagons.frostedengineering.addons.exception.AddonFolderCreationException
+ net.iceyleagons.frostedengineering.common.addons.exception.AddonFolderCreationException
 old/vegetationold/habitats/IHabitat.java
  old.vegetationold.habitats.IHabitat
 net/iceyleagons/frostedengineering/utils/festruct/FEStructSaver.java

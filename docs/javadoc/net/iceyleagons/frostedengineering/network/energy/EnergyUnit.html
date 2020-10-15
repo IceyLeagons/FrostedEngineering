@@ -100,7 +100,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>net.iceyleagons.frostedengineering.network.energy.EnergyUnit</li>
+<li>net.iceyleagons.frostedengineering.common.network.energy.EnergyUnit</li>
 </ul>
 </li>
 </ul>
@@ -113,7 +113,7 @@ var activeTableTab = "activeTableTab";
 </dl>
 <dl>
 <dt>Direct Known Subclasses:</dt>
-<dd><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/components/impl/storages/battery/Battery.html" title="class in net.iceyleagons.frostedengineering.network.energy.components.impl.storages.battery">Battery</a>, <a href="../../../../../net/iceyleagons/frostedengineering/network/energy/components/impl/generators/coal/CoalGenerator.html" title="class in net.iceyleagons.frostedengineering.network.energy.components.impl.generators.coal">CoalGenerator</a></dd>
+<dd><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/components/impl/storages/battery/Battery.html" title="class in net.iceyleagons.frostedengineering.common.network.impl.storages.battery">Battery</a>, <a href="../../../../../net/iceyleagons/frostedengineering/network/energy/components/impl/generators/coal/CoalGenerator.html" title="class in net.iceyleagons.frostedengineering.common.network.impl.generators.coal">CoalGenerator</a></dd>
 </dl>
 <hr>
 <br>
@@ -128,7 +128,7 @@ implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Un
  components have relations with this superclass (except
  Transformators, those aren't units)</dd>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../serialized-form.html#net.iceyleagons.frostedengineering.network.energy.EnergyUnit">Serialized Form</a></dd>
+<dd><a href="../../../../../serialized-form.html#net.iceyleagons.frostedengineering.common.network.energy.EnergyUnit">Serialized Form</a></dd>
 </dl>
 </li>
 </ul>
@@ -199,11 +199,11 @@ implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Un
 <th class="colOne" scope="col">Constructor and Description</th>
 </tr>
 <tr class="altColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyUnit.html#EnergyUnit-org.bukkit.Location-net.iceyleagons.frostedengineering.network.energy.EnergyNetwork-">EnergyUnit</a></span>(org.bukkit.Location&nbsp;loc,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyUnit.html#EnergyUnit-org.bukkit.Location-net.iceyleagons.frostedengineering.common.network.energy.EnergyNetwork-">EnergyUnit</a></span>(org.bukkit.Location&nbsp;loc,
           <a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyNetwork.html" title="class in net.iceyleagons.frostedengineering.network.energy">EnergyNetwork</a>&nbsp;network)</code>&nbsp;</td>
 </tr>
 <tr class="rowColor">
-<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyUnit.html#EnergyUnit-org.bukkit.Location-net.iceyleagons.frostedengineering.network.energy.EnergyNetwork-java.util.UUID-java.util.List-">EnergyUnit</a></span>(org.bukkit.Location&nbsp;loc,
+<td class="colOne"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyUnit.html#EnergyUnit-org.bukkit.Location-net.iceyleagons.frostedengineering.common.network.energy.EnergyNetwork-java.util.UUID-java.util.List-">EnergyUnit</a></span>(org.bukkit.Location&nbsp;loc,
           <a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyNetwork.html" title="class in net.iceyleagons.frostedengineering.network.energy">EnergyNetwork</a>&nbsp;network,
           java.util.UUID&nbsp;uuid,
           java.util.List&lt;org.bukkit.inventory.ItemStack&gt;&nbsp;itemsInside)</code>&nbsp;</td>
@@ -225,7 +225,7 @@ implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Un
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>static void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyUnit.html#addUnit-net.iceyleagons.frostedengineering.network.Unit-">addUnit</a></span>(<a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;u)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyUnit.html#addUnit-net.iceyleagons.frostedengineering.api.network.Unit-">addUnit</a></span>(<a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;u)</code>
 <div class="block">This will register the Unit in our lists so our listeners can work with them</div>
 </td>
 </tr>
@@ -319,7 +319,7 @@ implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Un
 </tr>
 <tr id="i18" class="altColor">
 <td class="colFirst"><code>static void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyUnit.html#removeUnit-net.iceyleagons.frostedengineering.network.Unit-">removeUnit</a></span>(<a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;u)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyUnit.html#removeUnit-net.iceyleagons.frostedengineering.api.network.Unit-">removeUnit</a></span>(<a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;u)</code>
 <div class="block">This will remove the Unit in our lists so our listeners can work with them</div>
 </td>
 </tr>
@@ -331,15 +331,15 @@ implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Un
 </tr>
 <tr id="i20" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyUnit.html#setEnergyNetwork-net.iceyleagons.frostedengineering.network.energy.EnergyNetwork-">setEnergyNetwork</a></span>(<a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyNetwork.html" title="class in net.iceyleagons.frostedengineering.network.energy">EnergyNetwork</a>&nbsp;net)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyUnit.html#setEnergyNetwork-net.iceyleagons.frostedengineering.common.network.energy.EnergyNetwork-">setEnergyNetwork</a></span>(<a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyNetwork.html" title="class in net.iceyleagons.frostedengineering.network.energy">EnergyNetwork</a>&nbsp;net)</code>
 <div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;
-<div class="block"><span class="deprecationComment">use <a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyUnit.html#setNetwork-net.iceyleagons.frostedengineering.network.Network-"><code>setNetwork(Network)</code></a></span></div>
+<div class="block"><span class="deprecationComment">use <a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyUnit.html#setNetwork-net.iceyleagons.frostedengineering.api.network.Network-"><code>setNetwork(Network)</code></a></span></div>
 </div>
 </td>
 </tr>
 <tr id="i21" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyUnit.html#setNetwork-net.iceyleagons.frostedengineering.network.Network-">setNetwork</a></span>(<a href="../../../../../net/iceyleagons/frostedengineering/network/Network.html" title="interface in net.iceyleagons.frostedengineering.network">Network</a>&nbsp;net)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyUnit.html#setNetwork-net.iceyleagons.frostedengineering.api.network.Network-">setNetwork</a></span>(<a href="../../../../../net/iceyleagons/frostedengineering/network/Network.html" title="interface in net.iceyleagons.frostedengineering.network">Network</a>&nbsp;net)</code>
 <div class="block">This is used by our algorithms to set the Energy Network</div>
 </td>
 </tr>
@@ -352,7 +352,7 @@ implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Un
 <code>clone, equals, finalize, getClass, hashCode, notify, notifyAll, toString, wait, wait, wait</code></li>
 </ul>
 <ul class="blockList">
-<li class="blockList"><a name="methods.inherited.from.class.net.iceyleagons.frostedengineering.network.Unit">
+<li class="blockList"><a name="methods.inherited.from.class.net.iceyleagons.frostedengineering.api.network.Unit">
 <!--   -->
 </a>
 <h3>Methods inherited from interface&nbsp;net.iceyleagons.frostedengineering.network.<a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a></h3>
@@ -461,7 +461,7 @@ implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Un
 <!--   -->
 </a>
 <h3>Constructor Detail</h3>
-<a name="EnergyUnit-org.bukkit.Location-net.iceyleagons.frostedengineering.network.energy.EnergyNetwork-">
+<a name="EnergyUnit-org.bukkit.Location-net.iceyleagons.frostedengineering.common.network.energy.EnergyNetwork-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -480,7 +480,7 @@ implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Un
 </dl>
 </li>
 </ul>
-<a name="EnergyUnit-org.bukkit.Location-net.iceyleagons.frostedengineering.network.energy.EnergyNetwork-java.util.UUID-java.util.List-">
+<a name="EnergyUnit-org.bukkit.Location-net.iceyleagons.frostedengineering.common.network.energy.EnergyNetwork-java.util.UUID-java.util.List-">
 <!--   -->
 </a>
 <ul class="blockListLast">
@@ -629,7 +629,7 @@ implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Un
 <div class="block">í This method will setup fatal properties to the Unit</div>
 </li>
 </ul>
-<a name="setEnergyNetwork-net.iceyleagons.frostedengineering.network.energy.EnergyNetwork-">
+<a name="setEnergyNetwork-net.iceyleagons.frostedengineering.common.network.energy.EnergyNetwork-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -637,7 +637,7 @@ implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Un
 <h4>setEnergyNetwork</h4>
 <pre>@Deprecated
 public&nbsp;void&nbsp;setEnergyNetwork(<a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyNetwork.html" title="class in net.iceyleagons.frostedengineering.network.energy">EnergyNetwork</a>&nbsp;net)</pre>
-<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;<span class="deprecationComment">use <a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyUnit.html#setNetwork-net.iceyleagons.frostedengineering.network.Network-"><code>setNetwork(Network)</code></a></span></div>
+<div class="block"><span class="deprecatedLabel">Deprecated.</span>&nbsp;<span class="deprecationComment">use <a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyUnit.html#setNetwork-net.iceyleagons.frostedengineering.api.network.Network-"><code>setNetwork(Network)</code></a></span></div>
 <div class="block">This is used by our algorithms to set the Energy Network</div>
 <dl>
 <dt><span class="paramLabel">Parameters:</span></dt>
@@ -660,18 +660,18 @@ public&nbsp;<a href="../../../../../net/iceyleagons/frostedengineering/network/e
 </dl>
 </li>
 </ul>
-<a name="setNetwork-net.iceyleagons.frostedengineering.network.Network-">
+<a name="setNetwork-net.iceyleagons.frostedengineering.api.network.Network-">
 <!--   -->
 </a>
 <ul class="blockList">
 <li class="blockList">
 <h4>setNetwork</h4>
 <pre>public&nbsp;void&nbsp;setNetwork(<a href="../../../../../net/iceyleagons/frostedengineering/network/Network.html" title="interface in net.iceyleagons.frostedengineering.network">Network</a>&nbsp;net)</pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html#setNetwork-net.iceyleagons.frostedengineering.network.Network-">Unit</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html#setNetwork-net.iceyleagons.frostedengineering.api.network.Network-">Unit</a></code></span></div>
 <div class="block">This is used by our algorithms to set the Energy Network</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html#setNetwork-net.iceyleagons.frostedengineering.network.Network-">setNetwork</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a></code></dd>
+<dd><code><a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html#setNetwork-net.iceyleagons.frostedengineering.api.network.Network-">setNetwork</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>net</code> - is the <a href="../../../../../net/iceyleagons/frostedengineering/network/Network.html" title="interface in net.iceyleagons.frostedengineering.network"><code>Network</code></a> to set to, make sure that the Network is appropriate for the Unit's type!</dd>
 </dl>
@@ -762,7 +762,7 @@ public&nbsp;<a href="../../../../../net/iceyleagons/frostedengineering/network/e
 </dl>
 </li>
 </ul>
-<a name="addUnit-net.iceyleagons.frostedengineering.network.Unit-">
+<a name="addUnit-net.iceyleagons.frostedengineering.api.network.Unit-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -776,7 +776,7 @@ public&nbsp;<a href="../../../../../net/iceyleagons/frostedengineering/network/e
 </dl>
 </li>
 </ul>
-<a name="removeUnit-net.iceyleagons.frostedengineering.network.Unit-">
+<a name="removeUnit-net.iceyleagons.frostedengineering.api.network.Unit-">
 <!--   -->
 </a>
 <ul class="blockList">

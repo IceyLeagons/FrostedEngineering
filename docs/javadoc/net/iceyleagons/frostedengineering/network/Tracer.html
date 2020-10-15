@@ -100,7 +100,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>net.iceyleagons.frostedengineering.network.Tracer</li>
+<li>net.iceyleagons.frostedengineering.common.network.Tracer</li>
 </ul>
 </li>
 </ul>
@@ -154,33 +154,33 @@ extends java.lang.Object</pre>
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>static void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/iceyleagons/frostedengineering/network/Tracer.html#addToNetwork-net.iceyleagons.frostedengineering.network.Unit-net.iceyleagons.frostedengineering.network.Network-">addToNetwork</a></span>(<a href="../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;unit,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/iceyleagons/frostedengineering/network/Tracer.html#addToNetwork-net.iceyleagons.frostedengineering.api.network.Unit-net.iceyleagons.frostedengineering.api.network.Network-">addToNetwork</a></span>(<a href="../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;unit,
             <a href="../../../../net/iceyleagons/frostedengineering/network/Network.html" title="interface in net.iceyleagons.frostedengineering.network">Network</a>&nbsp;network)</code>
 <div class="block">This is a helper function to add Units to networks with one simple method rather than multiple.</div>
 </td>
 </tr>
 <tr id="i1" class="rowColor">
 <td class="colFirst"><code>private static java.util.List&lt;<a href="../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&gt;</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/iceyleagons/frostedengineering/network/Tracer.html#dfs-net.iceyleagons.frostedengineering.network.Unit-">dfs</a></span>(<a href="../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;unit)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/iceyleagons/frostedengineering/network/Tracer.html#dfs-net.iceyleagons.frostedengineering.api.network.Unit-">dfs</a></span>(<a href="../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;unit)</code>
 <div class="block">Depth First Search algorithm implementation using <code>Stack</code>
  This will return all the connections that we can use later on.</div>
 </td>
 </tr>
 <tr id="i2" class="altColor">
 <td class="colFirst"><code>static void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/iceyleagons/frostedengineering/network/Tracer.html#trace-net.iceyleagons.frostedengineering.network.Unit-">trace</a></span>(<a href="../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;unit)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/iceyleagons/frostedengineering/network/Tracer.html#trace-net.iceyleagons.frostedengineering.api.network.Unit-">trace</a></span>(<a href="../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;unit)</code>
 <div class="block">This will start the tracing, and decide between merging and splitting.</div>
 </td>
 </tr>
 <tr id="i3" class="rowColor">
 <td class="colFirst"><code>private static void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/iceyleagons/frostedengineering/network/Tracer.html#traceMerge-net.iceyleagons.frostedengineering.network.Unit-">traceMerge</a></span>(<a href="../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;unit)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/iceyleagons/frostedengineering/network/Tracer.html#traceMerge-net.iceyleagons.frostedengineering.api.network.Unit-">traceMerge</a></span>(<a href="../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;unit)</code>
 <div class="block">This will start the merging process.</div>
 </td>
 </tr>
 <tr id="i4" class="altColor">
 <td class="colFirst"><code>private static void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/iceyleagons/frostedengineering/network/Tracer.html#traceSplit-net.iceyleagons.frostedengineering.network.Unit-">traceSplit</a></span>(<a href="../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;unit)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../net/iceyleagons/frostedengineering/network/Tracer.html#traceSplit-net.iceyleagons.frostedengineering.api.network.Unit-">traceSplit</a></span>(<a href="../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;unit)</code>
 <div class="block">This will start the splitting process.</div>
 </td>
 </tr>
@@ -223,7 +223,7 @@ extends java.lang.Object</pre>
 <!--   -->
 </a>
 <h3>Method Detail</h3>
-<a name="trace-net.iceyleagons.frostedengineering.network.Unit-">
+<a name="trace-net.iceyleagons.frostedengineering.api.network.Unit-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -240,7 +240,7 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="traceMerge-net.iceyleagons.frostedengineering.network.Unit-">
+<a name="traceMerge-net.iceyleagons.frostedengineering.api.network.Unit-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -255,7 +255,7 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="traceSplit-net.iceyleagons.frostedengineering.network.Unit-">
+<a name="traceSplit-net.iceyleagons.frostedengineering.api.network.Unit-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -270,7 +270,7 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="addToNetwork-net.iceyleagons.frostedengineering.network.Unit-net.iceyleagons.frostedengineering.network.Network-">
+<a name="addToNetwork-net.iceyleagons.frostedengineering.api.network.Unit-net.iceyleagons.frostedengineering.api.network.Network-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -291,7 +291,7 @@ extends java.lang.Object</pre>
 </dl>
 </li>
 </ul>
-<a name="dfs-net.iceyleagons.frostedengineering.network.Unit-">
+<a name="dfs-net.iceyleagons.frostedengineering.api.network.Unit-">
 <!--   -->
 </a>
 <ul class="blockListLast">
