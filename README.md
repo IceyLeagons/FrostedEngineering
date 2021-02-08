@@ -2,7 +2,7 @@
 
 Frosted Engineering is a Minecraft plugin framework designed to create Minecraft mod like experience in Spigot/Bukkit/Paper.
 
-We achieve this with in-plugin resource pack generating to supply players with a collection of custom models and sounds you may register in the API.
+We achieve this with in-plugin resource pack generation to supply players with a collection of custom models and sounds you may register in the API.
 We also inject things directly into the Minecraft server, so we can have custom biomes, entities and so on!
 
 So to say it's a more modern version of SlimeFun, but just a framework you can use, so it's somewhat similiar to Fabric.
