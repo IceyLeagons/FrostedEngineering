@@ -1,0 +1,9 @@
+{
+  "name": "ComputerCraft",
+  "main": "net.iceyleagons.computercraft.Main",
+  "authors": [
+    "TOTHTOMI"
+  ],
+  "version": "1.0",
+  "description": "A test addon"
+}
