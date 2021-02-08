@@ -12,6 +12,7 @@ import net.iceyleagons.frostedengineering.api.other.registry.Registry;
 import net.iceyleagons.frostedengineering.api.textures.TextureProvider;
 import org.bukkit.Location;
 import org.bukkit.event.Listener;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Optional;
@@ -36,6 +37,13 @@ public interface IFrostedEngineering {
      * @return the {@link JavaPlugin} of the registered {@link IFrostedEngineering} instance
      */
     JavaPlugin getPlugin();
+
+    /**
+     * @param worldName name of the world
+     * @param id        id of the world
+     * @return the {@link ChunkGenerator} for the world.
+     */
+    ChunkGenerator getDefaultWorldGenerator(String worldName, String id);
 
     /**
      * @return an instance of {@link Registry} responsible for the tick runnables
@@ -143,10 +151,10 @@ public interface IFrostedEngineering {
     /**
      * Registers an API Service
      *
-     * @param api the API interface class
-     * @param provider the provider of such interface
+     * @param api                the API interface class
+     * @param provider           the provider of such interface
      * @param registrationHolder the registration holder {@link Addon}
-     * @param <T> the API interface
+     * @param <T>                the API interface
      * @throws AlreadyRegisteredException if an API with that interface has been already registered once
      */
     <T> void registerAPI(Class<T> api, T provider, Addon registrationHolder) throws AlreadyRegisteredException;
@@ -160,8 +168,6 @@ public interface IFrostedEngineering {
      * @return the {@link APIService} if there's any or an empty {@link java.util.Optional}
      */
     <T> Optional<APIService<T>> getAPI(Class<T> api, Addon getter);
-
-
 
 
 }

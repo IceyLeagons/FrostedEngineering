@@ -1,6 +1,9 @@
 package net.iceyleagons.frostedengineering;
 
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Bootstrapper for the official {@link net.iceyleagons.frostedengineering.api.IFrostedEngineering} instance
@@ -28,5 +31,11 @@ public class FrostedEngineeringBootstrapper extends JavaPlugin {
     @Override
     public void onEnable() {
         instance.onEnable();
+    }
+
+    @Nullable
+    @Override
+    public ChunkGenerator getDefaultWorldGenerator(@NotNull String worldName, @Nullable String id) {
+        return instance.getDefaultWorldGenerator(worldName, id);
     }
 }

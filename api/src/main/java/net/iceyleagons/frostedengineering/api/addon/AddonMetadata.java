@@ -54,6 +54,12 @@ public class AddonMetadata {
     private String[] dependencies;
 
     /**
+     * @return the worlds this addon generates.
+     */
+    @Getter
+    private String[] generator;
+
+    /**
      * @return the website of the addon
      */
     @Getter
@@ -75,15 +81,14 @@ public class AddonMetadata {
     @Getter
     private String description;
 
-
     /**
      * Will attempt to create an addon metadata, if an error occurs see the exceptions down below.
      *
      * @param inputStream the input stream of the metadata file
-     * @param file the addon jar file itself
-     * @throws IOException if the {@link InputStream#close()} returned an error
+     * @param file        the addon jar file itself
+     * @throws IOException                     if the {@link InputStream#close()} returned an error
      * @throws MalformedAddonMetadataException if the addon.json does not contain required fields
-     * @throws IllegalAccessException if the class fields can not be accessed by {@link Reflections} (internal error)
+     * @throws IllegalAccessException          if the class fields can not be accessed by {@link Reflections} (internal error)
      */
     public AddonMetadata(InputStream inputStream, File file) throws IOException, MalformedAddonMetadataException, IllegalAccessException {
         JSONObject jsonObject = getJSONObject(inputStream);
@@ -95,6 +100,8 @@ public class AddonMetadata {
         handleField("authors", jsonObject, file, true, true);
         handleField("dependencies", jsonObject, file, true, false);
 
+        handleField("generator", jsonObject, file, true, false);
+
         handleField("website", jsonObject, file, false, false);
         handleField("version", jsonObject, file, false, true);
         handleField("description", jsonObject, file, false, true);
@@ -105,13 +112,13 @@ public class AddonMetadata {
      * try to parse it as an array and fills in the appropriate field in this class, otherwise if it does not contain it and it's required
      * it will throw an error, otherwise no.
      *
-     * @param name the name of the field
-     * @param jsonObject the {@link JSONObject}
-     * @param addonFile the addon {@link File}
+     * @param name          the name of the field
+     * @param jsonObject    the {@link JSONObject}
+     * @param addonFile     the addon {@link File}
      * @param arrayExpected whether it's an array or not
-     * @param required whether it's required or not
+     * @param required      whether it's required or not
      * @throws MalformedAddonMetadataException if the metadata does not contain a required field
-     * @throws IllegalAccessException if the field in this jar can not be accessed
+     * @throws IllegalAccessException          if the field in this jar can not be accessed
      */
     private void handleField(String name, JSONObject jsonObject, File addonFile, boolean arrayExpected, boolean required) throws MalformedAddonMetadataException, IllegalAccessException {
         if (jsonObject.has(name)) {

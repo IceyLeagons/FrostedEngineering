@@ -18,7 +18,17 @@ targetCompatibility = 1.8
 dependencies {
     extraLibs project(':api')
     compileOnly 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
-    extraLibs group: 'net.iceyleagons', name: 'icicle', version: '1.3.6-SNAPSHOT'
+    extraLibs(group: 'net.iceyleagons', name: 'icicle', version: '1.3.7-SNAPSHOT') {
+        exclude group: "mysql"
+        exclude group: "org.xerial"
+        exclude group: "org.mariadb.jdbc"
+        exclude group: "com.h2database"
+        exclude group: "org.mongodb"
+        exclude group: "net.java.dev.jna"
+        exclude group: "org.eclipse.jetty"
+        exclude group: "com.squareup.okhttp3"
+        exclude group: "io.netty"
+    }
 
     compileOnly 'org.projectlombok:lombok:1.18.16'
     annotationProcessor 'org.projectlombok:lombok:1.18.16'
@@ -36,7 +46,6 @@ tasks.withType(JavaCompile) {
 }
 
 jar {
-
     from {
         configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
     }

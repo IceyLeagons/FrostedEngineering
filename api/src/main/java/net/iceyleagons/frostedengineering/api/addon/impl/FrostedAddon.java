@@ -11,6 +11,7 @@ import net.iceyleagons.frostedengineering.api.exceptions.AlreadyRegisteredExcept
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
@@ -75,6 +76,10 @@ public abstract class FrostedAddon implements Addon {
         return new File(addonManager.getAddonFolder(), addonMetadata.getName());
     }
 
+    @Override
+    public ChunkGenerator getDefaultChunkGenerator(String worldName, String id) {
+        return null;
+    }
 
     @Override
     public void onLoad() {}

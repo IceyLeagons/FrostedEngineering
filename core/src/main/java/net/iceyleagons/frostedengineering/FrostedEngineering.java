@@ -2,6 +2,7 @@ package net.iceyleagons.frostedengineering;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import net.iceyleagons.frostedengineering.addon.AddonGUI;
 import net.iceyleagons.frostedengineering.addon.AddonManagerImpl;
@@ -14,6 +15,7 @@ import net.iceyleagons.frostedengineering.api.multiblock.MultiblockPattern;
 import net.iceyleagons.frostedengineering.api.network.UnitManager;
 import net.iceyleagons.frostedengineering.api.other.APIService;
 import net.iceyleagons.frostedengineering.api.other.Interactable;
+import net.iceyleagons.frostedengineering.api.other.TriMap;
 import net.iceyleagons.frostedengineering.api.other.registry.PairRegistry;
 import net.iceyleagons.frostedengineering.api.other.registry.Registry;
 import net.iceyleagons.frostedengineering.api.textures.TextureProvider;
@@ -24,14 +26,17 @@ import net.iceyleagons.icicle.Icicle;
 import net.iceyleagons.icicle.IcicleFeatures;
 import net.iceyleagons.icicle.misc.ASCIIArt;
 import net.iceyleagons.icicle.misc.commands.CommandUtils;
+import net.iceyleagons.icicle.reflect.Reflections;
 import net.iceyleagons.icicle.time.SchedulerUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -73,6 +78,9 @@ public class FrostedEngineering implements IFrostedEngineering {
     private final PairRegistry<Class<?>, APIService<?>> apis = new PairRegistry<>();
     private final PairRegistry<Location, Interactable> interactablePairRegistry = new PairRegistry<>();
 
+    @Getter
+    private static TriMap<String, Object, Method> generatorMap = new TriMap<>(3);
+
     private boolean debug = false;
     private boolean lowComputing = false;
 
@@ -86,11 +94,13 @@ public class FrostedEngineering implements IFrostedEngineering {
     @SneakyThrows
     @Override
     public void onLoad() {
-
-        //ASCII Art and Copyright&Version notice
+        //ASCII Art and Copyright & Version notice
         Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "\r\n" + ASCIIArt.get("FrostedEngineering", null, getPlugin()));
         Bukkit.getConsoleSender().sendMessage(ChatColor.AQUA + "Version " + ChatColor.WHITE + version + ChatColor.AQUA + " | " + license);
         Bukkit.getConsoleSender().sendMessage(ChatColor.GRAY + Icicle.getCopyrightText());
+
+        // Load addons before #onEnable(). Now #onLoad() has an actual purpose.
+        addonManager.loadAddonsInFolder();
 
         //Updater updater = new Updater("asd", getPlugin());
         /*if (updater.checkForUpdates().getType() == Updater.ResponseType.NOT_UP_TO_DATE) {
@@ -151,11 +161,10 @@ public class FrostedEngineering implements IFrostedEngineering {
     @SneakyThrows
     @Override
     public void onEnable() {
-        Icicle.init(getPlugin(), IcicleFeatures.COMMANDS, IcicleFeatures.INVENTORIES);
+        Icicle.init(getPlugin(), IcicleFeatures.COMMANDS, IcicleFeatures.INVENTORIES, IcicleFeatures.PRELOAD_REFLECTION);
         setupRunnables();
         registerEventListener(new InteractListener(this));
         registerEventListener(new MultiblockListener(this));
-        addonManager.loadAddonsInFolder();
 
         setupMetrics();
         //AddonGUI must be initialized after addons have been loaded!
@@ -209,6 +218,14 @@ public class FrostedEngineering implements IFrostedEngineering {
         executorService.shutdown();
     }
 
+
+    @Override
+    public ChunkGenerator getDefaultWorldGenerator(String worldName, String id) {
+        if (generatorMap.containsKey(worldName)) {
+            Map.Entry<Object, Method> methodEntry = generatorMap.getEntry(worldName);
+            return Reflections.invoke(methodEntry.getValue(), ChunkGenerator.class, methodEntry.getKey(), worldName, id);
+        } else return null;
+    }
 
     @Override
     public Registry<MultiblockPattern> getMultiblockRegistry() {

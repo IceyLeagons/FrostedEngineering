@@ -2,6 +2,7 @@ package net.iceyleagons.frostedengineering.addon;
 
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import net.iceyleagons.frostedengineering.FrostedEngineering;
 import net.iceyleagons.frostedengineering.api.IFrostedEngineering;
 import net.iceyleagons.frostedengineering.api.addon.Addon;
 import net.iceyleagons.frostedengineering.api.addon.AddonLoader;
@@ -11,6 +12,7 @@ import net.iceyleagons.frostedengineering.api.addon.impl.FrostedAddon;
 import net.iceyleagons.frostedengineering.api.exceptions.addon.AddonLoadingException;
 import net.iceyleagons.frostedengineering.api.exceptions.addon.InvalidAddonException;
 import net.iceyleagons.frostedengineering.api.exceptions.addon.MalformedAddonMetadataException;
+import net.iceyleagons.icicle.reflect.Reflections;
 
 import java.io.File;
 import java.io.IOException;
@@ -55,7 +57,7 @@ public class AddonLoaderImpl implements AddonLoader {
         try {
             AddonMetadata addonMetadata = getMetaData(file);
 
-            String authors = addonMetadata.getAuthors() != null ? " by "+String.join(", ", addonMetadata.getAuthors()) : "";
+            String authors = addonMetadata.getAuthors() != null ? " by " + String.join(", ", addonMetadata.getAuthors()) : "";
             frostedEngineering.getLogger().info("[FE-ADDONS] Loading in " + addonMetadata.getName() + " v" + addonMetadata.getVersion() + authors);
 
             ClassLoader classLoader = URLClassLoader.newInstance(new URL[]{file.toURI().toURL()}, getClass().getClassLoader());
@@ -66,9 +68,15 @@ public class AddonLoaderImpl implements AddonLoader {
             setup.setAccessible(true);
 
             Addon addon = addonClass.newInstance();
-            setup.invoke(addon,frostedEngineering, addonManager, this, addonMetadata, classLoader);
+            setup.invoke(addon, frostedEngineering, addonManager, this, addonMetadata, classLoader);
             //TODO load dependencies before loading this addon
             addon.onLoad();
+
+            if (addonMetadata.getGenerator() != null) {
+                Method generatorMethod = Reflections.getMethod(addonClass, "getDefaultChunkGenerator", true, String.class, String.class);
+                for (String generator : addonMetadata.getGenerator())
+                    FrostedEngineering.getGeneratorMap().put(generator, addon, generatorMethod);
+            }
 
             return addon;
         } catch (MalformedAddonMetadataException e) {
@@ -84,7 +92,7 @@ public class AddonLoaderImpl implements AddonLoader {
      * @param file is (hopefully) the addon jar file
      * @return the generated {@link AddonMetadata}
      * @throws MalformedAddonMetadataException if the addon.json file is not found or malformed
-     * @throws IOException if a java related error occurs
+     * @throws IOException                     if a java related error occurs
      */
     private static AddonMetadata getMetaData(@NonNull File file) throws MalformedAddonMetadataException, IOException, IllegalAccessException {
         try (JarFile jarFile = new JarFile(file)) {
