@@ -26,5 +26,6 @@ jobs:
       uses: actions/upload-artifact@v2.2.2
       with:
         name: artifacts
-        path: "*.jar"
+        path: core\build\libs\core.jar
+              api\build\libs\api.jar
         retention-days: 5
