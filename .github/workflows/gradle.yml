@@ -23,7 +23,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew build
     - name: Upload build artifact(s)
-      uses: actions/upload-arifact@v2.2.2
+      uses: actions/upload-artifact@v2.2.2
       with:
         name: artifacts
         path: "*.jar"
