@@ -1,9 +1,0 @@
-name: FrostedEngineering
-version: 1.0
-api-version: 1.13
-description: FrostedEngineering
-load: STARTUP
-authors:
-  - TOTHTOMI
-  - Gabe
-main: net.iceyleagons.frostedengineering.FrostedEngineeringBootstrapper

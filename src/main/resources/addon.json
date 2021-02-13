@@ -1,0 +1,12 @@
+{
+  "name": "Frosted Generator",
+  "main": "net.iceyleagons.worldgenerator.AddonMain",
+  "authors": [
+    "Gabe"
+  ],
+  "generator": [
+    "world"
+  ],
+  "version": "0.1",
+  "description": "A world generator with stunning looks"
+}
