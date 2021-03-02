@@ -2,7 +2,6 @@ package net.iceyleagons.frostedengineering;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.SneakyThrows;
 import net.iceyleagons.frostedengineering.addon.AddonGUI;
 import net.iceyleagons.frostedengineering.addon.AddonManagerImpl;
@@ -18,9 +17,10 @@ import net.iceyleagons.frostedengineering.api.other.Interactable;
 import net.iceyleagons.frostedengineering.api.other.TriMap;
 import net.iceyleagons.frostedengineering.api.other.registry.PairRegistry;
 import net.iceyleagons.frostedengineering.api.other.registry.Registry;
-import net.iceyleagons.frostedengineering.api.textures.TextureProvider;
+import net.iceyleagons.frostedengineering.api.textures.ITextureProvider;
 import net.iceyleagons.frostedengineering.listeners.InteractListener;
 import net.iceyleagons.frostedengineering.listeners.MultiblockListener;
+import net.iceyleagons.frostedengineering.textures.TextureProvider;
 import net.iceyleagons.frostedengineering.utils.Metrics;
 import net.iceyleagons.icicle.Icicle;
 import net.iceyleagons.icicle.IcicleFeatures;
@@ -68,6 +68,8 @@ public class FrostedEngineering implements IFrostedEngineering {
 
     private final ExecutorService executorService;
 
+    private final ITextureProvider textureProvider;
+
     private final Registry<Runnable> onTickManager = new Registry<>();
     private final Registry<Runnable> onSecondManager = new Registry<>();
 
@@ -89,6 +91,7 @@ public class FrostedEngineering implements IFrostedEngineering {
         this.logger = javaPlugin.getLogger();
         this.executorService = Executors.newCachedThreadPool();
         this.addonManager = new AddonManagerImpl(this);
+        this.textureProvider = new TextureProvider();
     }
 
     @SneakyThrows
@@ -112,8 +115,8 @@ public class FrostedEngineering implements IFrostedEngineering {
     }
 
     @Override
-    public TextureProvider getTextureProvider() {
-        return null;
+    public ITextureProvider getTextureProvider() {
+        return textureProvider;
     }
 
     @Override

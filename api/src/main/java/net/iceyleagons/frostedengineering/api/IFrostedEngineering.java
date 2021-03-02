@@ -9,7 +9,7 @@ import net.iceyleagons.frostedengineering.api.other.APIService;
 import net.iceyleagons.frostedengineering.api.other.Interactable;
 import net.iceyleagons.frostedengineering.api.other.registry.PairRegistry;
 import net.iceyleagons.frostedengineering.api.other.registry.Registry;
-import net.iceyleagons.frostedengineering.api.textures.TextureProvider;
+import net.iceyleagons.frostedengineering.api.textures.ITextureProvider;
 import org.bukkit.Location;
 import org.bukkit.event.Listener;
 import org.bukkit.generator.ChunkGenerator;
@@ -134,9 +134,9 @@ public interface IFrostedEngineering {
     AddonManager getAddonManager();
 
     /**
-     * @return the {@link TextureProvider} implementation used by this instance of {@link IFrostedEngineering}
+     * @return the {@link ITextureProvider} implementation used by this instance of {@link IFrostedEngineering}
      */
-    TextureProvider getTextureProvider();
+    ITextureProvider getTextureProvider();
 
     /**
      * @return the {@link ExecutorService} used by this instance of {@link IFrostedEngineering}
