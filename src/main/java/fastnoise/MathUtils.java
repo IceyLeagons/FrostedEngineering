@@ -2288,6 +2288,7 @@ public class MathUtils {
     @Data
     public static class Rotation {
 
+        @NonNull
         public float x, y, z;
         float rX, rY, rZ;
 
