@@ -3,38 +3,12 @@
   <component name="CompilerConfiguration">
     <annotationProcessing>
       <profile default="true" name="Default" enabled="true" />
-      <profile name="Gradle Imported" enabled="true">
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
-          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.14/bdc3e8dee0b300d3fd9414678fb9ddb42d5e20fb/lombok-1.18.14.jar" />
-        </processorPath>
-        <module name="frostedengineering.common.test" />
-        <module name="frostedengineering.API.main" />
-        <module name="frostedengineering.utils.main" />
-        <module name="frostedengineering.API.test" />
-        <module name="frostedengineering.main" />
-        <module name="frostedengineering.test" />
-        <module name="frostedengineering.common.main" />
-        <module name="frostedengineering.utils.test" />
+        <module name="FrostedEngineering" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="API" target="1.8" />
-      <module name="API.FrostedEngineering" target="1.8" />
-      <module name="API.FrostedEngineering.main" target="1.8" />
-      <module name="API.FrostedEngineering.test" target="1.8" />
-      <module name="API.main" target="1.8" />
-      <module name="API.test" target="1.8" />
-      <module name="common" target="1.8" />
-      <module name="common.main" target="1.8" />
-      <module name="common.test" target="1.8" />
-      <module name="FrostedEngineering" target="1.8" />
-      <module name="net.iceyleagons.frostedengineering.FrostedEngineering" target="1.8" />
-      <module name="net.iceyleagons.frostedengineering.FrostedEngineering.main" target="1.8" />
-      <module name="net.iceyleagons.frostedengineering.FrostedEngineering.test" target="1.8" />
-      <module name="utils" target="1.8" />
-      <module name="utils.main" target="1.8" />
-      <module name="utils.test" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
 </project>

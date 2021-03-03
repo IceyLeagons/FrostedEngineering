@@ -100,7 +100,7 @@ var activeTableTab = "activeTableTab";
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>net.iceyleagons.frostedengineering.common.network.energy.EnergyNetwork</li>
+<li>net.iceyleagons.frostedengineering.network.energy.EnergyNetwork</li>
 </ul>
 </li>
 </ul>
@@ -118,7 +118,7 @@ extends java.lang.Object
 implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Network.html" title="interface in net.iceyleagons.frostedengineering.network">Network</a>, java.io.Serializable</pre>
 <dl>
 <dt><span class="seeLabel">See Also:</span></dt>
-<dd><a href="../../../../../serialized-form.html#net.iceyleagons.frostedengineering.common.network.energy.EnergyNetwork">Serialized Form</a></dd>
+<dd><a href="../../../../../serialized-form.html#net.iceyleagons.frostedengineering.network.energy.EnergyNetwork">Serialized Form</a></dd>
 </dl>
 </li>
 </ul>
@@ -184,7 +184,7 @@ implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Ne
 </tr>
 <tr id="i0" class="altColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyNetwork.html#addUnit-net.iceyleagons.frostedengineering.api.network.Unit-">addUnit</a></span>(<a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;unit)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyNetwork.html#addUnit-net.iceyleagons.frostedengineering.network.Unit-">addUnit</a></span>(<a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;unit)</code>
 <div class="block">This method is used to add Units to the network</div>
 </td>
 </tr>
@@ -232,13 +232,13 @@ implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Ne
 </tr>
 <tr id="i11" class="rowColor">
 <td class="colFirst"><code>void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyNetwork.html#removeUnit-net.iceyleagons.frostedengineering.api.network.Unit-">removeUnit</a></span>(<a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;unit)</code>
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyNetwork.html#removeUnit-net.iceyleagons.frostedengineering.network.Unit-">removeUnit</a></span>(<a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;unit)</code>
 <div class="block">This method is used to remove Units from the network</div>
 </td>
 </tr>
 <tr id="i12" class="altColor">
 <td class="colFirst"><code>static void</code></td>
-<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyNetwork.html#serialize-net.iceyleagons.frostedengineering.common.network.energy.EnergyNetwork-java.io.File-">serialize</a></span>(<a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyNetwork.html" title="class in net.iceyleagons.frostedengineering.network.energy">EnergyNetwork</a>&nbsp;network,
+<td class="colLast"><code><span class="memberNameLink"><a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyNetwork.html#serialize-net.iceyleagons.frostedengineering.network.energy.EnergyNetwork-java.io.File-">serialize</a></span>(<a href="../../../../../net/iceyleagons/frostedengineering/network/energy/EnergyNetwork.html" title="class in net.iceyleagons.frostedengineering.network.energy">EnergyNetwork</a>&nbsp;network,
          java.io.File&nbsp;file)</code>&nbsp;</td>
 </tr>
 <tr id="i13" class="rowColor">
@@ -403,7 +403,7 @@ implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Ne
                                java.util.Map&lt;java.lang.Float,<a href="../../../../../net/iceyleagons/frostedengineering/network/energy/components/ChargableComponent.html" title="interface in net.iceyleagons.frostedengineering.network.energy.components">ChargableComponent</a>&gt;&nbsp;chargableComponentMap)</pre>
 </li>
 </ul>
-<a name="addUnit-net.iceyleagons.frostedengineering.api.network.Unit-">
+<a name="addUnit-net.iceyleagons.frostedengineering.network.Unit-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -412,11 +412,11 @@ implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Ne
 <pre>public&nbsp;void&nbsp;addUnit(@NonNull
                     <a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;unit)
              throws <a href="../../../../../net/iceyleagons/frostedengineering/network/energy/exceptions/UnsupportedUnitType.html" title="class in net.iceyleagons.frostedengineering.network.energy.exceptions">UnsupportedUnitType</a></pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/iceyleagons/frostedengineering/network/Network.html#addUnit-net.iceyleagons.frostedengineering.api.network.Unit-">Network</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/iceyleagons/frostedengineering/network/Network.html#addUnit-net.iceyleagons.frostedengineering.network.Unit-">Network</a></code></span></div>
 <div class="block">This method is used to add Units to the network</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../net/iceyleagons/frostedengineering/network/Network.html#addUnit-net.iceyleagons.frostedengineering.api.network.Unit-">addUnit</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/iceyleagons/frostedengineering/network/Network.html" title="interface in net.iceyleagons.frostedengineering.network">Network</a></code></dd>
+<dd><code><a href="../../../../../net/iceyleagons/frostedengineering/network/Network.html#addUnit-net.iceyleagons.frostedengineering.network.Unit-">addUnit</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/iceyleagons/frostedengineering/network/Network.html" title="interface in net.iceyleagons.frostedengineering.network">Network</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>unit</code> - is the <a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network"><code>Unit</code></a> to add</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -424,7 +424,7 @@ implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Ne
 </dl>
 </li>
 </ul>
-<a name="removeUnit-net.iceyleagons.frostedengineering.api.network.Unit-">
+<a name="removeUnit-net.iceyleagons.frostedengineering.network.Unit-">
 <!--   -->
 </a>
 <ul class="blockList">
@@ -433,11 +433,11 @@ implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Ne
 <pre>public&nbsp;void&nbsp;removeUnit(@NonNull
                        <a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network">Unit</a>&nbsp;unit)
                 throws <a href="../../../../../net/iceyleagons/frostedengineering/network/energy/exceptions/UnsupportedUnitType.html" title="class in net.iceyleagons.frostedengineering.network.energy.exceptions">UnsupportedUnitType</a></pre>
-<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/iceyleagons/frostedengineering/network/Network.html#removeUnit-net.iceyleagons.frostedengineering.api.network.Unit-">Network</a></code></span></div>
+<div class="block"><span class="descfrmTypeLabel">Description copied from interface:&nbsp;<code><a href="../../../../../net/iceyleagons/frostedengineering/network/Network.html#removeUnit-net.iceyleagons.frostedengineering.network.Unit-">Network</a></code></span></div>
 <div class="block">This method is used to remove Units from the network</div>
 <dl>
 <dt><span class="overrideSpecifyLabel">Specified by:</span></dt>
-<dd><code><a href="../../../../../net/iceyleagons/frostedengineering/network/Network.html#removeUnit-net.iceyleagons.frostedengineering.api.network.Unit-">removeUnit</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/iceyleagons/frostedengineering/network/Network.html" title="interface in net.iceyleagons.frostedengineering.network">Network</a></code></dd>
+<dd><code><a href="../../../../../net/iceyleagons/frostedengineering/network/Network.html#removeUnit-net.iceyleagons.frostedengineering.network.Unit-">removeUnit</a></code>&nbsp;in interface&nbsp;<code><a href="../../../../../net/iceyleagons/frostedengineering/network/Network.html" title="interface in net.iceyleagons.frostedengineering.network">Network</a></code></dd>
 <dt><span class="paramLabel">Parameters:</span></dt>
 <dd><code>unit</code> - is the <a href="../../../../../net/iceyleagons/frostedengineering/network/Unit.html" title="interface in net.iceyleagons.frostedengineering.network"><code>Unit</code></a> to delete</dd>
 <dt><span class="throwsLabel">Throws:</span></dt>
@@ -473,7 +473,7 @@ implements <a href="../../../../../net/iceyleagons/frostedengineering/network/Ne
 </dl>
 </li>
 </ul>
-<a name="serialize-net.iceyleagons.frostedengineering.common.network.energy.EnergyNetwork-java.io.File-">
+<a name="serialize-net.iceyleagons.frostedengineering.network.energy.EnergyNetwork-java.io.File-">
 <!--   -->
 </a>
 <ul class="blockList">

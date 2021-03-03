@@ -1,0 +1,6 @@
+{
+  "parent": "item/parent.json",
+  "textures": {
+    "layer0": "guis/gray.png"
+  }
+}
