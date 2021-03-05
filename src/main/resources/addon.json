@@ -1,9 +1,0 @@
-{
-  "name": "Dynamic Server",
-  "main": "net.iceyleagons.dynamicserver.DynamicServer",
-  "authors": [
-    "Gabe"
-  ],
-  "version": "0.1",
-  "description": "An addon aimed around performance."
-}
