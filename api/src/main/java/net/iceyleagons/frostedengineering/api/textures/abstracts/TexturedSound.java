@@ -1,6 +1,7 @@
 package net.iceyleagons.frostedengineering.api.textures.abstracts;
 
 import net.iceyleagons.frostedengineering.api.textures.types.ITextured;
+import org.bukkit.Material;
 
 public class TexturedSound implements ITextured {
     private final String name;
@@ -19,5 +20,10 @@ public class TexturedSound implements ITextured {
     @Override
     public String getLocation() {
         return location;
+    }
+
+    @Override
+    public Material getBaseMaterial() {
+        return null;
     }
 }

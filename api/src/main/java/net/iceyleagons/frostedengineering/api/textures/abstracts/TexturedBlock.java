@@ -15,17 +15,19 @@ public class TexturedBlock implements ITextured, IPlaceable, IBreakable {
     private final Size size;
     private final int idealBreakTime;
     private final Material idealTool;
+    private final Material material;
 
-    public TexturedBlock(Size size, String name, String location) {
-        this(size, name, location, Material.AIR, 10);
+    public TexturedBlock(Size size, String name, String location, Material material) {
+        this(size, name, location, material, Material.AIR, 10);
     }
 
-    public TexturedBlock(Size size, String name, String location, Material material, int breakTime) {
+    public TexturedBlock(Size size, String name, String location, Material material, Material idealTool, int breakTime) {
         this.size = size;
         this.name = name;
         this.location = location;
-        this.idealTool = material;
+        this.idealTool = idealTool;
         this.idealBreakTime = breakTime;
+        this.material = material;
     }
 
     @Override
@@ -66,6 +68,11 @@ public class TexturedBlock implements ITextured, IPlaceable, IBreakable {
     @Override
     public String getLocation() {
         return location;
+    }
+
+    @Override
+    public Material getBaseMaterial() {
+        return material;
     }
 
     @Override

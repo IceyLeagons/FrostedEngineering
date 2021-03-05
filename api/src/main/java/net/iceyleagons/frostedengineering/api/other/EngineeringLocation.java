@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import net.iceyleagons.frostedengineering.api.IFrostedEngineering;
 import net.iceyleagons.frostedengineering.api.network.Unit;
-import net.iceyleagons.icicle.location.Cuboid;
+import net.iceyleagons.icicle.location.block.Cuboid;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Sound;

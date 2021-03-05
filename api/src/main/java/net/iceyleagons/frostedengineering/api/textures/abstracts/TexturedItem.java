@@ -3,6 +3,7 @@ package net.iceyleagons.frostedengineering.api.textures.abstracts;
 import lombok.Getter;
 import net.iceyleagons.frostedengineering.api.textures.types.IInteractive;
 import net.iceyleagons.frostedengineering.api.textures.types.ITextured;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.EquipmentSlot;
@@ -14,24 +15,26 @@ public class TexturedItem implements ITextured, IInteractive {
     private final String title;
     private final String name;
     private final String location;
+    private final Material material;
 
-    public TexturedItem(String name, String location) {
-        this(name, location, name, null);
+    public TexturedItem(Material material, String name, String location) {
+        this(material, name, location, name, null);
     }
 
-    public TexturedItem(String name, String location, String title, String[] lore) {
+    public TexturedItem(Material material, String name, String location, String title, String[] lore) {
         this.name = name;
         this.location = location;
         this.title = title;
         this.lore = lore;
+        this.material = material;
     }
 
-    public TexturedItem(String name, String location, String title) {
-        this(name, location, title, null);
+    public TexturedItem(Material material, String name, String location, String title) {
+        this(material, name, location, title, null);
     }
 
-    public TexturedItem(String name, String location, String[] lore) {
-        this(name, location, name, lore);
+    public TexturedItem(Material material, String name, String location, String[] lore) {
+        this(material, name, location, name, lore);
     }
 
     @Override
@@ -47,5 +50,10 @@ public class TexturedItem implements ITextured, IInteractive {
     @Override
     public String getLocation() {
         return location;
+    }
+
+    @Override
+    public Material getBaseMaterial() {
+        return material;
     }
 }

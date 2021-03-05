@@ -20,12 +20,14 @@ import net.iceyleagons.frostedengineering.api.other.registry.Registry;
 import net.iceyleagons.frostedengineering.api.textures.ITextureProvider;
 import net.iceyleagons.frostedengineering.listeners.InteractListener;
 import net.iceyleagons.frostedengineering.listeners.MultiblockListener;
+import net.iceyleagons.frostedengineering.textures.TextureListeners;
 import net.iceyleagons.frostedengineering.textures.TextureProvider;
+import net.iceyleagons.frostedengineering.textures.uploaders.FrostedHost;
 import net.iceyleagons.frostedengineering.utils.Metrics;
+import net.iceyleagons.frostedengineering.utils.serialization.Serializer;
 import net.iceyleagons.icicle.Icicle;
-import net.iceyleagons.icicle.IcicleFeatures;
+import net.iceyleagons.icicle.commands.CommandUtils;
 import net.iceyleagons.icicle.misc.ASCIIArt;
-import net.iceyleagons.icicle.misc.commands.CommandUtils;
 import net.iceyleagons.icicle.reflect.Reflections;
 import net.iceyleagons.icicle.time.SchedulerUtils;
 import org.bukkit.Bukkit;
@@ -66,6 +68,8 @@ public class FrostedEngineering implements IFrostedEngineering {
     private final JavaPlugin plugin;
     private final Logger logger;
 
+    private final Serializer serializer;
+
     private final ExecutorService executorService;
 
     private final ITextureProvider textureProvider;
@@ -81,13 +85,14 @@ public class FrostedEngineering implements IFrostedEngineering {
     private final PairRegistry<Location, Interactable> interactablePairRegistry = new PairRegistry<>();
 
     @Getter
-    private static TriMap<String, Object, Method> generatorMap = new TriMap<>(3);
+    private static final TriMap<String, Object, Method> generatorMap = new TriMap<>(3);
 
     private boolean debug = false;
     private boolean lowComputing = false;
 
     public FrostedEngineering(JavaPlugin javaPlugin) {
         this.plugin = javaPlugin;
+        this.serializer = new Serializer();
         this.logger = javaPlugin.getLogger();
         this.executorService = Executors.newCachedThreadPool();
         this.addonManager = new AddonManagerImpl(this);
@@ -164,10 +169,10 @@ public class FrostedEngineering implements IFrostedEngineering {
     @SneakyThrows
     @Override
     public void onEnable() {
-        Icicle.init(getPlugin(), IcicleFeatures.COMMANDS, IcicleFeatures.INVENTORIES, IcicleFeatures.PRELOAD_REFLECTION);
         setupRunnables();
         registerEventListener(new InteractListener(this));
         registerEventListener(new MultiblockListener(this));
+        registerEventListener(new TextureListeners(this));
 
         setupMetrics();
         //AddonGUI must be initialized after addons have been loaded!
@@ -175,12 +180,15 @@ public class FrostedEngineering implements IFrostedEngineering {
 
         //Registering main command
         Command command = new Command(addonGUI, this);
-        CommandUtils.injectCommand("frostedengineering", command, command, "/fe", "Main command for FrostedEngineering", "fe.main",
+        CommandUtils commandUtils = new CommandUtils(this.getPlugin());
+        commandUtils.injectCommand("frostedengineering", command, command, "/fe", "Main command for FrostedEngineering", "fe.main",
                 "No permission!", Collections.singletonList("fe"));
-
 
         //Make sure addons are loaded/enabled lastly to make sure all necessary methods/fields are initialized before
         addonManager.enableAddons();
+
+        // After we load all the addons, we start uploading the resource pack.
+        new FrostedHost().commence(this, getPlugin().getDataFolder());
     }
 
     private void setupMetrics() {
